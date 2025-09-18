@@ -1,0 +1,77 @@
+import { FlashList } from "@shopify/flash-list";
+import { ImageStyle } from "expo-image";
+import { router } from "expo-router";
+import { memo } from "react";
+import { StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
+import Animated, { FadeInLeft } from "react-native-reanimated";
+import { CardPoster } from "./Item/CardPoster";
+import { ListHeader } from "./ListHeader";
+
+interface LatestUpdatesProps {
+    updates: any[];
+    showHeader?: boolean;
+    headerTextStyle?: StyleProp<TextStyle>;
+    containerStye?: StyleProp<ViewStyle>;
+    imageContainer?: StyleProp<ViewStyle>;
+    imageStyle?: StyleProp<ImageStyle>;
+    imageTextTitle?: StyleProp<TextStyle>;
+    imageTextVoice?: StyleProp<TextStyle>;
+    episodeTextStyle?: StyleProp<TextStyle>;
+}
+
+const LatestUpdates = (props: LatestUpdatesProps) => {
+    console.log('render last updates')
+    if (!props.updates || props.updates.length < 1) return null;
+
+    const renderItem = ({ item, index }: { item: any, index: number }) => {
+        const handeNavigate = () => router.push({
+            pathname: '/(screens)/(anime)/[id]',
+            params: { id: item.shikimori_id }
+        });
+
+        return (
+            <Animated.View entering={index < 4 ? FadeInLeft.delay(100 * (index)).duration(750) : undefined}>
+                <CardPoster
+                    index={index}
+                    img={item?.poster?.originalUrl}
+                    imgStyle={props.imageStyle}
+                    container={props.imageContainer}
+                    transition={700}
+                    imgPriority={'high'}
+                    onPress={handeNavigate}
+                >
+                    <Text style={props.episodeTextStyle} numberOfLines={2}>Серия {item.last_episode}</Text>
+                    <Text style={props.imageTextTitle} numberOfLines={2}>{item.title}</Text>
+                    <Text style={props.imageTextVoice} numberOfLines={2}>{item.translation.title}</Text>
+                </CardPoster>
+            </Animated.View >
+        )
+    };
+
+    return (
+        <View>
+            <ListHeader
+                text="Последние обновления"
+                textStyle={props.headerTextStyle}
+                iconName="arrow.right"
+                iconColor="white"
+                iconSize={18}
+                containerStyle={{
+                    paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+                }}
+                onPress={() => router.push({ pathname: '/(screens)/(anime)/lastUpdates' })}
+            />
+
+            <FlashList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={props.updates}
+                contentContainerStyle={props.containerStye}
+                keyExtractor={(item) => `t-${item.translation.id}-shiki-${item.shikimori_id}-${item.title}`}
+                renderItem={renderItem}
+            />
+        </View>
+    )
+};
+
+export default memo(LatestUpdates);

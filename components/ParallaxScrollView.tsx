@@ -1,82 +1,95 @@
-import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet } from 'react-native';
+import { forwardRef, type PropsWithChildren, type ReactElement } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
+    AnimatedScrollViewProps,
+    Extrapolation,
+    interpolate,
+    useAnimatedRef,
+    useAnimatedStyle,
+    useScrollOffset
 } from 'react-native-reanimated';
 
-import { ThemedView } from '@/components/ThemedView';
-import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-const HEADER_HEIGHT = 250;
-
 type Props = PropsWithChildren<{
-  headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
-}>;
+    HEADER_HEIGHT?: number,
+    headerImage: ReactElement;
+    headerBackgroundColor: { dark: string; light: string };
+    useScale?: boolean,
+    tabBottomHeight?: number,
+} & AnimatedScrollViewProps>;
 
-export default function ParallaxScrollView({
-  children,
-  headerImage,
-  headerBackgroundColor,
-}: Props) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
-  const bottom = useBottomTabOverflow();
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
-          ),
-        },
-        {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
-        },
-      ],
-    };
-  });
 
-  return (
-    <ThemedView style={styles.container}>
-      <Animated.ScrollView
-        ref={scrollRef}
-        scrollEventThrottle={16}
-        scrollIndicatorInsets={{ bottom }}
-        contentContainerStyle={{ paddingBottom: bottom }}>
-        <Animated.View
-          style={[
-            styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
-            headerAnimatedStyle,
-          ]}>
-          {headerImage}
-        </Animated.View>
-        <ThemedView style={styles.content}>{children}</ThemedView>
-      </Animated.ScrollView>
-    </ThemedView>
-  );
-}
+const ParallaxScrollView = forwardRef<Animated.ScrollView, Props>(
+    (
+        {
+            children,
+            headerImage,
+            headerBackgroundColor,
+            tabBottomHeight,
+            useScale = true,
+            HEADER_HEIGHT = 500,
+            ...restProps
+        },
+        ref
+    ) => {
+        const innerRef = useAnimatedRef<Animated.ScrollView>();
+        const scrollRef = (ref as React.RefObject<Animated.ScrollView>) || innerRef;
+
+        const scrollOffset = useScrollOffset(scrollRef);
+        const headerAnimatedStyle = useAnimatedStyle(() => {
+            return {
+                transform: [
+                    {
+                        translateY: interpolate(
+                            scrollOffset.value,
+                            [-HEADER_HEIGHT, 0, 0],
+                            [-HEADER_HEIGHT, 0, HEADER_HEIGHT * 0.35],
+                            Extrapolation.CLAMP
+                        ),
+                    },
+                    {
+                        scale: interpolate(scrollOffset.value,
+                            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
+                            useScale ? [2, 1, 1] : [1, 1, 1]),
+                    },
+                ],
+            };
+        });
+
+        return (
+            <View style={styles.container}>
+                <Animated.ScrollView
+                    {...restProps}
+                    ref={scrollRef}
+                    scrollEventThrottle={16}
+                    scrollIndicatorInsets={{ bottom: tabBottomHeight }}
+                    contentContainerStyle={{ paddingBottom: tabBottomHeight ? tabBottomHeight : 20 }}>
+                    <Animated.View
+                        style={[
+                            styles.header,
+                            { height: HEADER_HEIGHT, },
+                            headerAnimatedStyle,
+                        ]}>
+                        {headerImage}
+                    </Animated.View>
+                    <View style={styles.content}>{children}</View>
+                </Animated.ScrollView>
+            </View>
+        );
+    })
+
+export default ParallaxScrollView;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    height: HEADER_HEIGHT,
-    overflow: 'hidden',
-  },
-  content: {
-    flex: 1,
-    padding: 32,
-    gap: 16,
-    overflow: 'hidden',
-  },
+    container: {
+        flex: 1,
+    },
+    header: {
+        overflow: 'hidden',
+        zIndex: 2
+    },
+    content: {
+        flex: 1,
+        gap: 16,
+        overflow: 'hidden',
+    },
 });
