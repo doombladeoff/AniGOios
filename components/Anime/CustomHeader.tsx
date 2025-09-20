@@ -1,19 +1,20 @@
 import { Card } from "@/components/Anime/Card";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { Button, Host, Image as UIImage } from "@expo/ui/swift-ui";
+import { frame, padding } from "@expo/ui/swift-ui/modifiers";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { memo, useMemo } from "react";
 import {
     Dimensions,
-    Pressable,
     StyleSheet,
     Text,
-    View,
+    View
 } from "react-native";
 import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Status } from "../Status";
+import { Status } from "./Status";
 
 interface HeaderProps {
     animeData: any;
@@ -22,20 +23,17 @@ interface HeaderProps {
     showStatus?: boolean;
     statusHeader?: string | null;
     fallbackImage?: string;
-    setPosterLoad: React.Dispatch<React.SetStateAction<boolean>>;
-    setShowPosters: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get("screen");
 
-const Header = ({
+const CustomHeader = ({
     animeData,
     Right,
     animatedStyle1,
     showStatus,
     statusHeader,
     fallbackImage,
-    setPosterLoad,
 }: HeaderProps) => {
     const insets = useSafeAreaInsets();
 
@@ -43,15 +41,17 @@ const Header = ({
 
     return (
         <>
-            {/* Top bar */}
             <View style={[styles.topBar, { paddingTop: topInset }]}>
-                <Pressable onPress={() => router.back()} hitSlop={20}>
-                    <IconSymbol name="arrow.left" size={20} color="white" />
-                </Pressable>
+                <Host style={{ width: 35, height: 35 }}>
+                    <Button modifiers={[frame({ width: 35, height: 35 })]} variant='glass'
+                        onPress={() => router.back()}
+                    >
+                        <UIImage systemName="arrow.left" size={20} modifiers={[padding({ vertical: 8 })]} />
+                    </Button>
+                </Host>
                 {Right}
             </View>
 
-            {/* Info row */}
             <Animated.View
                 entering={FadeIn.delay(500)}
                 style={[styles.infoRow, { paddingTop: topInset }]}
@@ -75,7 +75,6 @@ const Header = ({
                 </View>
             </Animated.View>
 
-            {/* Poster block + background */}
             <Animated.View style={[styles.posterWrapper, animatedStyle1]}>
                 <View style={[styles.posterContainer, { marginVertical: insets.top }]}>
                     <Animated.View
@@ -84,7 +83,7 @@ const Header = ({
                     >
                         <Card>
                             {showStatus && (
-                                <Status showType="poster" status={statusHeader as string} />
+                                <Status id={animeData.malId} showType="poster" status={statusHeader as string} />
                             )}
                             <Image
                                 source={{ uri: animeData?.poster?.main2xUrl }}
@@ -92,13 +91,11 @@ const Header = ({
                                 priority="high"
                                 transition={500}
                                 contentFit="cover"
-                                onLoadEnd={() => setPosterLoad(true)}
                             />
                         </Card>
                     </Animated.View>
                 </View>
 
-                {/* Gradient overlay */}
                 <LinearGradient
                     colors={[
                         "transparent",
@@ -109,7 +106,6 @@ const Header = ({
                     style={styles.gradient}
                 />
 
-                {/* Background blurred image */}
                 <Image
                     source={{ uri: fallbackImage }}
                     style={styles.bgImage}
@@ -140,7 +136,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: SCREEN_WIDTH,
         height: 140,
-        paddingHorizontal: 60,
+        paddingHorizontal: 70,
         backgroundColor: "black",
         gap: 10,
         zIndex: -1,
@@ -225,4 +221,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default memo(Header);
+export default memo(CustomHeader);

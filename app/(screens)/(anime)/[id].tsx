@@ -1,5 +1,8 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import { AnimeStatusEnum } from "@/API/Shikimori/Shikimori.types";
 import Bookmark from "@/components/Anime/Bookmark";
+import CustomHeader from "@/components/Anime/CustomHeader";
 import {
     CharacterList,
     Details,
@@ -11,7 +14,6 @@ import {
 import { HeaderRight } from "@/components/Anime/HeaderRight";
 import Player from "@/components/Anime/Player";
 import { CrunchyPoster, Poster3D } from "@/components/Anime/Posters";
-import Header from "@/components/Anime/Test/Header";
 import { ItemsT } from "@/components/ContextComponent/DropdownMenu";
 import { GradientBlur } from "@/components/GradientBlur";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
@@ -24,16 +26,18 @@ import { storage } from "@/utils/storage";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Dimensions, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+
+import { ActivityIndicator, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import { easeGradient } from "react-native-easing-gradient";
 import Animated, { Extrapolation, FadeIn, FadeInDown, interpolate, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
 const { height: ScreenHeight, width: ScreenWidth } = Dimensions.get('screen');
 
-const showStatus = storage.getShowStatus() ?? true;
+
 export default function AnimeScreen() {
     const useTestHeader: boolean = storage.getUseTestHeader() ?? false;
+    const showStatus = storage.getShowStatus() ?? true;
+
     const headerHeight = useHeaderHeight();
     const { colors, locations } = easeGradient({
         colorStops: {
@@ -122,27 +126,20 @@ export default function AnimeScreen() {
             {console.log('render PAGE !')}
             <Stack.Screen
                 options={{
-                    // headerShown: !showPosters,
                     headerShown: true,
-                    // headerStyle:{backgroundColor:'red'},
                     ...(useTestHeader && {
-                        header: () => useTestHeader ? <Header
+                        header: () => useTestHeader ? <CustomHeader
                             Right={<HeaderRight img={{ crunch: backgroundImage, def: animeData?.poster?.originalUrl }} customItems={headerRightItems} />}
                             animeData={animeData}
                             animatedStyle1={animatedStyle1}
                             showStatus={showStatus}
-                            // statusHeader={statusHeader as string | null}
                             fallbackImage={fallbackImage}
-                            setPosterLoad={() => { }}
-                            setShowPosters={() => { }}
-
                         /> : undefined
                     }),
-                    ...(Platform.Version < '26.0' && {
-                        headerRight: () => <HeaderRight img={{ crunch: backgroundImage, def: animeData?.poster?.originalUrl }}
-                            customItems={headerRightItems}
-                        />
-                    }),
+
+                    headerRight: () => <HeaderRight img={{ crunch: backgroundImage, def: animeData?.poster?.originalUrl }}
+                        customItems={headerRightItems}
+                    />,
                 }}
             />
             <Animated.View style={[StyleSheet.absoluteFill, { width: '100%', height: headerHeight, zIndex: 100 }, animatedStyle]}>
@@ -171,11 +168,11 @@ export default function AnimeScreen() {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ gap: 205 }}
                 headerBackgroundColor={{ dark: 'black', light: 'white' }}
-                HEADER_HEIGHT={useCrunch ? 600 : 470}
+                HEADER_HEIGHT={!useTestHeader ? useCrunch ? 600 : 470 : 470}
                 useScale={useCrunch ? true : false}
                 headerImage={
                     <View>
-                        {useCrunch && (
+                        {(useCrunch && !useTestHeader) && (
                             <CrunchyPoster
                                 id={Number(id)}
                                 showStatus={showStatus}

@@ -1,52 +1,60 @@
-import { storage } from "@/utils/storage"
-import { router } from "expo-router"
-import { View } from "react-native"
-import { DropdownMenu } from "../ContextComponent"
-import { Items } from "../ContextComponent/ContextMenu"
-import { IconSymbol } from "../ui/IconSymbol"
+import { storage } from "@/utils/storage";
+import { Button, ContextMenu, Host, HStack, Image } from "@expo/ui/swift-ui";
+import { frame } from "@expo/ui/swift-ui/modifiers";
+import { router } from "expo-router";
+import { Items } from "../ContextComponent/ContextMenu";
 
 interface HeaderRightProps {
     img?: { crunch: string | undefined, def: string | undefined };
     customItems?: Items[]
 }
-export const HeaderRight = ({ img, customItems }: HeaderRightProps) => {
-    return (
-        <DropdownMenu
-            triggerItem={
-                <View hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={{ shadowColor: 'black', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.85, shadowRadius: 6 }}>
-                    <IconSymbol name='ellipsis.circle.fill' size={24} color={'white'} />
-                </View>
-            }
-            items={[
-                ...(__DEV__ ? [{
-                    title: 'Очистить данные',
-                    onSelect: () => storage.clearALL(),
-                }] : []),
-                {
-                    title: 'Редактировать постер',
-                    onSelect: () => router.push({
-                        pathname: '/(screens)/(settings)/(edit)/posterEditor',
-                        params: { src: JSON.stringify(img) },
-                    })
-                },
-                ...(customItems ?? [])
-            ]}
-        />
-        // <ContextMenu.Root>
-        //     <ContextMenu.Trigger>
-        //         <View hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} style={{ shadowColor: 'black', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.85, shadowRadius: 6 }}>
-        //             <IconSymbol name='ellipsis.circle.fill' size={24} color={'white'} />
-        //         </View>
-        //     </ContextMenu.Trigger>
-        //     <ContextMenu.Content>
-        //         <ContextMenu.Item key="deleteALl" onSelect={() => storage.clearALL()}>
-        //             <ContextMenu.ItemTitle>Очистить данные</ContextMenu.ItemTitle>
-        //         </ContextMenu.Item>
-        //         <ContextMenu.Item key="goto1" onSelect={() => router.push({ pathname: '/(screens)/(settings)/posterEditor', params: { src: JSON.stringify(img) } })}>
-        //             <ContextMenu.ItemTitle>Редакитровать постер</ContextMenu.ItemTitle>
-        //         </ContextMenu.Item>
-        //     </ContextMenu.Content>
-        // </ContextMenu.Root>
-    )
 
-}
+export const HeaderRight = ({ img, customItems }: HeaderRightProps) => {
+
+    const item: Items[] = [
+        {
+            title: "Закрыть",
+            iconName: "xmark",
+            onSelect: () => { },
+        },
+        {
+            title: "Очистить данные",
+            onSelect: () => storage.clearALL(),
+            destructive: true,
+            iconName: 'trash.slash.square.fill',
+        },
+        {
+            title: "Редактировать постер",
+            iconName: 'pencil.and.scribble',
+            onSelect: () =>
+                router.push({
+                    pathname: "/(screens)/(settings)/(edit)/posterEditor",
+                    params: { src: JSON.stringify(img) },
+                }),
+        },
+        ...(customItems ?? []),
+    ];
+
+    return (
+        <Host>
+            <ContextMenu activationMethod='singlePress'>
+                <ContextMenu.Items>
+                    {item.map(({ title, iconName, onSelect }) => (
+                        <Button key={title} systemImage={iconName} onPress={onSelect}>
+                            {title}
+                        </Button>
+                    ))}
+                </ContextMenu.Items>
+                <ContextMenu.Trigger>
+                    <Host style={{ width: 35, height: 35 }}>
+                        <HStack modifiers={[frame({ width: 25, height: 25 })]}>
+                            <Button modifiers={[frame({ width: 35, height: 35 })]}>
+                                <Image systemName="ellipsis" size={25} color="white" />
+                            </Button>
+                        </HStack>
+                    </Host>
+                </ContextMenu.Trigger>
+            </ContextMenu>
+        </Host>
+    )
+};
