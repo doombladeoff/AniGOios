@@ -1,7 +1,6 @@
 import FavoriteItem from "@/components/FavoriteItem";
 import { GradientBlur } from "@/components/GradientBlur";
 import Filters, { OrderT } from "@/components/Screens/Favorite/Filters";
-import { HeaderFavorite } from "@/components/Screens/Favorite/HeaderFavorite";
 import { useBottomHeight } from "@/hooks/useBottomHeight";
 import { auth } from "@/lib/firebase";
 import { getFavoriteAnime } from "@/utils/firebase/userFavorites";
@@ -13,7 +12,6 @@ import { Stack } from "expo-router";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Dimensions, Platform, RefreshControl, StyleSheet, View } from "react-native";
 import { easeGradient } from "react-native-easing-gradient";
-import { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const filterMapping = {
@@ -23,7 +21,6 @@ const filterMapping = {
 } as const;
 
 const { width } = Dimensions.get('screen');
-
 
 export default function FavoriteScreen() {
     const headerHeight = useHeaderHeight();
@@ -97,15 +94,6 @@ export default function FavoriteScreen() {
         }
     }, []);
 
-
-    const modalOpacity = useSharedValue(0);
-
-    useEffect(() => {
-        modalOpacity.value = withTiming(openFilters ? 0.6 : 0, { duration: 300 });
-    }, [openFilters]);
-
-    const modalOpacityStyle = useAnimatedStyle(() => ({ opacity: modalOpacity.value }));
-
     const onRefresh = useCallback(() => {
         setPage(0);
         hasMore.current = true;
@@ -138,25 +126,13 @@ export default function FavoriteScreen() {
         <View style={{ flex: 1 }}>
             <Stack.Screen
                 options={{
-                    ...(Platform.Version >= '26.0' && {
-                        header: () => (
-                            <HeaderFavorite
-                                rightIcon="line.3.horizontal.decrease"
-                                onPress={() => setOpenFilters(true)}
-                            />
-                        ),
-                    }),
-                    headerRight: () => {
-                        if (Platform.Version < '26.0')
-                            return (
-                                <Host style={{ width: 35, height: 35 }}>
-                                    <Button onPress={() => setOpenFilters(true)}>
-                                        <UIImage systemName="line.3.horizontal.decrease" size={22} color="white" />
-                                    </Button>
-                                </Host>
-                            )
-                        return null;
-                    },
+                    headerRight: () => (
+                        <Host style={{ width: 35, height: 35 }}>
+                            <Button onPress={() => setOpenFilters(true)}>
+                                <UIImage systemName="line.3.horizontal.decrease" size={22} color="white" />
+                            </Button>
+                        </Host>
+                    ),
                 }}
             />
 

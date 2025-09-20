@@ -4,17 +4,15 @@ import Recommendations from '@/components/HomeRecommendations';
 import List from '@/components/List';
 import LatestUpdates from '@/components/List/LatestUpdates';
 import { Page } from '@/components/Page';
-import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useHomeScreenData } from '@/hooks/homeData/useHomeScreenData';
 import { useBottomHeight } from '@/hooks/useBottomHeight';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import React, { Fragment, useCallback } from 'react';
-import { Dimensions, Platform, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { easeGradient } from 'react-native-easing-gradient';
-import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('screen');
@@ -29,30 +27,7 @@ type ListDataT = {
     render: boolean;
 }
 
-const Header = () => {
-    if (Platform.Version >= '26.0')
-        return (
-            <View style={{ zIndex: 100, position: 'absolute', top: 60, width: '100%', paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Animated.View entering={FadeInUp.delay(1000)}>
-                    <View>
-                        <Text style={{ color: 'white', fontSize: 26, fontWeight: '800' }}>AniGO</Text>
-                    </View>
-                </Animated.View>
-                <Animated.View entering={FadeInUp.delay(1000)}>
-                    <Button
-                        width={35}
-                        height={35}
-                        onPressBtn={() => router.push({ pathname: '/favorite' })}
-                        iconName='bookmark.fill'
-                        iconSize={32}
-                        iconColor='orange'
-                        style={{ justifyContent: 'center', alignItems: 'center' }}
-                    />
-                </Animated.View>
-            </View>
-        )
-    return null;
-}
+const isIOS_26 = Platform.Version >= '26.0';
 
 export default function HomeScreen() {
     const headerHeight = useHeaderHeight();
@@ -138,12 +113,11 @@ export default function HomeScreen() {
                     pointerEvents='none'
                 />
 
-                <Header />
             </Fragment>
 
             <ScrollView
                 contentContainerStyle={{
-                    paddingTop: Platform.Version < '26.0' ? 10 : 0,
+                    paddingTop: !isIOS_26 ? 10 : 0,
                     paddingBottom: bottomTabHeight,
                     gap: 15
                 }}
