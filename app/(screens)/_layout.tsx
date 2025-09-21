@@ -29,15 +29,6 @@ export default function ScreensLayout() {
                 }}
             />
             <Stack.Screen
-                name="player"
-                options={{
-                    headerTransparent: true,
-                    orientation: 'all',
-                    headerTitle: '',
-                    title: ''
-                }}
-            />
-            <Stack.Screen
                 name="(user)"
                 options={{ headerShown: false }}
             />
