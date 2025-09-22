@@ -1,6 +1,7 @@
 import { DropdownMenu } from "@/components/ContextComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol.ios";
-import { StyleProp, Text, View, ViewStyle } from "react-native";
+import * as Haptics from 'expo-haptics';
+import { Pressable, StyleProp, Text, View, ViewStyle } from "react-native";
 
 interface EpisodePickerProps {
     containerStyle?: StyleProp<ViewStyle>;
@@ -21,12 +22,12 @@ export const EpisodePicker = ({ containerStyle, itemStyle, episodesArray, voiceO
                     <DropdownMenu
                         label="Серия"
                         triggerItem={
-                            <View style={itemStyle}>
+                            <Pressable onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)} style={itemStyle}>
                                 <Text style={{ color: "white" }}>
                                     Серия {selectedEp}
                                 </Text>
                                 <IconSymbol name='chevron.up.chevron.down' size={14} color={'skyblue'} />
-                            </View>
+                            </Pressable>
                         }
                         items={episodesArray.map((ep, index) => ({
                             title: `Серия ${ep.number}`,
@@ -39,12 +40,12 @@ export const EpisodePicker = ({ containerStyle, itemStyle, episodesArray, voiceO
                     <DropdownMenu
                         label="Озвучка"
                         triggerItem={
-                            <View style={itemStyle}>
+                            <Pressable onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)} style={itemStyle}>
                                 <Text style={{ color: 'white' }}>
                                     {selectedVoiceOver}
                                 </Text>
                                 <IconSymbol name='chevron.up.chevron.down' size={14} color={'skyblue'} />
-                            </View>
+                            </Pressable>
                         }
                         items={voiceOvers.map((i, id) => {
                             return {

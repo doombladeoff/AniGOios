@@ -1,4 +1,4 @@
-import { Player as VideoPlayer } from '@/components/Anime/Player/Player';
+import { VideoPlayer } from '@/components/Anime/Player/VideoPlayer';
 import { usePlayer } from "@/hooks/player/usePlayer";
 import { storage } from '@/utils/storage';
 import { memo, useState } from "react";
@@ -7,23 +7,18 @@ import { EpisodePicker } from './EpisodePicker';
 
 interface PlayerStyleProps {
     id: number | string;
-    useWide?: boolean;
 }
 
-const Player = ({ id, useWide = false }: PlayerStyleProps) => {
-    console.log('Player Render')
+const Player = ({ id }: PlayerStyleProps) => {
     const {
         videoUrl,
         voiceOvers,
-        selectedIndex,
-        thumbnails,
         episodeList,
         toggle,
-        fetchEpisodes,
         fetchVideoUrl,
-    } = usePlayer({ id: id as string });
+    } = usePlayer({ animeId: id as string });
 
-    if (!thumbnails)
+    if (!episodeList || !voiceOvers)
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <ActivityIndicator size={'small'} color={'white'} />
@@ -41,7 +36,7 @@ const Player = ({ id, useWide = false }: PlayerStyleProps) => {
     const [selectedEp, setSelectedep] = useState(storedEp);
 
     return (
-        <>
+        <View>
             <EpisodePicker
                 containerStyle={{ flexDirection: 'row', alignItems: 'center' }}
                 itemStyle={styles.dropItem}
@@ -53,17 +48,17 @@ const Player = ({ id, useWide = false }: PlayerStyleProps) => {
                 onSelectVoiceOver={(voiceOverId) => { toggle(voiceOverId); fetchVideoUrl(String(selectedEp)) }}
             />
 
-
-            <VideoPlayer
-                videoUrl={videoUrl}
-                style={styles.player}
-                overlayStyle={styles.overlay}
-                useWide={useWide}
-                episodeNumber={selectedEp}
-                animeId={id}
-            />
-
-        </>
+            {videoUrl &&
+                <VideoPlayer
+                    key={selectedEp}
+                    videoUrl={videoUrl}
+                    style={styles.player}
+                    overlayStyle={styles.overlay}
+                    episodeNumber={selectedEp}
+                    animeId={id}
+                />
+            }
+        </View>
     )
 };
 

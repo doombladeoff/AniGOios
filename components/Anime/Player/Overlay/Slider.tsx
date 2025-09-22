@@ -1,5 +1,6 @@
 import { formatTime } from "@/utils/playerHelper";
 import Slider from "@react-native-community/slider";
+import { useState } from "react";
 import { Text, View, ViewStyle } from "react-native";
 import Animated, { AnimatedStyle } from "react-native-reanimated";
 
@@ -11,9 +12,12 @@ interface PlayerSliderProps {
     onSlidingStart?: (value: number) => void;
     onSlidingComplete?: (value: number) => void;
     onValueChange?: (value: number) => void;
+    isSliding?: boolean;
 }
 
-export const PlayerSlider = ({ style, currentTime, duration, maximumValue, onSlidingComplete, onSlidingStart, onValueChange }: PlayerSliderProps) => {
+export const PlayerSlider = ({ style, currentTime, duration, maximumValue, onSlidingComplete, onSlidingStart, onValueChange, isSliding }: PlayerSliderProps) => {
+    const [slideValue, setSlideValue] = useState(0);
+
     return (
         <Animated.View style={[style, { paddingHorizontal: 12, width: '100%', }]}>
             <Slider
@@ -26,12 +30,12 @@ export const PlayerSlider = ({ style, currentTime, duration, maximumValue, onSli
                 style={{ height: 40, width: '100%', shadowColor: 'black', shadowOpacity: 1, shadowRadius: 8, shadowOffset: { width: 0, height: 0 } }}
                 onSlidingComplete={(v) => onSlidingComplete && onSlidingComplete(v)}
                 onSlidingStart={(v) => onSlidingStart && onSlidingStart(v)}
-                onValueChange={(v) => onValueChange && onValueChange(v)}
+                onValueChange={(v) => { onValueChange && onValueChange(v); setSlideValue(v) }}
             />
             <View
                 style={{ flexDirection: "row", justifyContent: "space-between" }}>
                 <View style={{ shadowColor: 'black', shadowOpacity: 1, shadowRadius: 2, shadowOffset: { width: 0, height: 0 } }}>
-                    <Text style={{ color: "white" }}>{formatTime(currentTime)}</Text>
+                    <Text style={{ color: "white" }}>{isSliding ? formatTime(slideValue) : formatTime(currentTime)}</Text>
                 </View>
                 <Text style={{ color: "white" }}>{formatTime(duration)}</Text>
             </View>
