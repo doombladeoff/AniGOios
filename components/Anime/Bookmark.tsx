@@ -1,8 +1,8 @@
 import { auth } from '@/lib/firebase';
+import { addFavoriteAnime, isAnimeInFavorites, removeFavoriteAnime, updateStatusFavoriteAnime } from '@/lib/firebase/userFavorites';
+import { addAnimeToFolder, removeAnimeFromFolder } from '@/lib/firebase/userFolders';
 import { useAnimeStore } from '@/store/animeStore';
 import { useUserStore } from '@/store/userStore';
-import { addFavoriteAnime, isAnimeInFavorites, removeFavoriteAnime, updateStatusFavoriteAnime } from '@/utils/firebase/userFavorites';
-import { addAnimeToFolder, removeAnimeFromFolder } from '@/utils/firebase/userFolders';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { SFSymbols6_0 } from 'sf-symbols-typescript';
 import * as Dropdown from 'zeego/dropdown-menu';

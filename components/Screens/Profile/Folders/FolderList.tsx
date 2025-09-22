@@ -1,7 +1,7 @@
 import { ContextMenu } from "@/components/ContextComponent"
 import { IconSymbol } from "@/components/ui/IconSymbol"
+import { deleteFolder } from "@/lib/firebase/userFolders"
 import { useUserStore } from "@/store/userStore"
-import { deleteFolder } from "@/utils/firebase/userFolders"
 import { router } from "expo-router"
 import { memo } from "react"
 import { Alert, Dimensions, Pressable, Text, View } from "react-native"

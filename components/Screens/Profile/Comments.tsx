@@ -1,6 +1,6 @@
 import { ContextMenu } from "@/components/ContextComponent";
+import { Comment, deleteComment } from "@/lib/firebase/userComments";
 import { useUserStore } from "@/store/userStore";
-import { Comment, deleteComment } from "@/utils/firebase/userComments";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { Text, View } from "react-native";

@@ -1,6 +1,6 @@
 import { BottomSheet as BS } from "@/components/ui/BottomSheet";
 import { IconSymbol } from "@/components/ui/IconSymbol.ios";
-import { createFolder, editAnimeFolder } from "@/utils/firebase/userFolders";
+import { createFolder, editAnimeFolder } from "@/lib/firebase/userFolders";
 import { useState } from "react";
 import { Pressable, Text, useWindowDimensions, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";

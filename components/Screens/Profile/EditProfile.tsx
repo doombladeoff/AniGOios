@@ -1,8 +1,8 @@
-import { Header } from "@/components/Screens/Profile";
+import { Header } from "@/components/Screens/Profile/Header";
 import { IconSymbol } from "@/components/ui/IconSymbol.ios";
+import { UpdateUseranme } from "@/lib/firebase/update-username";
+import { useAvatarUser } from "@/lib/firebase/user-images/uploadImages";
 import { useUserStore } from "@/store/userStore";
-import { UpdateUseranme } from "@/utils/firebase/update-username";
-import { useAvatarUser } from "@/utils/firebase/user-images/uploadImages";
 import { useCallback, useRef, useState } from "react";
 import {
     Animated,

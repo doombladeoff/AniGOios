@@ -1,7 +1,7 @@
 import { ContextMenu } from "@/components/ContextComponent";
 import { auth, db } from "@/lib/firebase";
+import { deleteCommentFromAnime, deleteCommentFromAnswer } from "@/lib/firebase/comments";
 import { CustomUser } from "@/store/userStore";
-import { deleteCommentFromAnime, deleteCommentFromAnswer } from "@/utils/firebase/comments";
 import { formatDate } from "@/utils/formatDate";
 import { Image } from "expo-image";
 import { router } from "expo-router";

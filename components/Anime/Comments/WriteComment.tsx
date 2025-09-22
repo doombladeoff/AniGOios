@@ -1,6 +1,6 @@
+import { addCommentToAnime, addCommentToComment } from "@/lib/firebase/comments";
+import { updateExp } from "@/lib/firebase/userRangUpdate";
 import { useUserStore } from "@/store/userStore";
-import { addCommentToAnime, addCommentToComment } from "@/utils/firebase/comments";
-import { updateExp } from "@/utils/firebase/userRangUpdate";
 import { useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";
 import { Pressable, TextInput } from "react-native-gesture-handler";
