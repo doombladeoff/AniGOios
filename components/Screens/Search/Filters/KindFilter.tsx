@@ -4,19 +4,19 @@ import { TranslatedKind } from "@/constants/TranslatedStatus";
 import { useSearchStore } from "@/store/filterStore";
 import * as Haptics from 'expo-haptics';
 import { AnimationSpec } from "expo-symbols";
-import React from "react";
-import { Dimensions, Pressable, Text, View } from "react-native";
+import React, { useCallback } from "react";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
 const screenWidth = Dimensions.get("window").width;
-const itemWidth = (screenWidth - 40) / 2; // 40px — примерный padding
+const itemWidth = (screenWidth - 40) / 2;
 
+type KindListT = {
+    key: AnimeKindEnum,
+    label: string,
+}
 
-type ItemProps = {
-    item: { key: AnimeKindEnum; label: string };
-};
-
-const kindList = [
+const kindList: KindListT[] = [
     { key: AnimeKindEnum.tv, label: TranslatedKind[AnimeKindEnum.tv] },
     { key: AnimeKindEnum.movie, label: TranslatedKind[AnimeKindEnum.movie] },
     { key: AnimeKindEnum.ova, label: TranslatedKind[AnimeKindEnum.ova] },
@@ -25,24 +25,38 @@ const kindList = [
     { key: AnimeKindEnum.tv_special, label: TranslatedKind[AnimeKindEnum.tv_special] },
 ];
 
-const animationButtons = {
-    'check': {
-        effect: {
-            type: 'bounce',
-            direction: 'down',
-        },
-        speed: 10,
-    } as AnimationSpec,
-}
+const checkAnimation: AnimationSpec = {
+    effect: { type: "bounce", direction: "down" },
+    speed: 10,
+};
 
 const KindFilter = () => {
     console.log("Render KindFilter");
     const kind = useSearchStore(state => state.kind);
     const toggleKind = useSearchStore(state => state.toggleKind);
 
+    const handlePress = useCallback((key: AnimeKindEnum) => {
+        toggleKind(key);
+        Haptics.selectionAsync();
+    }, [toggleKind]);
+
+    const renderItem = ({ item, index }: { item: KindListT, index: number }) => {
+        return (
+            <Pressable onPress={() => handlePress(item.key)} style={styles.container}>
+                <IconSymbol
+                    name={kind.includes(item.key) ? "checkmark.square.fill" : "square"}
+                    size={26}
+                    color="white"
+                    animationSpec={checkAnimation}
+                />
+                <Text style={styles.itemText}>{item.label}</Text>
+            </Pressable>
+        )
+    };
+
     return (
         <View>
-            <Text style={{ fontSize: 18, color: "white", fontWeight: "600", marginBottom: 8 }}>Тип</Text>
+            <Text style={styles.headerText}>Тип</Text>
             <FlatList
                 scrollEnabled={false}
                 data={kindList}
@@ -50,29 +64,33 @@ const KindFilter = () => {
                 numColumns={2}
                 columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 8 }}
                 contentContainerStyle={{ gap: 5 }}
-                renderItem={({ item }) => (
-                    <Pressable
-                        onPress={() => { toggleKind(item.key); Haptics.selectionAsync() }}
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            width: itemWidth,
-                            paddingVertical: 8,
-                            borderRadius: 12,
-                        }}
-                    >
-                        <IconSymbol
-                            name={kind.includes(item.key) ? "checkmark.square.fill" : "square"}
-                            size={26}
-                            color="white"
-                            animationSpec={animationButtons['check']}
-                        />
-                        <Text style={{ color: "white", marginLeft: 8, flexShrink: 1 }}>{item.label}</Text>
-                    </Pressable>
-                )}
+                renderItem={renderItem}
+
             />
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    headerText: {
+        fontSize: 18,
+        color: "white",
+        fontWeight: "600",
+        marginBottom: 8
+    },
+    container: {
+        flexDirection: "row",
+        alignItems: "center",
+        width: itemWidth,
+        paddingVertical: 8,
+        borderRadius: 12,
+
+    },
+    itemText: {
+        color: "white",
+        marginLeft: 8,
+        flexShrink: 1
+    },
+})
 
 export default KindFilter;

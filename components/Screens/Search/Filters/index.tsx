@@ -3,7 +3,7 @@ import { Host, Picker } from "@expo/ui/swift-ui";
 import { padding } from "@expo/ui/swift-ui/modifiers";
 import * as Haptics from 'expo-haptics';
 import { useState } from "react";
-import { Button, KeyboardAvoidingView, Modal, Text, View } from "react-native";
+import { Button, Modal, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, { FadeInLeft, FadeInRight } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -45,34 +45,21 @@ export const ModalFilter = ({ showFilters, setShowFilters, handleApplyFilters }:
                 />
             </Host>
 
-            <KeyboardAvoidingView behavior='padding' keyboardVerticalOffset={55}>
-                <ScrollView contentContainerStyle={{ paddingTop: 10, paddingHorizontal: 15, backgroundColor: "#1b1919", gap: 20, paddingBottom: insets.bottom }}>
-                    {selectedIndex === 0 && (
-                        <Animated.View entering={FadeInLeft} style={{ gap: 20 }}>
-                            <SortFilter />
-                            <KindFilter />
-                            <Text style={{ color: "white", fontSize: 18, fontWeight: "600" }}>Год</Text>
-                            <YearFilter
-                                inputStyle={{
-                                    backgroundColor: "rgba(35, 35, 35, 0.4)",
-                                    color: "#fff",
-                                    padding: 12,
-                                    width: 90,
-                                    fontSize: 14,
-                                    fontWeight: "500",
-                                    borderRadius: 12,
-                                }}
-                                keyboardType="numeric"
-                            />
-                        </Animated.View>
-                    )}
-                    {selectedIndex === 1 && (
-                        <Animated.View entering={FadeInRight}>
-                            <GenreFilter />
-                        </Animated.View>
-                    )}
-                </ScrollView>
-            </KeyboardAvoidingView>
+            <ScrollView contentContainerStyle={{ paddingTop: 10, paddingHorizontal: 15, backgroundColor: "#1b1919", gap: 20, paddingBottom: insets.bottom }}>
+                {selectedIndex === 0 && (
+                    <Animated.View entering={FadeInLeft} style={{ gap: 20 }}>
+                        <SortFilter />
+                        <KindFilter />
+                        <Text style={{ color: "white", fontSize: 18, fontWeight: "600" }}>Год</Text>
+                        <YearFilter />
+                    </Animated.View>
+                )}
+                {selectedIndex === 1 && (
+                    <Animated.View entering={FadeInRight}>
+                        <GenreFilter />
+                    </Animated.View>
+                )}
+            </ScrollView>
         </Modal>
     )
 }
