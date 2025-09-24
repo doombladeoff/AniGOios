@@ -2,7 +2,7 @@ import { auth, db } from "@/lib/firebase";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { StyleProp, Text, TextStyle } from "react-native";
+import { StyleProp, StyleSheet, Text, TextStyle, View } from "react-native";
 import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
 
 const translatedStatus = {
@@ -18,6 +18,14 @@ type StatusKey = keyof typeof translatedStatus;
 function getStatus(status: string): string {
     return translatedStatus[status as StatusKey] ?? status;
 }
+
+const statusColors: Record<string, string> = {
+    planned: "orange",
+    completed: "green",
+    watching: "skyblue",
+    dropped: "red",
+    on_hold: "gray",
+};
 
 interface StatusProps {
     showType: "header" | "poster";
@@ -50,85 +58,56 @@ export const Status = ({ showType, id, status, textStyle }: StatusProps) => {
         });
 
         return () => unsubscribe();
-    }, [id, auth.currentUser?.uid]);
+    }, [id, auth.currentUser?.uid, status]);
 
-    if (statusHeader.length < 1 && !status) return null;
+    const resolvedStatus = status ?? statusHeader;
+    if (!resolvedStatus) return null;
+
+    const bgColor = statusColors[resolvedStatus] ?? "transparent";
+    const fontSize = status ? 12 : 15;
 
     return (
         <Animated.View
-            key={status ? status : statusHeader}
             entering={showInHeader ? FadeInUp : FadeIn}
-            style={{
-                top: showInHeader ? headerHeight / 1.55 : 5,
-                zIndex: 200,
-                position: "absolute",
-                alignSelf: "center",
-                justifyContent: "center",
-                alignItems: "center",
-                width: "100%",
-                shadowColor: "black",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.6,
-                shadowRadius: 8,
-            }}
+            style={[
+                styles.container,
+                { top: showInHeader ? headerHeight / 1.55 : 5 }
+            ]}
         >
-            {status ? (
-                <Text
-                    style={[{
-                        color: "white",
-                        backgroundColor:
-                            status === "planned"
-                                ? "orange"
-                                : status === "completed"
-                                    ? "green"
-                                    : status === "watching"
-                                        ? "skyblue"
-                                        : status === "dropped"
-                                            ? "red"
-                                            : status === "on_hold"
-                                                ? "gray"
-                                                : "transparent",
-                    }, textStyle ? textStyle : {
-                        borderRadius: 6,
-                        top: 4,
-                        paddingHorizontal: 8,
-                        paddingVertical: 4,
-                        fontSize: 14,
-                        fontWeight: "500",
-                    }]}
-                >
-                    {getStatus(status)}
+            <View style={[styles.statusView, { backgroundColor: bgColor }]}>
+                <Text style={[styles.text, { fontSize }]}>
+                    {getStatus(resolvedStatus)}
                 </Text>
-            ) : (
-                <Text
-                    style={[{
-                        color: "white",
-                        backgroundColor:
-                            statusHeader === "planned"
-                                ? "orange"
-                                : statusHeader === "completed"
-                                    ? "green"
-                                    : statusHeader === "watching"
-                                        ? "skyblue"
-                                        : statusHeader === "dropped"
-                                            ? "red"
-                                            : statusHeader === "on_hold"
-                                                ? "gray"
-                                                : "transparent",
-                    }, textStyle ? textStyle : {
-                        borderRadius: 6,
-                        top: 4,
-                        paddingHorizontal: 8,
-                        paddingVertical: 4,
-                        fontSize: 14,
-                        fontWeight: "500",
-                    }]}
-                >
-                    {getStatus(statusHeader)}
-                </Text>
-            )
-            }
-
-        </Animated.View >
+            </View>
+        </Animated.View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        zIndex: 200,
+        position: "absolute",
+        alignSelf: "center",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        shadowColor: "black",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.6,
+        shadowRadius: 8,
+    },
+    statusView: {
+        top: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 6,
+        shadowColor: 'black',
+        shadowOpacity: 0.45,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 0 },
+    },
+    text: {
+        color: "white",
+        fontWeight: "500",
+    }
+})
