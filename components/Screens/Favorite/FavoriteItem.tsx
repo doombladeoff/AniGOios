@@ -4,8 +4,9 @@ import { router } from "expo-router";
 import { memo } from "react";
 import { Alert, Dimensions, Pressable } from "react-native";
 import Animated, { FadeIn, FadeOutDown } from "react-native-reanimated";
-import { Status } from "./Anime/Status";
-import { ContextMenu } from "./ContextComponent";
+
+import { Status } from "@/components/Anime/Status";
+import { ContextMenu } from "@/components/ContextComponent";
 
 const { width, height } = Dimensions.get("screen");
 const ITEM_HEIGHT = height / 4.5;
