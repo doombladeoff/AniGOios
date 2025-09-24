@@ -1,10 +1,15 @@
 
 import HeaderBackButton from "@/components/ui/HeaderBackButton";
 import { Stack } from "expo-router";
+import { Platform } from "react-native";
+
+const isIOS26 = Platform.Version >= "26.0";
 
 export default function ScreensLayout() {
     return (
-        <Stack>
+        <Stack screenOptions={{
+            headerLeft: () => <HeaderBackButton />,
+        }}>
             <Stack.Screen
                 name="(characters)"
                 options={{
@@ -39,6 +44,12 @@ export default function ScreensLayout() {
                     headerTransparent: true,
                     title: '',
                     headerLeft: () => <HeaderBackButton />
+                }}
+            />
+            <Stack.Screen
+                name="folder"
+                options={{
+                    ...(isIOS26 && { headerTransparent: true })
                 }}
             />
         </Stack>
