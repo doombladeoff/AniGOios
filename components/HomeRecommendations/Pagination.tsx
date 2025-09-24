@@ -1,3 +1,4 @@
+import { GlassView } from 'expo-glass-effect';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { SharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
@@ -10,7 +11,7 @@ interface PaginationProps {
 export const Pagination = ({ activeIndex, length }: PaginationProps) => {
     return (
         <View style={styles.container}>
-            <View style={{ backgroundColor: 'rgba(95, 95, 95, 0.5)', flexDirection: 'row', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 12 }}>
+            <GlassView style={styles.pagination}>
                 {Array.from({ length }).map((_, i) => {
                     const animatedStyle = useAnimatedStyle(() => {
                         return {
@@ -24,7 +25,7 @@ export const Pagination = ({ activeIndex, length }: PaginationProps) => {
 
                     return <Animated.View key={i} style={animatedStyle} />
                 })}
-            </View>
+            </GlassView>
         </View>
     );
 };
@@ -34,4 +35,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
     },
+    pagination: {
+        backgroundColor: 'rgba(95, 95, 95, 0.5)',
+        flexDirection: 'row',
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 12
+    }
 });
