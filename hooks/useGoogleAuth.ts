@@ -1,3 +1,6 @@
+import { auth, db } from '@/lib/firebase';
+import { addUser } from '@/lib/firebase/addUser';
+import { useUserStore } from '@/store/userStore';
 import { makeRedirectUri } from 'expo-auth-session';
 import { useAuthRequest } from 'expo-auth-session/providers/google';
 import { useRouter } from 'expo-router';
@@ -8,18 +11,10 @@ import {
     signInWithEmailAndPassword,
     updateProfile
 } from 'firebase/auth';
-import { useCallback, useEffect } from 'react';
-// import { useAuth } from '@/context/AuthContext';
-// import { addUser } from "@/utils/firebase/addUser";
-import { auth, db } from '@/lib/firebase';
-import { useUserStore } from '@/store/userStore';
-import { addUser } from '@/utils/firebase/addUser';
 import { doc, getDoc } from 'firebase/firestore';
-// import { YummyAPI } from '@/api/Yummy';
-// import { useAuthStore } from '@/store/authStore';
+import { useCallback, useEffect } from 'react';
 
 export const useGoogleAuth = () => {
-    // const { setUser } = useAuth();
     const setUser = useUserStore(s => s.setUser);
     const router = useRouter();
 
@@ -33,7 +28,13 @@ export const useGoogleAuth = () => {
     const handleAuthSuccess = useCallback(
         async (user: any, userData: any = {}) => {
             try {
-                await addUser(user);
+                const userDocRef = doc(db, "user-collection", user.uid);
+                let userDoc = await getDoc(userDocRef);
+
+                if (!userDoc.exists()) {
+                    await addUser(user);
+                    userDoc = await getDoc(userDocRef);
+                }
 
                 const tokenDocRef = doc(db, 'yummy-tokens', 'tokenData');
                 let tokenDoc = await getDoc(tokenDocRef);
@@ -56,11 +57,14 @@ export const useGoogleAuth = () => {
                     yummyTokenDate = new Date(tokenData.date);
                 }
 
-                setUser({
+                const fullUserData = {
                     ...user,
+                    ...userDoc.data(),
                     yummyToken,
                     yummyTokenDate,
-                });
+                };
+
+                setUser(fullUserData);
 
                 router.replace('/(tabs)/(home)/home');
             } catch (error) {

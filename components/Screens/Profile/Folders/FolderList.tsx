@@ -19,11 +19,11 @@ interface FolderListProps {
 }
 
 function FolderList({ userId, openCreateFolder, editFolder }: FolderListProps) {
-    const folders = useUserStore(
+    const { folders } = useUserStore(
         useShallow((s) => ({
-            folders: s.user?.folders,
+            folders: s.user?.folders
         }))
-    ).folders;
+    );
 
     if (!folders) return;
 
