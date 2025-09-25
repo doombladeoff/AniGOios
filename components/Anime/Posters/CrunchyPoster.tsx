@@ -3,7 +3,7 @@ import { getLinks } from "@/utils/crunchyroll/getCrunchyrollData"
 import { Image } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { memo, useEffect, useMemo, useState } from "react"
-import { Dimensions, Image as RNImage, StyleSheet, View } from "react-native"
+import { ColorValue, Dimensions, Image as RNImage, StyleSheet, View } from "react-native"
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated"
 import { useShallow } from "zustand/shallow"
 import { Status } from "../Status"
@@ -12,12 +12,12 @@ interface CrunchyPosterProps {
     id: number;
     showStatus: boolean;
     statusHeader?: string;
-    // img: string;
     showLogo?: boolean;
-    // img_logo: string;
 }
 
 const { height: ScreenHeight, width: ScreenWidth } = Dimensions.get('screen');
+
+const GradientColors = ['transparent', 'transparent', 'rgba(0,0,0,0.5)', 'black'] as [ColorValue, ColorValue, ...ColorValue[]]
 
 const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: CrunchyPosterProps) => {
     const { hasTall, hasWide, crunchyId, logo } = useAnimeStore(useShallow(s => ({
@@ -53,11 +53,13 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: Crunch
 
     return (
         <View>
-            {console.log('CrunchyPoster Render', showStatus, id)}
-            {showStatus && <Status id={String(id)} showType="header" />}
-            <LinearGradient colors={['transparent', 'transparent', 'rgba(0,0,0,0.5)', 'black']}
+            {showStatus && <Status id={String(id)} showType="header" containerStyle={style.statusContainer} />}
+            <LinearGradient
+                colors={GradientColors}
                 style={[StyleSheet.absoluteFill, { width: '100%', height: '100%', zIndex: 1 }]}
-                pointerEvents='none' />
+                pointerEvents='none'
+            />
+
             <Animated.View entering={FadeInUp.duration(700)}>
                 <Image
                     source={{ uri: backgroundImage }}
@@ -72,7 +74,7 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: Crunch
             </Animated.View>
 
             {showLogo &&
-                <Animated.View entering={FadeInDown.duration(700)} style={{ zIndex: 3, bottom: 0, alignSelf: 'center', position: 'absolute' }}>
+                <Animated.View entering={FadeInDown.duration(700)} style={style.logoImg}>
                     <Image source={{ uri: img_logo }}
                         style={{
                             width: size.width,
@@ -83,9 +85,30 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: Crunch
                         contentFit='contain' />
                 </Animated.View>
             }
-
         </View>
     )
 };
+
+const style = StyleSheet.create({
+    logoImg: {
+        zIndex: 3,
+        bottom: 0,
+        alignSelf: 'center',
+        position: 'absolute'
+    },
+    statusContainer: {
+        top: 4,
+        zIndex: 200,
+        position: "absolute",
+        alignSelf: "center",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        shadowColor: "black",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.6,
+        shadowRadius: 8,
+    }
+})
 
 export default memo(CrunchyPoster);

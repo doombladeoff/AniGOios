@@ -2,7 +2,7 @@ import { useMappingHelper } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { memo } from "react";
-import { Alert, Dimensions, Pressable } from "react-native";
+import { Alert, Dimensions, Pressable, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeOutDown } from "react-native-reanimated";
 
 import { Status } from "@/components/Anime/Status";
@@ -33,14 +33,13 @@ const FavoriteItem = ({ item, onRemove, index }: { item: any; onRemove: () => vo
                             }}
                             transition={600}
                         />
-                        <Status id={item.id} status={item.status} showType="poster" textStyle={{
-                            borderRadius: 6,
-                            top: 4,
-                            paddingHorizontal: 8,
-                            paddingVertical: 4,
-                            fontSize: 12,
-                            fontWeight: "500",
-                        }} />
+                        <Status
+                            id={item.id}
+                            status={item.status}
+                            showType="poster"
+                            textStyle={styles.statusText}
+                            containerStyle={styles.statusContainer}
+                        />
                     </Pressable>
                 }
                 items={[
@@ -58,5 +57,29 @@ const FavoriteItem = ({ item, onRemove, index }: { item: any; onRemove: () => vo
         </Animated.View>
     );
 };
+
+const styles = StyleSheet.create({
+    statusContainer: {
+        top: 4,
+        zIndex: 200,
+        position: "absolute",
+        alignSelf: "center",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        shadowColor: "black",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.6,
+        shadowRadius: 8,
+    },
+    statusText: {
+        borderRadius: 6,
+        top: 4,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        fontSize: 12,
+        fontWeight: "500",
+    }
+})
 
 export default memo(FavoriteItem);

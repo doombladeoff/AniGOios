@@ -2,7 +2,7 @@ import { auth, db } from "@/lib/firebase";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { StyleProp, StyleSheet, Text, TextStyle, View } from "react-native";
+import { StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
 
 const translatedStatus = {
@@ -32,8 +32,9 @@ interface StatusProps {
     id: string;
     status?: string;
     textStyle?: StyleProp<TextStyle>;
+    containerStyle?: StyleProp<ViewStyle>;
 }
-export const Status = ({ showType, id, status, textStyle }: StatusProps) => {
+export const Status = ({ showType, id, status, textStyle, containerStyle }: StatusProps) => {
     const headerHeight = useHeaderHeight();
     const showInHeader = showType === "header";
 
@@ -70,7 +71,7 @@ export const Status = ({ showType, id, status, textStyle }: StatusProps) => {
         <Animated.View
             entering={showInHeader ? FadeInUp : FadeIn}
             style={[
-                styles.container,
+                containerStyle,
                 { top: showInHeader ? headerHeight / 1.55 : 5 }
             ]}
         >
@@ -84,27 +85,10 @@ export const Status = ({ showType, id, status, textStyle }: StatusProps) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        zIndex: 200,
-        position: "absolute",
-        alignSelf: "center",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        shadowColor: "black",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.6,
-        shadowRadius: 8,
-    },
     statusView: {
-        top: 4,
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
-        shadowColor: 'black',
-        shadowOpacity: 0.45,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 0 },
     },
     text: {
         color: "white",
