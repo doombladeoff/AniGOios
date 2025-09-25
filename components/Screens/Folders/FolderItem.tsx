@@ -1,5 +1,5 @@
 import { ShikimoriAnime } from "@/API/Shikimori/Shikimori.types"
-import { Score } from "@/components/RenderList/Score"
+import { Score } from "@/components/Score"
 import { IconSymbol } from "@/components/ui/IconSymbol"
 import { TranslatedKind, TranslatedStatus } from "@/constants/TranslatedStatus"
 import { GlassView } from "expo-glass-effect"

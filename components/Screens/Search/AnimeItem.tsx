@@ -7,7 +7,7 @@ import { router } from "expo-router";
 import { memo } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { Score } from "../../RenderList/Score";
+import { Score } from "../../Score";
 
 const AnimeItem = ({ item, index }: { item: ShikimoriAnime, index: number }) => {
     const handleNav = () => router.push({ pathname: '/(screens)/(anime)/[id]', params: { id: item.malId } });
