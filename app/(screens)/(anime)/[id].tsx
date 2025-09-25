@@ -240,10 +240,8 @@ export default function AnimeScreen() {
 
                     <ScreenshotsList
                         id={Number(id)}
-                        useContextMenu
-                        containerStyle={{ paddingHorizontal: 10, zIndex: -2, }}
+                        containerStyle={{ paddingHorizontal: 10 }}
                         imageStyle={{ width: 280, height: 150, borderRadius: 12, marginLeft: 0, margin: 10, backgroundColor: 'gray' }}
-                        imageStylePreview={{ width: 380, height: 200, borderRadius: 8, backgroundColor: 'gray' }}
                         headerText="Скриншоты"
                         headerTextStyle={{ paddingHorizontal: 15, color: 'white', fontSize: 18, fontWeight: '600', zIndex: 22, marginTop: 10 }}
                     />
