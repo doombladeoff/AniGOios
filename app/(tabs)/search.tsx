@@ -147,7 +147,7 @@ export default function SearchScreen() {
                 contentContainerStyle={{
                     paddingHorizontal: 10,
                     paddingTop: isIOS26 ? insets.top + 10 : insets.top + 30,
-                    paddingBottom: isIOS26 ? 0 : bottomTabHeight,
+                    paddingBottom: bottomTabHeight,
                 }}
                 scrollIndicatorInsets={{ top: 65, bottom: bottomTabHeight }}
                 onScroll={() => Keyboard.dismiss()}

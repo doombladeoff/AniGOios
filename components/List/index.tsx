@@ -1,4 +1,5 @@
 import { ShikimoriAnime } from "@/API/Shikimori/Shikimori.types"
+import { useBottomHeight } from "@/hooks/useBottomHeight"
 import { useHeaderHeight } from "@react-navigation/elements"
 import { FlashList, FlashListProps } from "@shopify/flash-list"
 import { ImageStyle } from "expo-image"
@@ -50,6 +51,8 @@ function List({
 }: ListProps) {
     console.log('render list', headerText)
     const headerHeight = useHeaderHeight();
+    const bottomTabHeight = useBottomHeight();
+
     const anonsCard = typeRequest === 'anons';
 
     const handleNavigate = useCallback((id: number) => {
@@ -166,7 +169,13 @@ function List({
                 numColumns={horizontal ? 1 : numColumns ? numColumns : 3}
                 keyExtractor={(item) => `${item.malId}-anime`}
                 data={data}
-                contentContainerStyle={{ gap: horizontal ? 5 : 0, paddingHorizontal: horizontal ? 5 : 0, paddingVertical: horizontal ? 10 : headerHeight + 5 }}
+                contentContainerStyle={{
+                    gap: horizontal ? 5 : 0,
+                    paddingHorizontal: horizontal ? 5 : 0,
+                    paddingTop: horizontal ? 10 : headerHeight + 5,
+                    paddingBottom: horizontal ? 0 : bottomTabHeight
+                }}
+                contentInsetAdjustmentBehavior="automatic"
                 maxItemsInRecyclePool={15}
                 renderItem={renderItem}
                 {...rest}
