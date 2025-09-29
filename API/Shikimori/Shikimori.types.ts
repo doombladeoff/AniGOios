@@ -1,3 +1,5 @@
+import { CrunchyrollData } from "../Crunchyroll/getCrunchyrollData";
+
 export type ShikimoriAnime = {
     airedOn: IncompleteDate;
     characterRoles: CharacterRole[];
@@ -51,21 +53,13 @@ export type ShikimoriAnime = {
     videos: Video[];
 
     postersArray: string[];
-    crunchyroll: Crunchyroll;
+    crunchyroll: CrunchyrollData;
     recommendations: any[];
     animatedPoster: any;
     translatedLogo: any;
     animeList: any;
+    yummyEpisodes: any[];
 };
-
-export type Crunchyroll = {
-    crunchyPosters: {
-        hasTall: boolean;
-        hasWide: boolean;
-        poster: string | undefined;
-    };
-    crunchyData: any;
-}
 
 export type Manga = {
     airedOn: IncompleteDate;

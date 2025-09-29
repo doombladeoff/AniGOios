@@ -1,5 +1,4 @@
 import { useAnimeStore } from "@/store/animeStore"
-import { getLinks } from "@/utils/crunchyroll/getCrunchyrollData"
 import { Image } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { memo, useEffect, useMemo, useState } from "react"
@@ -15,23 +14,22 @@ interface CrunchyPosterProps {
     showLogo?: boolean;
 }
 
-const { height: ScreenHeight, width: ScreenWidth } = Dimensions.get('screen');
-
 const GradientColors = ['transparent', 'transparent', 'rgba(0,0,0,0.5)', 'black'] as [ColorValue, ColorValue, ...ColorValue[]]
 
 const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: CrunchyPosterProps) => {
-    const { hasTall, hasWide, crunchyId, logo } = useAnimeStore(useShallow(s => ({
-        hasTall: s.animeMap[id]?.crunchyroll.crunchyPosters.hasTall,
-        hasWide: s.animeMap[id]?.crunchyroll.crunchyPosters.hasWide,
-        crunchyId: s.animeMap[id]?.crunchyroll.crunchyData.crunchyrollId,
-        logo: s.animeMap[id]?.translatedLogo
+    const { hasTall, hasWide, crunchyId, logo, animeData } = useAnimeStore(useShallow(s => ({
+        hasTall: s.animeMap[id]?.crunchyroll.hasTallThumbnail,
+        hasWide: s.animeMap[id]?.crunchyroll.hasWideThumbnail,
+        crunchyId: s.animeMap[id]?.crunchyroll.crunchyrollId,
+        logo: s.animeMap[id]?.translatedLogo,
+        animeData: s.animeMap[id],
     })));
 
-    const img_logo = logo || (crunchyId && getLinks(crunchyId).titleThumbnail);
+    const img_logo = logo || animeData.crunchyroll.crunchyImages.titleLogo
 
     const backgroundImage = useMemo(() => {
-        if (hasTall) return getLinks(crunchyId, ScreenWidth * 3, ScreenHeight * 3, "tall").backgroundThumbnail;
-        if (hasWide) return getLinks(crunchyId, ScreenWidth * 5, ScreenHeight * 3, "wide").backgroundThumbnail;
+        if (hasTall) return animeData.crunchyroll.crunchyImages.tallThumbnail;
+        if (hasWide) return animeData.crunchyroll.crunchyImages.wideThumbnail;
     }, [crunchyId, hasTall, hasWide]);
 
     const [size, setSize] = useState({ width: 600, height: 150 });
@@ -62,7 +60,7 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: Crunch
 
             <Animated.View entering={FadeInUp.duration(700)}>
                 <Image
-                    source={{ uri: backgroundImage }}
+                    source={{ uri: backgroundImage || '' }}
                     style={{
                         width: '100%',
                         height: '100%',

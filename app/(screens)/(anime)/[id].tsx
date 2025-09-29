@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import { AnimeStatusEnum } from "@/API/Shikimori/Shikimori.types";
 import Bookmark from "@/components/Anime/Bookmark";
@@ -21,18 +21,13 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useAnimeFetch } from "@/hooks/anime/useAnimeFetch";
 import { useScrollOpacity } from '@/hooks/useScrollOpacity';
 import { auth } from "@/lib/firebase";
-import { getLinks } from "@/utils/crunchyroll/getCrunchyrollData";
 import { storage } from "@/utils/storage";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-
-import { ActivityIndicator, Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { easeGradient } from "react-native-easing-gradient";
 import Animated, { Extrapolation, FadeIn, FadeInDown, interpolate, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
-
-const { height: ScreenHeight, width: ScreenWidth } = Dimensions.get('screen');
-
 
 export default function AnimeScreen() {
     const useTestHeader: boolean = storage.getUseTestHeader() ?? false;
@@ -48,9 +43,8 @@ export default function AnimeScreen() {
     });
 
     const { id } = useLocalSearchParams();
-    const { animeData, isLoading } = useAnimeFetch(id as string);
+    const { animeData, isLoading, useCrunch, usePoster3D } = useAnimeFetch(id as string);
     const [isOpened, setIsOpened] = useState(false);
-
 
     const isAnons = animeData?.status === AnimeStatusEnum.anons;
 
@@ -63,26 +57,16 @@ export default function AnimeScreen() {
         }
     }, []);
 
-    const useCrunch = animeData?.crunchyroll?.crunchyPosters?.hasTall
-        ? storage?.getCrunchyPoster?.() ?? true
-        : false;
+    const crunchyId = animeData?.crunchyroll?.crunchyrollId;
 
-    const usePoster3D = !animeData?.crunchyroll?.crunchyPosters?.hasTall
-        ? true
-        : storage?.get3DPoster?.() ?? false;
-
-    useEffect(() => { if (animeData) console.log(useCrunch, usePoster3D, animeData) }, [animeData])
-
-
-    const crunchyId = animeData?.crunchyroll?.crunchyData?.crunchyrollId ?? "";
     const fallbackImage = animeData?.poster?.originalUrl;
 
     const { animatedStyle, scrollHandler } = useScrollOpacity(useCrunch ? 600 : 270);
 
     const backgroundImage = useMemo(() => {
-        if (animeData?.crunchyroll.crunchyPosters.hasTall) return getLinks(crunchyId, ScreenWidth * 3, ScreenHeight * 3, "tall").backgroundThumbnail
-        if (animeData?.crunchyroll.crunchyPosters.hasWide) return getLinks(crunchyId, ScreenWidth * 5, ScreenHeight * 3, "wide").backgroundThumbnail
-    }, [crunchyId, animeData?.crunchyroll.crunchyPosters.hasTall, animeData?.crunchyroll.crunchyPosters.hasWide]);
+        if (animeData?.crunchyroll.hasTallThumbnail) return animeData.crunchyroll.crunchyImages.tallThumbnail;
+        if (animeData?.crunchyroll.hasWideThumbnail) return animeData.crunchyroll.crunchyImages.wideThumbnail;
+    }, [crunchyId, animeData?.crunchyroll.hasTallThumbnail, animeData?.crunchyroll.hasWideThumbnail]);
 
     const top = useSharedValue(0);
     const combinedScrollHandler = useAnimatedScrollHandler({
@@ -123,13 +107,12 @@ export default function AnimeScreen() {
 
     return (
         <View style={{ flex: 1 }}>
-            {console.log('render PAGE !')}
             <Stack.Screen
                 options={{
                     headerShown: true,
                     ...(useTestHeader && {
                         header: () => useTestHeader ? <CustomHeader
-                            Right={<HeaderRight img={{ crunch: backgroundImage, def: animeData?.poster?.originalUrl }} customItems={headerRightItems} />}
+                            Right={<HeaderRight img={{ crunch: backgroundImage || '', def: animeData?.poster?.originalUrl }} customItems={headerRightItems} />}
                             animeData={animeData}
                             animatedStyle1={animatedStyle1}
                             showStatus={showStatus}
@@ -137,7 +120,7 @@ export default function AnimeScreen() {
                         /> : undefined
                     }),
 
-                    headerRight: () => <HeaderRight img={{ crunch: backgroundImage, def: animeData?.poster?.originalUrl }}
+                    headerRight: () => <HeaderRight img={{ crunch: backgroundImage || '', def: animeData?.poster?.originalUrl }}
                         customItems={headerRightItems}
                     />,
                 }}
