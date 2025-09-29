@@ -2,7 +2,11 @@
 
 /ios
 ios/
+android/
 GoogleService-info.plist
+.env
+data/
+/app/experemental
 
 # dependencies
 node_modules/
@@ -41,3 +45,4 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+eas.json

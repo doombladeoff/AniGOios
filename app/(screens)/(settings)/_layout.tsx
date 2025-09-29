@@ -1,5 +1,6 @@
 import HeaderBackButton from "@/components/ui/HeaderBackButton";
 import { Stack } from "expo-router";
+import { Platform } from "react-native";
 
 export default function SettingsLayout() {
     return (
@@ -12,7 +13,10 @@ export default function SettingsLayout() {
                     headerTitle: 'Настройки',
                     headerTitleAlign: 'center',
                     headerTintColor: 'white',
-                    headerStyle: { backgroundColor: '#1c1c1e' },
+                    headerTransparent: true,
+                    ...(Platform.Version < '26.0' && {
+                        headerStyle: { backgroundColor: '#1c1c1e' },
+                    }),
                 }}
             />
             <Stack.Screen
@@ -22,7 +26,6 @@ export default function SettingsLayout() {
                     headerTitle: '',
                     headerTitleAlign: 'center',
                     headerTintColor: 'white',
-                    headerTransparent: true,
                 }}
             />
         </Stack>

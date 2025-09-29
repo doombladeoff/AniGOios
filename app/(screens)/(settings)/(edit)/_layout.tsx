@@ -1,5 +1,6 @@
 import HeaderBackButton from "@/components/ui/HeaderBackButton";
 import { Stack } from "expo-router";
+import { Platform } from "react-native";
 
 export default function EditSettingsScreen() {
     return (
@@ -28,8 +29,12 @@ export default function EditSettingsScreen() {
             <Stack.Screen
                 name="editProfile"
                 options={{
+                    headerTitle: 'Профиль',
                     headerTitleAlign: 'center',
                     headerTransparent: true,
+                    ...(Platform.Version < '26.0' && {
+                        headerStyle: { backgroundColor: '#1c1c1e' },
+                    }),
                 }}
             />
         </Stack>
