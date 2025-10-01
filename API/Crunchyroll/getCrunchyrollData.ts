@@ -129,25 +129,28 @@ const processAnimeLinks = async (externalLinks: any, streamingUrl: string | unde
 };
 
 async function getValidToken(crunchy: Crunchy): Promise<string> {
-    const now = Date.now();
-    const savedToken = storage.getCrunchyrollToken();
+    try {
+        const now = Date.now();
+        const savedToken = storage.getCrunchyrollToken();
 
-    if (!savedToken) {
-        await crunchy.login();
-        const data = JSON.stringify({ token: crunchy.accessToken!, time: now });
-        storage.setCrunchyrollToken(data);
+        const saveToken = async () => {
+            await crunchy.login();
+            const token = crunchy.accessToken!;
+            storage.setCrunchyrollToken(JSON.stringify({ token, time: now }));
+            return token;
+        };
 
-        return crunchy.accessToken!;
+        if (!savedToken) return await saveToken();
+
+        const { token, time } = JSON.parse(savedToken) as { token: string; time: number };
+        if (now - time >= 30 * 60 * 1000) return await saveToken();
+
+        return token;
+    } catch (error) {
+        console.error('[Crunchyroll] Ошибка токена:', error);
+        return '';
     }
 
-    const { token, time } = JSON.parse(savedToken) as { token: string; time: number };
-    if (now - time >= 30 * 60 * 1000) { // 30 минут
-        await crunchy.login();
-        storage.setCrunchyrollToken({ token: crunchy.accessToken!, time: now });
-        return crunchy.accessToken!;
-    }
-
-    return token;
 }
 
 async function checkImage(url: string): Promise<boolean> {
