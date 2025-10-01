@@ -1,14 +1,14 @@
-import { ContextMenu } from "@/components/ContextComponent";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { auth, db } from "@/lib/firebase";
 import { deleteCommentFromAnime, deleteCommentFromAnswer } from "@/lib/firebase/comments";
 import { CustomUser } from "@/store/userStore";
 import { formatDate } from "@/utils/formatDate";
+import { GlassView } from "expo-glass-effect";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { doc, onSnapshot } from "firebase/firestore";
 import { memo, useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { CommentAnimeT } from "./CommentAnime.type";
 
 interface CommentItemProps {
@@ -17,16 +17,17 @@ interface CommentItemProps {
     disabled?: boolean;
     type: 'comment' | 'answer';
     mainCommentID?: string;
+    answerMode?: boolean;
 }
 
-const CommentItem = memo(({ comment, animeID, disabled = false, type, mainCommentID }: CommentItemProps) => {
+const CommentItem = memo(({ comment, animeID, disabled = false, type, mainCommentID, answerMode = false }: CommentItemProps) => {
     const [user, setUser] = useState<CustomUser | null>(null);
 
     useEffect(() => {
         const unsub = onSnapshot(doc(db, "user-collection", comment.user.id), (docSnap) => {
-            if (docSnap.exists()) {
-                setUser(docSnap.data() as CustomUser);
-            }
+            if (!docSnap.exists()) return;
+
+            setUser(docSnap.data() as CustomUser);
         });
 
         return () => unsub();
@@ -36,98 +37,78 @@ const CommentItem = memo(({ comment, animeID, disabled = false, type, mainCommen
     const displayPhoto = user?.avatarURL || comment.user.photoURL;
 
     const isOwner = comment.user.id === auth.currentUser?.uid;
-    return (
-        <>
-            {isOwner ? (
-                <ContextMenu
-                    triggerItem={
-                        <View style={styles.container}>
-                            <Pressable onPress={() => router.push({ pathname: '/(screens)/(user)/[id]', params: { id: comment.user.id } })}>
-                                <Image source={{ uri: displayPhoto }} style={styles.avatar} transition={500} />
-                            </Pressable>
-                            <View style={{ flex: 1, flexShrink: 1, gap: 5 }}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-                                    <Text style={styles.name}>{displayName}</Text>
-                                    <Text style={styles.text}>{formatDate(comment.createdAt)}</Text>
-                                </View>
-                                <Pressable disabled={disabled} onPress={() => router.push({ pathname: '/(screens)/(anime)/(comments)/[id]', params: { id: comment.id, animeID: animeID } })}>
-                                    <Text style={styles.text} numberOfLines={6}>{comment.text}</Text>
-                                </Pressable>
-                            </View>
-                        </View>
-                    }
-                    items={[
-                        {
-                            title: "Удалить",
-                            destructive: true,
-                            onSelect: () => {
-                                if (type === 'answer')
-                                    Alert.prompt(
-                                        "Удалить комментарий?",
-                                        '',
-                                        [
-                                            { text: 'Отмена', style: 'default' },
-                                            {
-                                                text: "Удалить",
-                                                onPress: () => {
-                                                    mainCommentID && deleteCommentFromAnswer({ animeId: Number(animeID), commentId: comment.id, mainCommentID: mainCommentID })
-                                                },
-                                                style: 'destructive'
-                                            }
-                                        ]
-                                    );
-                                else
-                                    Alert.alert(
-                                        "Удалить комментарий?",
-                                        undefined,
-                                        [
-                                            { text: 'Отмена', style: 'default' },
-                                            {
-                                                text: "Удалить",
-                                                onPress: () => {
-                                                    deleteCommentFromAnime({ animeId: Number(animeID), commentId: comment.id })
-                                                },
-                                                style: 'destructive'
-                                            }
-                                        ]
-                                    );
 
-                            }
-                        }
-                    ]}
-                />
-            ) : (
-                <View style={styles.container}>
-                    <Pressable onPress={() => router.push({ pathname: '/(screens)/(user)/[id]', params: { id: comment.user.id } })}>
-                        <Image source={{ uri: displayPhoto }} style={styles.avatar} transition={500} />
-                    </Pressable>
-                    <View style={{ flex: 1, flexShrink: 1, gap: 5 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+    const handleDelete = () => {
+        const title = "Удалить комментарий?";
+        const message = type === "answer" ? "" : comment.text;
+
+        const onDelete = () => {
+            if (type === "answer" && mainCommentID) {
+                deleteCommentFromAnswer({
+                    animeId: Number(animeID),
+                    commentId: comment.id,
+                    mainCommentID,
+                });
+            } else {
+                deleteCommentFromAnime({
+                    animeId: Number(animeID),
+                    commentId: comment.id,
+                });
+            }
+        };
+
+        Alert.alert(title, message, [
+            { text: "Отмена", style: "default" },
+            { text: "Удалить", onPress: onDelete, style: "destructive" },
+        ]);
+    };
+
+    const handleNavigateUser = () => router.push({ pathname: '/(screens)/(user)/[id]', params: { id: comment.user.id } });
+    const handleNavigateToComment = () => router.push({ pathname: '/(screens)/(anime)/(comments)/[id]', params: { id: comment.id, animeID: animeID } });
+
+    return (
+        <GlassView isInteractive glassEffectStyle={'clear'} style={styles.container}>
+            <Pressable onPress={handleNavigateUser}>
+                <View style={styles.avatar}>
+                    <Image source={{ uri: displayPhoto }} style={styles.avatar} transition={500} />
+                </View>
+            </Pressable>
+            <Pressable disabled={disabled} onPress={handleNavigateToComment} style={{ flex: 1 }}>
+                <View style={{ flex: 1, flexShrink: 1, gap: 10 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 5 }}>
                             <Text style={styles.name}>{displayName}</Text>
                             <Text style={styles.text}>{formatDate(comment.createdAt)}</Text>
                         </View>
-                        <Pressable disabled={disabled} onPress={() => router.push({ pathname: '/(screens)/(anime)/(comments)/[id]', params: { id: comment.id, animeID: animeID } })}>
-                            <Text style={styles.text} numberOfLines={6}>{comment.text}</Text>
-                        </Pressable>
+                        {isOwner && !answerMode &&
+                            <Pressable hitSlop={20} onPress={handleDelete}>
+                                <IconSymbol name="trash" size={20} color={'red'} />
+                            </Pressable>
+                        }
                     </View>
+                    <Text style={styles.text} numberOfLines={6}>{comment.text}</Text>
                 </View>
-            )}
-        </>
+            </Pressable>
+        </GlassView>
     );
 });
 
 const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
-        padding: 8,
+        padding: 12,
         alignItems: "center",
-        backgroundColor: 'black'
+        borderRadius: 12,
     },
     avatar: {
         width: 40,
         height: 40,
         borderRadius: 20,
         marginRight: 8,
+        shadowColor: 'red',
+        shadowOpacity: 0.35,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 0 }
     },
     name: {
         color: 'white',
