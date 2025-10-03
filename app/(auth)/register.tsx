@@ -1,39 +1,71 @@
-import { ImageBackground } from "expo-image";
+import { RegisterForm } from "@/components/Screens/Auth/RegisterForm";
+import { BlurView } from "expo-blur";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams } from "expo-router";
 import {
     Keyboard,
-    KeyboardAvoidingView,
-    Platform, StyleSheet,
-    TouchableWithoutFeedback
+    Platform,
+    StyleSheet,
+    Text,
+    TouchableWithoutFeedback,
+    View
 } from "react-native";
-// import { RegisterForm } from "@/components/Forms/RegisterForm";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 
 export default function RegisterScreen() {
-    const {email} = useLocalSearchParams();
-
     return (
-        <ImageBackground
-            source={""}
-            style={{flex: 1}}
-            contentFit="cover"
-        >
+        <View style={styles.container}>
             <LinearGradient
-                style={StyleSheet.absoluteFill}
-                colors={[
-                    "rgba(0,0,0, 0.7)",
-                    "rgba(0,0,0, 0.8)",
-                    "rgba(0,0,0, 0.9)",
-                    "black"
-                ]}
+                colors={["#141e30", "#243b55"]}
+                style={StyleSheet.absoluteFillObject}
             />
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <KeyboardAvoidingView style={{flex: 1}}
-                                      behavior={Platform.OS === "ios" ? "padding" : undefined}
+                <KeyboardAvoidingView
+                    style={{ width: "100%", paddingHorizontal: 0 }}
+                    behavior={Platform.OS === "ios" ? "padding" : undefined}
+                    keyboardVerticalOffset={22}
                 >
-                    {/* <RegisterForm defaultEmail={email as string}/> */}
+                    <Text style={styles.title}>Регистрация</Text>
+
+                    {isLiquidGlassAvailable() ? (
+                        <GlassView glassEffectStyle="clear" style={styles.glassBlurContainer}>
+                            <RegisterForm />
+                        </GlassView>
+                    ) : (
+                        <View style={{
+                            shadowColor: 'white',
+                            shadowOffset: { width: 0, height: 0 },
+                            shadowOpacity: 0.1,
+                            shadowRadius: 12
+                        }}>
+                            <BlurView tint="regular" intensity={60} style={[styles.glassBlurContainer, { overflow: 'hidden' }]}>
+                                <RegisterForm />
+                            </BlurView>
+                        </View>
+                    )}
                 </KeyboardAvoidingView>
             </TouchableWithoutFeedback>
-        </ImageBackground>
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        backgroundColor: "transparent",
+        gap: 20,
+        paddingHorizontal: 20,
+    },
+    title: {
+        fontSize: 28,
+        color: "white",
+        fontWeight: "bold",
+        marginBottom: 30,
+    },
+    glassBlurContainer: {
+        gap: 15,
+        padding: 20,
+        borderRadius: 24
+    }
+});

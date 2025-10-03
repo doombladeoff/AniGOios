@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useRef } from "react";
+import { View } from "react-native";
 
 export default function StartScreen() {
     const isSkip = storage.getSkip();
@@ -25,7 +26,7 @@ export default function StartScreen() {
 
             if (!user) {
                 setUser(null);
-                router.replace("/(auth)");
+                router.replace({ pathname: '/(auth)' });
                 return;
             }
 
@@ -34,11 +35,9 @@ export default function StartScreen() {
                 router.replace("/(tabs)/(home)/home");
             }
 
-            // Подписка на документ пользователя
             const userDocRef = doc(db, "user-collection", user.uid);
             const unsubscribeSnapshot = onSnapshot(userDocRef, (snap) => {
                 if (!snap.exists()) {
-                    // Создаем дефолтного пользователя если нет
                     const defaultUser: CustomUser = {
                         ...user,
                         avatarURL: "",
@@ -63,7 +62,6 @@ export default function StartScreen() {
                     const combinedUser: CustomUser = { ...user, ...userData };
                     setUser(combinedUser);
                 }
-
             });
 
             return () => {
@@ -76,5 +74,5 @@ export default function StartScreen() {
         };
     }, []);
 
-    return null;
+    return <View />;
 }

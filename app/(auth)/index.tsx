@@ -1,170 +1,206 @@
+import { LogInForm } from "@/components/Screens/Auth/LogInForm";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { auth } from "@/lib/firebase";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { BlurView } from "expo-blur";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
+import { ImageBackground } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import { Link, Stack } from "expo-router";
+import { sendPasswordResetEmail } from "firebase/auth";
 import {
+    Keyboard,
+    Platform,
+    Pressable,
     StyleSheet,
     Text,
-    TouchableOpacity,
+    TouchableWithoutFeedback,
     View
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import SvgHandwriting from "@/components/other /Path/AnimPath";
-import { useGoogleAuth } from "@/hooks/useGoogleAuth";
-import { useUserStore } from "@/store/userStore";
-import { storage } from "@/utils/storage";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+export const resetPassword = async (email: string) => {
+    try {
+        await sendPasswordResetEmail(auth, email);
+        return { success: true, message: "Письмо для сброса пароля отправлено на " + email };
+    } catch (error: any) {
+        let message = "Ошибка при сбросе пароля";
+
+        switch (error.code) {
+            case "auth/invalid-email":
+                message = "Некорректный email";
+                break;
+            case "auth/user-not-found":
+                message = "Пользователь с таким email не найден";
+                break;
+            default:
+                message = error.message;
+        }
+
+        return { success: false, message };
+    }
+};
 
 export default function AuthScreen() {
-    const setUser = useUserStore(s => s.setUser)
-    const insets = useSafeAreaInsets();
     const { promptAsync } = useGoogleAuth();
 
     return (
-        <Animated.View entering={FadeIn.duration(600)} style={styles.container}>
-            <Animated.View style={[styles.inner, { paddingTop: insets.top }]}>
-                <TouchableOpacity
-                    onPress={() => {
-                        setUser(null);
-                        storage.setSkip(true);
-                        router.replace({ pathname: "/(tabs)/(home)/home" });
+        <View style={{ flex: 1 }}>
+            <ImageBackground source={require('@/assets/images/loginBackground.jpeg')} style={{ flex: 1 }} blurRadius={10}>
+                <Stack.Screen
+                    options={{
+                        headerShown: true,
+                        headerTransparent: true,
+                        headerLeft: undefined,
                     }}
-                    hitSlop={10}
-                    activeOpacity={0.8}
-                    style={styles.skipButtonContainer}
+                />
+                <LinearGradient
+                    colors={["#141e30", "#243b55"]}
+                    style={[StyleSheet.absoluteFillObject, { opacity: 0.2 }]}
+                />
+
+                <Animated.View
+                    entering={FadeIn.duration(600)}
+                    style={styles.container}
                 >
-                    <Text style={styles.skipButtonText}>Skip</Text>
-                </TouchableOpacity>
+                    <View style={{ zIndex: 1, shadowColor: 'black', shadowRadius: 6, shadowOpacity: 0.65, shadowOffset: { width: 0, height: 2 }, position: 'static' }}>
+                        <Text style={styles.title}>Добро пожаловать 👋</Text>
+                        <Text style={styles.subtitle}>Войдите в аккаунт</Text>
+                    </View>
 
-                <SvgHandwriting />
-                <View style={styles.socialButtonsContainer}>
-                    {["google", "apple"].map((icon, i) => (
-                        <TouchableOpacity
-                            key={icon}
-                            style={[styles.socialButton, i === 0 && styles.marginRight]}
-                            onPress={() => promptAsync()}
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <KeyboardAvoidingView
+                            style={{ width: "100%", paddingHorizontal: 20 }}
+                            behavior={Platform.OS === "ios" ? "padding" : undefined}
+                            keyboardVerticalOffset={10}
                         >
-                            <FontAwesome6 name={icon} size={26 + (icon === "apple" ? 2 : 0)}
-                                color="white" />
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                            {isLiquidGlassAvailable() ? (
+                                <GlassView glassEffectStyle="clear" style={{ gap: 15, padding: 20, borderRadius: 24 }}>
+                                    <LogInForm />
+                                </GlassView>
+                            ) : (
+                                <View style={{
+                                    shadowColor: 'white',
+                                    shadowOffset: { width: 0, height: 0 },
+                                    shadowOpacity: 0.5,
+                                    shadowRadius: 12
+                                }}>
+                                    <BlurView tint="regular" intensity={60} style={{ gap: 15, padding: 20, borderRadius: 24, overflow: 'hidden' }}>
+                                        <LogInForm />
+                                    </BlurView>
+                                </View>
+                            )}
 
-            </Animated.View>
-        </Animated.View>
+                        </KeyboardAvoidingView>
+                    </TouchableWithoutFeedback>
+                    <View style={styles.orContainer}>
+                        <View style={styles.orLine} />
+                        <Text style={styles.orText}>или</Text>
+                        <View style={styles.orLine} />
+                    </View>
+
+                    <View style={styles.socialButtonsContainer}>
+                        {["google", "apple"].map((icon) => (
+                            <Pressable key={icon} onPress={() => promptAsync()}>
+                                <GlassView isInteractive glassEffectStyle="clear" style={styles.socialButton}>
+                                    <FontAwesome6
+                                        name={icon}
+                                        size={26 + (icon === "apple" ? 2 : 0)}
+                                        color="white"
+                                    />
+                                </GlassView>
+                            </Pressable>
+                        ))}
+                    </View>
+
+                    <View style={{ alignItems: 'center', gap: 10 }}>
+                        <View style={styles.footer}>
+                            <Text style={{ color: "white" }}>Нет аккаунта?</Text>
+
+                            <Link href={{ pathname: "/(auth)/register" }} asChild>
+                                <Pressable>
+                                    <Text style={styles.footerLink}>Зарегистрируйтесь</Text>
+                                </Pressable>
+                            </Link>
+                        </View>
+
+                        <Link href={{ pathname: "/(auth)/resetpass" }} asChild>
+                            <Pressable>
+                                <Text style={styles.footerLink}>Забыли пароль?</Text>
+                            </Pressable>
+                        </Link>
+                    </View>
+
+                </Animated.View>
+            </ImageBackground>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'black'
-    },
-    flex: {
-        flex: 1
-    },
-    background: {
-        flex: 1,
-        zIndex: -2
-    },
-    inner: {
-        flex: 1,
-        paddingHorizontal: 20
-    },
-    skipButtonContainer: {
-        alignSelf: "flex-end",
-        marginTop: 10
-    },
-    skipButtonText: {
-        fontSize: 18,
-        color: 'white'
+        justifyContent: "center",
     },
     title: {
-        fontSize: 42,
-        marginBottom: 20,
+        fontSize: 32,
         color: "white",
-        fontWeight: "bold"
+        fontWeight: "bold",
+        textAlign: "center",
     },
-    formContainer: {
-        flex: 1,
-        justifyContent: "center"
-    },
-    input: {
-        marginVertical: 4,
-        height: 50,
-        borderWidth: 1,
-        borderRadius: 10,
-        padding: 10,
-        backgroundColor: "white",
-        shadowColor: "white",
-        shadowRadius: 10,
-        shadowOpacity: 0.5,
-        shadowOffset: { width: 0, height: 0 }
+    subtitle: {
+        fontSize: 16,
+        color: "lightgray",
+        textAlign: "center",
+        marginBottom: 30,
     },
     loginButton: {
-        alignSelf: "center",
-        marginTop: 25,
-        backgroundColor: "white",
-        padding: 10,
-        borderRadius: 25,
-        flexDirection: "row",
-        gap: 10,
-        width: "100%",
-        justifyContent: "center",
+        backgroundColor: "#4facfe",
+        borderRadius: 12,
+        height: 48,
         alignItems: "center",
-        shadowColor: "white",
-        shadowRadius: 10,
-        shadowOpacity: 0.5,
-        shadowOffset: { width: 0, height: 0 }
-    },
-    loginText: {
-        color: "black",
-        fontWeight: "600"
-    },
-    errorText: {
-        color: "red",
-        paddingTop: 10
+        justifyContent: "center",
+        marginTop: 10,
     },
     orContainer: {
         flexDirection: "row",
         alignItems: "center",
         marginVertical: 20,
-        alignSelf: "center"
+        justifyContent: "center",
     },
     orLine: {
-        borderWidth: 1,
-        borderRadius: 25,
-        width: 115,
-        borderColor: "white",
-        height: 1
+        height: 1,
+        width: 100,
+        backgroundColor: "rgba(255,255,255,0.3)",
     },
     orText: {
-        color: "white",
-        marginHorizontal: 10
+        color: "lightgray",
+        marginHorizontal: 10,
     },
     socialButtonsContainer: {
         flexDirection: "row",
-        justifyContent: "center"
+        justifyContent: "center",
+        gap: 20,
     },
     socialButton: {
-        backgroundColor: "rgba(89,88,88,0.8)",
-        padding: 10,
-        borderRadius: 100,
-        width: 50,
-        height: 50,
+        backgroundColor: "rgba(255,255,255,0.1)",
+        padding: 12,
+        borderRadius: 50,
+        width: 55,
+        height: 55,
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
     },
-    marginRight: {
-        marginRight: 10
+    footer: {
+        marginTop: 30,
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 5,
     },
-    registerFooter: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        left: 0,
-        flexDirection: 'row',
-        gap: 10,
-    }
+    footerLink: {
+        color: "#4facfe",
+        fontWeight: "600",
+    },
 });

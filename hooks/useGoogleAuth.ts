@@ -92,8 +92,9 @@ export const useGoogleAuth = () => {
         try {
             const { user } = await signInWithEmailAndPassword(auth, email, password);
             await authenticateUser(user);
-        } catch (error) {
-            console.error("Login failed:", error);
+        } catch (error: any) {
+            console.error("Login failed:", error.code);
+            throw error;
         }
     }, [authenticateUser]);
 
@@ -104,8 +105,9 @@ export const useGoogleAuth = () => {
             await updateProfile(user, { displayName: username });
             const userData = { displayName: username };
             await handleAuthSuccess(user, userData);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Registration failed:", error);
+            throw error;
         }
     }, [handleAuthSuccess]);
 
