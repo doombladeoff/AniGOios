@@ -1,4 +1,5 @@
 import { UIPage } from "@/components/Screens/Settings/Page";
+import { useTheme } from "@/hooks/ThemeContext";
 import { auth } from "@/lib/firebase";
 import { storage } from "@/utils/storage";
 import { Button, HStack, Picker, Section, Spacer, Switch, Image as UIImage, Text as UIText } from "@expo/ui/swift-ui";
@@ -7,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 export default function SettingsScreen() {
+    const { theme, mode, setMode } = useTheme();
     //Player
     const [isDefaultPlayer, setIsDefaultPlayer] = useState<boolean>(storage.getDefaultPlayer() ?? false);
     const [skipOpening, setSkipOpening] = useState<boolean>(storage.getSkipOpening() ?? false);
@@ -101,6 +103,32 @@ export default function SettingsScreen() {
                         console.log(index)
                         setSelectedSeekTime(index);
                         storage.setSkipTime(index);
+                    }}
+                />
+            </Section>
+
+            <Section title="Тема" modifiers={[
+            ]}>
+                <Switch
+                    label="Светлая"
+                    value={mode === 'light'}
+                    onValueChange={(v) => {
+                        setMode('light')
+                    }}
+                />
+                <Switch
+                    label="Темная"
+                    value={mode === 'dark'}
+                    onValueChange={(v) => {
+                        setMode('dark')
+                    }}
+                />
+
+                <Switch
+                    label="Системная"
+                    value={mode === 'system'}
+                    onValueChange={(v) => {
+                        setMode('system')
                     }}
                 />
             </Section>
