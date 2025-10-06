@@ -1,4 +1,6 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { ThemedText } from '@/components/ui/ThemedText';
+import { useTheme } from '@/hooks/ThemeContext';
 import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import React, { useState } from 'react';
@@ -18,8 +20,9 @@ const OFFSET = 10;
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 export const VoiceOversStack = ({ items }: { items: any }) => {
+    const isDarkMode = useTheme().theme === 'dark';
     const [expanded, setExpanded] = useState(false);
-    const progress = useSharedValue(0); // от 0 до 1
+    const progress = useSharedValue(0);
 
     const toggle = () => {
         setExpanded((prev) => !prev);
@@ -30,7 +33,7 @@ export const VoiceOversStack = ({ items }: { items: any }) => {
         const rotate = interpolate(
             progress.value,
             [0, 1],
-            [0, 90] // из 0° в 180° при раскрытии
+            [0, 90]
         );
         return {
             transform: [{ rotate: `${rotate}deg` }],
@@ -40,15 +43,14 @@ export const VoiceOversStack = ({ items }: { items: any }) => {
     return (
         <View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 10 }}>
-                <Text
+                <ThemedText lightColor='black'
                     style={{
-                        color: 'white',
                         fontSize: 16,
                         fontWeight: '500',
                     }}
                 >
                     Актеры озвучки
-                </Text>
+                </ThemedText>
                 <Pressable
                     onPress={toggle}
                     style={{
@@ -141,7 +143,7 @@ export const VoiceOversStack = ({ items }: { items: any }) => {
                                 },
                             ]}
                         >
-                            <BlurView intensity={100} tint="dark" style={{ ...StyleSheet.absoluteFillObject }} />
+                            <BlurView intensity={100} tint={isDarkMode ? "dark" : 'systemMaterialLight'} style={{ ...StyleSheet.absoluteFillObject }} />
                             <Image
                                 source={{ uri: item.person.images.jpg.image_url }}
                                 style={{
@@ -154,8 +156,8 @@ export const VoiceOversStack = ({ items }: { items: any }) => {
                                 transition={500}
                             />
                             <View>
-                                <Text style={{ color: 'white', fontWeight: 'bold' }}>{item.person.name}</Text>
-                                <Text style={{ color: 'white' }}>{item.language}</Text>
+                                <ThemedText lightColor='black' darkColor='white' style={{ fontWeight: 'bold' }}>{item.person.name}</ThemedText>
+                                <ThemedText>{item.language}</ThemedText>
                             </View>
                         </AnimatedView>
                     );

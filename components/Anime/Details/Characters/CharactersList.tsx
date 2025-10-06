@@ -1,7 +1,10 @@
+import { ThemedText } from "@/components/ui/ThemedText";
+import { ThemedView } from "@/components/ui/ThemedView";
 import { useAnimeStore } from "@/store/animeStore";
 import { FlashList } from "@shopify/flash-list";
 import { Link, router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { memo } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import { useShallow } from "zustand/shallow";
 import { CharacterItem } from "./CharacterItem";
 
@@ -23,9 +26,8 @@ const CharacterList = ({ id }: { id: number; }) => {
 
     return (
         <View>
-            {console.log('Render Characters')}
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', zIndex: 9999, marginHorizontal: 10, marginBottom: 15, }}>
-                <Text style={{ fontSize: 18, fontWeight: '500', color: 'white', }}> Персонажи</Text>
+            <View style={styles.containerHaeder}>
+                <ThemedText style={{ fontSize: 18, fontWeight: '500' }}>Персонажи</ThemedText>
                 <Link href={{
                     pathname: '/(screens)/(characters)/characters',
                     params: {
@@ -33,7 +35,9 @@ const CharacterList = ({ id }: { id: number; }) => {
                     }
                 }} asChild>
                     <Pressable>
-                        <Text style={{ fontSize: 14, backgroundColor: 'white', paddingHorizontal: 6, paddingVertical: 4, borderRadius: 8 }}>Все</Text>
+                        <ThemedView lightColor="black" darkColor="white" style={{ borderRadius: 12 }}>
+                            <ThemedText lightColor="white" darkColor="black" style={{ fontSize: 14, paddingHorizontal: 8, paddingVertical: 4 }}>Все</ThemedText>
+                        </ThemedView>
                     </Pressable>
                 </Link>
             </View>
@@ -47,6 +51,16 @@ const CharacterList = ({ id }: { id: number; }) => {
         </View>
 
     )
-}
+};
 
-export default CharacterList;
+const styles = StyleSheet.create({
+    containerHaeder: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginHorizontal: 10,
+        marginBottom: 15,
+    }
+})
+
+export default memo(CharacterList);
