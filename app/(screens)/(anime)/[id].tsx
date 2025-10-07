@@ -9,7 +9,7 @@ import {
     GenresList,
     NextEpisodeInfo,
     RecommendationList,
-    ScreenshotsList,
+    Screenshots
 } from "@/components/Anime/Details";
 import { HeaderRight } from "@/components/Anime/HeaderRight";
 import Player from "@/components/Anime/Player";
@@ -220,15 +220,12 @@ export default function AnimeScreen() {
                         icon="clock"
                     />
 
-
-                    <ScreenshotsList
+                    <Screenshots
                         id={Number(id)}
-                        containerStyle={{ paddingHorizontal: 10 }}
-                        imageStyle={{ width: 280, height: 150, borderRadius: 12, marginLeft: 0, margin: 10, backgroundColor: 'gray' }}
+                        imageStyle={{ width: 280, height: 160, borderRadius: 12, marginLeft: 0, margin: 10, backgroundColor: 'gray' }}
                         headerText="Скриншоты"
-                        headerTextStyle={{ paddingHorizontal: 15, color: 'white', fontSize: 18, fontWeight: '600', zIndex: 22, marginTop: 10 }}
+                        headerTextStyle={{ paddingHorizontal: 15, fontSize: 18, fontWeight: '600', zIndex: 22, marginTop: 10 }}
                     />
-
 
                     {(!isAnons) &&
                         <View onLayout={(e) => playerPosition.current = e.nativeEvent.layout.y * 1.75}>
