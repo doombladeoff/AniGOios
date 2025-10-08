@@ -1,4 +1,5 @@
 import { Card } from "@/components/Anime/Card";
+import { useTheme } from "@/hooks/ThemeContext";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { memo } from "react";
@@ -14,10 +15,13 @@ interface Poster3DProps {
     id: string
 };
 
-const GradeintColors = ['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,1)'] as [ColorValue, ColorValue, ...ColorValue[]];
+const GradeintColorsDark = ['transparent', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,1)'] as [ColorValue, ColorValue, ...ColorValue[]];
+const GradeintColorsLight = ['transparent', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.45)', 'rgba(255, 255, 255, 1)'] as [ColorValue, ColorValue, ...ColorValue[]];
 
 const Poster3D = ({ showStatus, img, imgSmall, id }: Poster3DProps) => {
     const insets = useSafeAreaInsets();
+    const GradientColors = useTheme().theme === 'dark' ? GradeintColorsDark : GradeintColorsLight;
+    
     return (
         <View>
             <Animated.View entering={FadeIn.duration(1000)} style={[styles.container, { marginVertical: insets.top }, styles.shadow]}>
@@ -32,7 +36,7 @@ const Poster3D = ({ showStatus, img, imgSmall, id }: Poster3DProps) => {
                     />
                 </Card>
             </Animated.View>
-            <LinearGradient colors={GradeintColors} style={styles.gradient} />
+            <LinearGradient colors={GradientColors} style={styles.gradient} />
             <Image priority={'high'} transition={300} source={{ uri: imgSmall }} style={styles.backImage} blurRadius={30} contentFit='cover' />
         </View>
     )

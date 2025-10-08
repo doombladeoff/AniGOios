@@ -1,8 +1,9 @@
+import { useTheme } from "@/hooks/ThemeContext";
 import { storage } from "@/utils/storage";
-import { Button, ContextMenu, Host, HStack, Image } from "@expo/ui/swift-ui";
-import { frame } from "@expo/ui/swift-ui/modifiers";
+import { Button, ContextMenu, Host, Image } from "@expo/ui/swift-ui";
+import { frame, shadow } from "@expo/ui/swift-ui/modifiers";
 import { router } from "expo-router";
-import { Items } from "../ContextComponent/ContextMenu";
+import { Items } from "../../ContextComponent/ContextMenu";
 
 interface HeaderRightProps {
     img?: { crunch: string | undefined, def: string | undefined };
@@ -10,6 +11,7 @@ interface HeaderRightProps {
 }
 
 export const HeaderRight = ({ img, customItems }: HeaderRightProps) => {
+    const isDarkMode = useTheme().theme === 'dark';
 
     const item: Items[] = [
         {
@@ -47,11 +49,9 @@ export const HeaderRight = ({ img, customItems }: HeaderRightProps) => {
                 </ContextMenu.Items>
                 <ContextMenu.Trigger>
                     <Host style={{ width: 35, height: 35 }}>
-                        <HStack modifiers={[frame({ width: 25, height: 25 })]}>
-                            <Button modifiers={[frame({ width: 35, height: 35 })]}>
-                                <Image systemName="ellipsis" size={25} color="white" />
-                            </Button>
-                        </HStack>
+                        <Button modifiers={[shadow({ radius: 2, color: 'black' })]}>
+                            <Image color={isDarkMode ? 'white' : 'black'} systemName="ellipsis" size={25} modifiers={[frame({ width: 25, height: 35 })]} />
+                        </Button>
                     </Host>
                 </ContextMenu.Trigger>
             </ContextMenu>

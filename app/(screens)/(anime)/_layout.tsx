@@ -10,8 +10,7 @@ export default function AnimeLayout() {
                     orientation: 'portrait',
                     headerTransparent: true,
                     headerTitle: '',
-                    // headerBlurEffect: 'regular',
-                    headerLeft: () => <HeaderBackButton />
+                    headerLeft: () => <HeaderBackButton />,
                 }}
             />
             <Stack.Screen name="(comments)" options={{ headerShown: false }} />

@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import { AnimeStatusEnum } from "@/API/Shikimori/Shikimori.types";
 import Bookmark from "@/components/Anime/Bookmark";
-import CustomHeader from "@/components/Anime/CustomHeader";
 import {
     CharacterList,
     Details,
@@ -11,35 +10,27 @@ import {
     RecommendationList,
     Screenshots
 } from "@/components/Anime/Details";
-import { HeaderRight } from "@/components/Anime/HeaderRight";
+import CustomHeader from "@/components/Anime/Header/CustomHeader";
+import { HeaderRight } from "@/components/Anime/Header/HeaderRight";
 import Player from "@/components/Anime/Player";
 import { CrunchyPoster, Poster3D } from "@/components/Anime/Posters";
 import { ItemsT } from "@/components/ContextComponent/DropdownMenu";
-import { GradientBlur } from "@/components/GradientBlur";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { ThemedView } from "@/components/ui/ThemedView";
 import { useAnimeFetch } from "@/hooks/anime/useAnimeFetch";
-import { useScrollOpacity } from '@/hooks/useScrollOpacity';
+import { useTheme } from "@/hooks/ThemeContext";
 import { auth } from "@/lib/firebase";
 import { storage } from "@/utils/storage";
-import { useHeaderHeight } from "@react-navigation/elements";
-import { LinearGradient } from "expo-linear-gradient";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import { easeGradient } from "react-native-easing-gradient";
-import Animated, { Extrapolation, FadeIn, FadeInDown, interpolate, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
+import Animated, { FadeIn, useAnimatedRef, useScrollOffset } from "react-native-reanimated";
 
 export default function AnimeScreen() {
     const useTestHeader: boolean = storage.getUseTestHeader() ?? false;
     const showStatus = storage.getShowStatus() ?? true;
-
-    const headerHeight = useHeaderHeight();
-    const { colors, locations } = easeGradient({
-        colorStops: {
-            0: { color: 'black' },
-            0.5: { color: 'rgba(0,0,0,0.9)' },
-            1: { color: 'transparent' }
-        },
     });
 
     const { id } = useLocalSearchParams();
@@ -57,23 +48,8 @@ export default function AnimeScreen() {
         }
     }, []);
 
-    const crunchyId = animeData?.crunchyroll?.crunchyrollId;
-
     const fallbackImage = animeData?.poster?.originalUrl;
 
-    const { animatedStyle, scrollHandler } = useScrollOpacity(useCrunch ? 600 : 270);
-
-    const backgroundImage = useMemo(() => {
-        if (animeData?.crunchyroll.hasTallThumbnail) return animeData.crunchyroll.crunchyImages.tallThumbnail;
-        if (animeData?.crunchyroll.hasWideThumbnail) return animeData.crunchyroll.crunchyImages.wideThumbnail;
-    }, [crunchyId, animeData?.crunchyroll.hasTallThumbnail, animeData?.crunchyroll.hasWideThumbnail]);
-
-    const top = useSharedValue(0);
-    const combinedScrollHandler = useAnimatedScrollHandler({
-        onScroll: (event) => {
-            const y = event.contentOffset.y;
-            top.value = interpolate(
-                y,
                 [0, 330],
                 [0, -470],
                 Extrapolation.CLAMP
@@ -95,6 +71,8 @@ export default function AnimeScreen() {
         pathname: '/(screens)/(anime)/(comments)/comments',
         params: { id: animeData?.malId }
     })), [])
+        params: { id: animeData.malId }
+    })), [animeData]);
 
     if (isLoading) {
         return (
@@ -102,6 +80,7 @@ export default function AnimeScreen() {
                 <ActivityIndicator size='small' color="white" />
                 <Text style={{ color: 'white', textAlign: 'center', marginTop: 20 }}>Загрузка...</Text>
             </View>
+            <ThemedView lightColor="white" darkColor="black" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         )
     }
 
@@ -109,40 +88,25 @@ export default function AnimeScreen() {
         <View style={{ flex: 1 }}>
             <Stack.Screen
                 options={{
-                    headerShown: true,
                     ...(useTestHeader && {
                         header: () => useTestHeader ? <CustomHeader
-                            Right={<HeaderRight img={{ crunch: backgroundImage || '', def: animeData?.poster?.originalUrl }} customItems={headerRightItems} />}
                             animeData={animeData}
-                            animatedStyle1={animatedStyle1}
-                            showStatus={showStatus}
                             fallbackImage={fallbackImage}
                         /> : undefined
-                    }),
-
-                    headerRight: () => <HeaderRight img={{ crunch: backgroundImage || '', def: animeData?.poster?.originalUrl }}
+                        img={{ crunch: backgroundImage || '', def: animeData?.poster?.originalUrl }}
                         customItems={headerRightItems}
                     />,
                 }}
             />
-            <Animated.View style={[StyleSheet.absoluteFill, { width: '100%', height: headerHeight, zIndex: 100 }, animatedStyle]}>
-                <GradientBlur
-                    containerStyle={{
-                        position: 'absolute',
-                        top: 0,
-                        zIndex: 2, width: '100%', height: headerHeight
-                    }}
-                    locations={locations as [number, number, ...number[]]}
-                    colors={colors as [string, string, ...string[]]}
                     tint="regular"
                     blurIntensity={20}
-                />
                 <LinearGradient
                     colors={['black', 'transparent']}
                     style={[StyleSheet.absoluteFill, { width: '100%', height: headerHeight, zIndex: 200 }]}
                     pointerEvents='none'
                 />
             </Animated.View>
+                fallbackImage={fallbackImage}
             <ParallaxScrollView
                 ref={scrollRef}
                 onScroll={useTestHeader ? combinedScrollHandler : scrollHandler}

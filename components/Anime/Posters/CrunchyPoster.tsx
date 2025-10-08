@@ -1,9 +1,10 @@
+import { useTheme } from "@/hooks/ThemeContext"
 import { useAnimeStore } from "@/store/animeStore"
-import { Image } from "expo-image"
+import { Image, ImageStyle } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { memo, useEffect, useMemo, useState } from "react"
-import { ColorValue, Dimensions, Image as RNImage, StyleSheet, View } from "react-native"
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated"
+import { ColorValue, Dimensions, Image as RNImage, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import Animated, { EntryOrExitLayoutType, FadeInDown } from "react-native-reanimated"
 import { useShallow } from "zustand/shallow"
 import { Status } from "../Status"
 
@@ -12,11 +13,17 @@ interface CrunchyPosterProps {
     showStatus: boolean;
     statusHeader?: string;
     showLogo?: boolean;
+    statusContainer?: StyleProp<ViewStyle>;
+    animationEntering?: EntryOrExitLayoutType;
+    imagestyle?: StyleProp<ImageStyle>;
 }
 
-const GradientColors = ['transparent', 'transparent', 'rgba(0,0,0,0.5)', 'black'] as [ColorValue, ColorValue, ...ColorValue[]]
+const GradeintColorsDark = ['transparent', 'rgba(0,0,0,0.15)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,1)'] as [ColorValue, ColorValue, ...ColorValue[]];
+const GradeintColorsLight = ['transparent', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.45)', 'rgba(255, 255, 255, 1)'] as [ColorValue, ColorValue, ...ColorValue[]];
 
-const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: CrunchyPosterProps) => {
+const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id, statusContainer, animationEntering, imagestyle }: CrunchyPosterProps) => {
+    const isDarkMode = useTheme().theme === 'dark';
+
     const { hasTall, hasWide, crunchyId, logo, animeData } = useAnimeStore(useShallow(s => ({
         hasTall: s.animeMap[id]?.crunchyroll.hasTallThumbnail,
         hasWide: s.animeMap[id]?.crunchyroll.hasWideThumbnail,
@@ -25,7 +32,7 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: Crunch
         animeData: s.animeMap[id],
     })));
 
-    const img_logo = logo || animeData.crunchyroll.crunchyImages.titleLogo
+    const img_logo = logo || animeData.crunchyroll.crunchyImages.titleLogo;
 
     const backgroundImage = useMemo(() => {
         if (hasTall) return animeData.crunchyroll.crunchyImages.tallThumbnail;
@@ -51,20 +58,21 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: Crunch
 
     return (
         <View>
-            {showStatus && <Status id={String(id)} showType="header" containerStyle={style.statusContainer} />}
+            {showStatus && <Status id={String(id)} showType="header" containerStyle={statusContainer || style.statusContainer} />}
             <LinearGradient
-                colors={GradientColors}
+                colors={isDarkMode ? GradeintColorsDark : GradeintColorsLight}
                 style={[StyleSheet.absoluteFill, { width: '100%', height: '100%', zIndex: 1 }]}
                 pointerEvents='none'
             />
 
-            <Animated.View entering={FadeInUp.duration(700)}>
+            <Animated.View entering={animationEntering}>
                 <Image
                     source={{ uri: backgroundImage || '' }}
-                    style={{
+                    style={[imagestyle || {
                         width: '100%',
                         height: '100%',
-                    }}
+                        backgroundColor: 'black'
+                    }]}
                     contentFit="cover"
                     contentPosition={'top'}
                     transition={400}
@@ -72,7 +80,7 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id }: Crunch
             </Animated.View>
 
             {showLogo &&
-                <Animated.View entering={FadeInDown.duration(700)} style={style.logoImg}>
+                <Animated.View entering={FadeInDown.duration(700)} style={[style.logoImg, !isDarkMode && { shadowColor: 'black', shadowOpacity: 0.65, shadowRadius: 8, shadowOffset: { width: 0, height: 0 } }]}>
                     <Image source={{ uri: img_logo }}
                         style={{
                             width: size.width,
@@ -107,6 +115,6 @@ const style = StyleSheet.create({
         shadowOpacity: 0.6,
         shadowRadius: 8,
     }
-})
+});
 
 export default memo(CrunchyPoster);

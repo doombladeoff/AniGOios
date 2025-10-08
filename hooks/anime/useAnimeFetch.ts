@@ -8,7 +8,7 @@ import { useAnimeStore } from "@/store/animeStore";
 import { checkAnimeAssets } from "@/utils/anime/checkAnimeAssets";
 import { storage } from "@/utils/storage";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 async function fetchAnimeById(id: number | string, fetchCrunch: boolean) {
     let recommendations = [];
@@ -85,10 +85,16 @@ export const useAnimeFetch = (id: number | string) => {
         return () => { active = false; };
     }, [id]);
 
+    const backgroundImage = useMemo(() => {
+        if (animeFromStore?.crunchyroll?.hasTallThumbnail) return animeFromStore.crunchyroll.crunchyImages.tallThumbnail;
+        if (animeFromStore?.crunchyroll?.hasWideThumbnail) return animeFromStore.crunchyroll.crunchyImages.wideThumbnail;
+    }, [animeFromStore?.crunchyroll?.hasTallThumbnail, animeFromStore?.crunchyroll?.hasWideThumbnail]);
+
     return {
         animeData: animeFromStore ?? null,
         isLoading,
         useCrunch,
-        usePoster3D
+        usePoster3D,
+        backgroundImage
     }
 };
