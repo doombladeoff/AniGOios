@@ -1,9 +1,11 @@
+import { useTheme } from "@/hooks/ThemeContext";
 import { FlashList } from "@shopify/flash-list";
 import { ImageStyle } from "expo-image";
 import { router } from "expo-router";
 import { memo } from "react";
-import { StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import Animated, { FadeInLeft } from "react-native-reanimated";
+import { ThemedText } from "../ui/ThemedText";
 import { CardPoster } from "./Item/CardPoster";
 import { ListHeader } from "./ListHeader";
 
@@ -20,7 +22,8 @@ interface LatestUpdatesProps {
 }
 
 const LatestUpdates = (props: LatestUpdatesProps) => {
-    console.log('render last updates')
+    const isDarkMode = useTheme().theme === 'dark';
+
     if (!props.updates || props.updates.length < 1) return null;
 
     const renderItem = ({ item, index }: { item: any, index: number }) => {
@@ -40,11 +43,11 @@ const LatestUpdates = (props: LatestUpdatesProps) => {
                     imgPriority={'high'}
                     onPress={handeNavigate}
                 >
-                    <Text style={props.episodeTextStyle} numberOfLines={2}>Серия {item.last_episode}</Text>
-                    <Text style={props.imageTextTitle} numberOfLines={2}>{item.title}</Text>
-                    <Text style={props.imageTextVoice} numberOfLines={2}>{item.translation.title}</Text>
+                    <ThemedText lightColor="white" style={props.episodeTextStyle} numberOfLines={2}>Серия {item.last_episode}</ThemedText>
+                    <ThemedText style={props.imageTextTitle} numberOfLines={2}>{item.title}</ThemedText>
+                    <ThemedText style={props.imageTextVoice} numberOfLines={2}>{item.translation.title}</ThemedText>
                 </CardPoster>
-            </Animated.View >
+            </Animated.View>
         )
     };
 
@@ -54,7 +57,7 @@ const LatestUpdates = (props: LatestUpdatesProps) => {
                 text="Последние обновления"
                 textStyle={props.headerTextStyle}
                 iconName="arrow.right"
-                iconColor="white"
+                iconColor={isDarkMode ? 'white' : 'black'}
                 iconSize={18}
                 containerStyle={{
                     paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
