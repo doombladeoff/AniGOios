@@ -68,7 +68,7 @@ function List({
         }
     ], [handleNavigate]);
 
-    const renderItem = useCallback(({ item, index }: { item: ShikimoriAnimeB; index: number }) => {
+    const renderItem = ({ item, index }: { item: ShikimoriAnimeB; index: number }) => {
         const handlePress = () => handleNavigate(item.malId);
         return !useContextMenu ? (
             <CardPoster
@@ -97,15 +97,19 @@ function List({
                 <ScoreBadge
                     score={item.score}
                     anons={anonsCard}
-                    containerStyle={styles.scoreContainer}
+                    containerStyle={[styles.scoreContainer, !horizontal && {
+                        left: 8, top: 10
+                    }]}
                     textStyle={styles.scoreText}
                     horizontal={horizontal}
                 />
             </CardPoster>
         ) : (
-            <ContextMenu
-                triggerItem={
-                    <Animated.View entering={index < 4 ? FadeInLeft.delay(100 * (index)).duration(750) : undefined}>
+            <Animated.View
+                style={{ shadowColor: 'black', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 4 }}
+                entering={index < 4 ? FadeInLeft.delay(100 * (index)).duration(750) : undefined}>
+                <ContextMenu
+                    triggerItem={
                         <CardPoster
                             index={index}
                             img={item.poster?.main2xUrl}
@@ -128,34 +132,33 @@ function List({
                                 horizontal={horizontal}
                             />
                         </CardPoster>
-                    </Animated.View>
-                }
-                previewItem={
-                    <View style={{ minWidth: width, maxWidth: width }}>
-                        <Preview
-                            bannerImg={item.bannerImage}
-                            img={item.poster.originalUrl}
-                            width={width}
-                            title={item.russian}
-                            score={item.score}
-                            isAnons={typeRequest === 'anons'}
-                            description={item.description}
-                        />
-                    </View>
-                }
-                items={contextMenuItems(item.malId)}
-            />
+                    }
+                    previewItem={
+                        <View style={{ minWidth: width, maxWidth: width }}>
+                            <Preview
+                                bannerImg={item.bannerImage}
+                                img={item.poster.originalUrl}
+                                width={width}
+                                title={item.russian}
+                                score={item.score}
+                                isAnons={typeRequest === 'anons'}
+                                description={item.description}
+                            />
+                        </View>
+                    }
+                    items={contextMenuItems(item.malId)}
+                />
+            </Animated.View>
         )
-    }, []);
+    };
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ paddingTop: horizontal ? 10 : 0, flex: 1 }}>
             {showHeader &&
                 <ListHeader
                     text={headerText}
                     textStyle={textStyle}
                     iconName="arrow.right"
-                    iconColor="white"
                     iconSize={18}
                     containerStyle={styles.headerStyle}
                     onPress={() => router.push({ pathname: '/(tabs)/(home)/animelist', params: { typeRequest: typeRequest, headerText: headerText } })}
@@ -170,10 +173,10 @@ function List({
                 keyExtractor={(item) => `${item.malId}-anime`}
                 data={data}
                 contentContainerStyle={{
-                    gap: horizontal ? 5 : 0,
+                    paddingLeft: horizontal ? 10 : 0,
                     paddingHorizontal: horizontal ? 5 : 0,
                     paddingTop: horizontal ? 10 : headerHeight + 5,
-                    paddingBottom: horizontal ? 0 : bottomTabHeight
+                    paddingBottom: horizontal ? 15 : bottomTabHeight,
                 }}
                 contentInsetAdjustmentBehavior="automatic"
                 maxItemsInRecyclePool={15}
@@ -193,6 +196,11 @@ const styles = StyleSheet.create({
     },
     container: {
         alignItems: 'center',
+        marginRight: 5,
+        shadowColor: 'black',
+        shadowOpacity: 0.45,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 0 },
     },
     scoreContainer: {
         position: 'absolute',
