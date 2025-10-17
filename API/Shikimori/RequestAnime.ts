@@ -57,7 +57,6 @@ export const ANIME_FIELDS: AnimeFields = {
     scoresStats: { score: true, count: true },
     statusesStats: { status: true, count: true },
     description: true,
-    opengraphImageUrl: true
 };
 
 export function buildFields(fieldsObj: any): string {
@@ -85,6 +84,7 @@ export function buildAnimeQueryFromObject(fieldsObj: any) {
       $page: Int!
       $season: SeasonString
       $genre: String
+      $score: Int
     ) {
       animes(
         search: $search
@@ -98,6 +98,7 @@ export function buildAnimeQueryFromObject(fieldsObj: any) {
         page: $page
         season: $season
         genre: $genre
+        score: $score
       ) {
         ${buildFields(fieldsObj)}
       }
@@ -105,12 +106,7 @@ export function buildAnimeQueryFromObject(fieldsObj: any) {
   `;
 }
 
-export const getAnimeList = async (
-    props: RequestProps,
-    fieldsObj: AnimeFields = ANIME_FIELDS,
-    // apolloClient?: ApolloClient<NormalizedCacheObject>
-    apolloClient?: any
-) => {
+function buildVariables(props: RequestProps) {
     const {
         name,
         ids,
@@ -122,27 +118,34 @@ export const getAnimeList = async (
         rating,
         page = 1,
         season,
-        genre
+        genre,
+        score,
     } = props;
 
-    const adjustedLimit = Math.min(limit ?? 2, 50);
-    const pageDefault = page ? page : 1;
+    const adjustedLimit = Math.min(Math.max(limit, 1), 50);
 
-    const variables = {
+    return {
         ...(name && { search: name }),
         ...(ids && { ids }),
         ...(kind?.length && { kind: kind.join(",") }),
         ...(status?.length && { status: status.join(",") }),
-        // ...(duration?.length && { duration: duration.join(",") }),
+        ...(duration?.length && { duration: duration.join(",") }),
         ...(rating?.length && { rating: rating.join(",") }),
         ...(!ids && { order: order }),
-        // season: ,
         ...(season?.length && { season }),
         ...(genre?.length && { genre: genre.join(",") }),
-        limit: (!ids || limit) ? adjustedLimit : 1,
-        page: !ids ? pageDefault : 1,
+        limit: adjustedLimit,
+        page,
+        ...(score && { score }),
     };
+}
 
+export const getAnimeList = async (
+    props: RequestProps,
+    fieldsObj: AnimeFields = ANIME_FIELDS,
+    apolloClient?: any
+) => {
+    const variables = buildVariables(props);
     console.log(variables)
     try {
         const { data } = await (apolloClient || client).query({
