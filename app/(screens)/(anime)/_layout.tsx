@@ -1,19 +1,27 @@
 import HeaderBackButton from "@/components/ui/HeaderBackButton";
+import { useTheme } from "@/hooks/ThemeContext";
 import { Stack } from "expo-router";
+import { Platform } from "react-native";
 
 export default function AnimeLayout() {
+    const isDarkMode = useTheme().theme === 'dark';
     return (
-        <Stack>
+        <Stack screenOptions={{
+            contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+        }}
+        >
             <Stack.Screen
                 name="[id]"
                 options={{
-                    orientation: 'portrait',
                     headerTransparent: true,
                     headerTitle: '',
                     headerLeft: () => <HeaderBackButton />,
                 }}
             />
-            <Stack.Screen name="(comments)" options={{ headerShown: false }} />
+            <Stack.Screen
+                name="(comments)"
+                options={{ headerShown: false }}
+            />
             <Stack.Screen
                 name="animeByGenre"
                 options={{
@@ -32,7 +40,15 @@ export default function AnimeLayout() {
             />
             <Stack.Screen
                 name="animeHistory"
-                options={{ title: 'История', headerLeft: () => <HeaderBackButton />, headerTransparent: true }}
+                options={{
+                    headerTransparent: Platform.Version >= '26.0' ? true : false,
+                    ...(Platform.Version < '26.0' && {
+                        headerStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                    }),
+                    title: "История просмотра",
+                    headerTintColor: 'white',
+                    headerLeft: () => <HeaderBackButton />,
+                }}
             />
         </Stack>
     )

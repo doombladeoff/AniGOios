@@ -1,29 +1,21 @@
 import { ContinueWatching } from "@/components/ContinueWatching";
-import { GradientBlur } from "@/components/GradientBlur";
-import Input from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { ThemedView } from "@/components/ui/ThemedView";
+import { getLastAnime, updateAnimeHistory } from "@/lib/firebase/update/userLastAnime";
 import { LastAnime, useUserStore } from "@/store/userStore";
-import { getLastAnime, updateAnimeHistory } from "@/utils/firebase/update/userLastAnime";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
-import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "expo-router";
 import { QueryDocumentSnapshot } from "firebase/firestore";
-import { useCallback, useEffect, useState } from "react";
-import { Dimensions, Keyboard, StyleSheet, View } from "react-native";
-import { easeGradient } from "react-native-easing-gradient";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Dimensions, Keyboard, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AnimeHistoryScreen() {
-    const headeHeight = useHeaderHeight();
+    const navigation = useNavigation();
+    const headerHeight = useHeaderHeight();
     const insets = useSafeAreaInsets();
-    const { colors, locations } = easeGradient({
-        colorStops: {
-            0: { color: 'black' },
-            0.5: { color: 'rgba(0,0,0,0.9)' },
-            1: { color: 'transparent' }
-        },
-    });
 
     const user = useUserStore(s => s.user);
 
@@ -40,21 +32,21 @@ export default function AnimeHistoryScreen() {
         const fetchInitial = async () => {
             try {
                 const res = await getLastAnime(user.uid, 10);
+
                 setAnimeList(res.data);
                 setLastDoc(res.lastDoc);
             } catch (error) {
                 console.error(error);
             } finally {
-                setTimeout(() => setLoading(false), 700);
+                setLoading(false);
             }
         };
 
         fetchInitial();
     }, [user]);
 
-    const fetchNextPage = async () => {
+    const fetchNextPage = useCallback(async () => {
         if (!user || loadingMore || !lastDoc) return;
-
         setLoadingMore(true);
         try {
             const res = await getLastAnime(user.uid, 10, lastDoc);
@@ -65,40 +57,34 @@ export default function AnimeHistoryScreen() {
         } finally {
             setLoadingMore(false);
         }
-    };
+    }, [user, lastDoc, loadingMore]);
 
     useEffect(() => {
-        if (!searchText || searchText.length === 0) {
-            return setFiltered([]);
+        if (!searchText.trim()) {
+            setFiltered([]);
+            return;
         }
 
+        const q = searchText.toLowerCase();
         const handler = setTimeout(() => {
-            console.log(searchText)
-            const res = animeList.filter(anime =>
-                anime.title.toLowerCase().includes(searchText.toLowerCase())
-            );
-            setFiltered(res);
-        }, 500);
+            setFiltered(animeList.filter(a => a.title.toLowerCase().includes(q)));
+        }, 200);
 
         return () => clearTimeout(handler);
-    }, [searchText]);
+    }, [searchText, animeList]);
 
-    const handleUpdate = (id: number, watchedEpisodes: number) => {
-        setAnimeList(prev =>
-            prev.map(anime =>
-                anime.id === id ? { ...anime, watchedEpisodes } : anime
-            )
-        );
+    const handleUpdate = useCallback((id: number, watchedEpisodes: number) => {
+        setAnimeList(prev => {
+            const anime = prev.find(a => a.id === id);
+            const next = prev.map(a => (a.id === id ? { ...a, watchedEpisodes } : a));
+            if (anime && user) {
+                updateAnimeHistory(user.uid, { ...anime, watchedEpisodes }, true).catch(console.error);
+            }
+            return next;
+        });
+    }, [user]);
 
-        const anime = animeList.find(a => a.id === id);
-        if (anime && user) {
-            updateAnimeHistory(user.uid, { ...anime, watchedEpisodes }, true)
-                .catch(console.error);
-        }
-    };
-
-
-    const renderItem = ({ item }: { item: LastAnime }) => (
+    const renderItem = useCallback(({ item }: { item: LastAnime }) => (
         <Animated.View entering={FadeInDown} style={{ marginVertical: 5 }}>
             <ContinueWatching
                 id={item.id}
@@ -110,81 +96,67 @@ export default function AnimeHistoryScreen() {
                 showHeader={false}
             />
         </Animated.View>
-    );
+    ), [handleUpdate]);
 
-    const SkeletonR = () => {
+    const SkeletonR = useMemo(() => {
         const fakeRows = new Array(5).fill(0);
-
         return (
-            <View style={{ paddingTop: headeHeight * 1.75, paddingHorizontal: 10 }}>
+            <View style={{ paddingHorizontal: 10, paddingBottom: insets.bottom }}>
                 {fakeRows.map((_, idx) => (
                     <View key={idx} style={{ flexDirection: "row", marginBottom: 0 }}>
-                        {new Array(1).fill(0).map((__, i) => (
-                            <View key={i} style={{ marginBottom: 10 }}>
-                                <Skeleton width={Dimensions.get('screen').width - 20} height={130} radius={12} />
-                            </View>
-                        ))}
+                        <View style={{ marginBottom: 10 }}>
+                            <Skeleton width={Dimensions.get('screen').width - 20} height={130} radius={12} />
+                        </View>
                     </View>
                 ))}
             </View>
         );
-    };
+    }, [headerHeight, insets.bottom]);
 
-    const handleChangeText = useCallback((text: string) => {
-        setSearchText(text);
-    }, []);
+    useEffect(() => {
+        navigation.setOptions({
+            headerSearchBarOptions: {
+                placeholder: "Поиск",
+                hideWhenScrolling: false,
+                cancelButtonText: 'Отмена',
+                obscureBackground: true,
+                onChangeText: (e: any) => {
+                    const text = e?.nativeEvent?.text ?? e ?? '';
+                    setSearchText(String(text));
+                },
+            }
+        });
+    }, [navigation, headerHeight]);
+
+    const dataToRender = filtered.length > 0 ? filtered : animeList;
 
     return (
-        <View style={{ flex: 1 }}>
-            <GradientBlur
-                containerStyle={{
-                    position: 'absolute',
-                    top: 0,
-                    zIndex: 2, width: '100%', height: insets.top * 2.5,
-                }}
-                locations={locations as [number, number, ...number[]]}
-                colors={colors as [string, string, ...string[]]}
-                tint="regular"
-                blurIntensity={20}
-            />
-            <LinearGradient
-                colors={['black', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0)']}
-                style={[StyleSheet.absoluteFill, { width: '100%', height: insets.top * 2, zIndex: 200 }]}
-                pointerEvents='none'
-            />
-
-            <Input
-                initialValue=''
-                onSearch={(text) => { handleChangeText(text) }}
-                containerStyle={{
-                    position: "absolute",
-                    top: headeHeight + 10,
-                    left: 10,
-                    right: 10,
-                    zIndex: 9999,
-                    shadowColor: "#000",
-                    shadowOpacity: 0.75,
-                    shadowRadius: 12,
-                    shadowOffset: { width: 0, height: 8 },
-                }}
-            />
-
+        <ThemedView style={{ flex: 1 }} darkColor="black" lightColor="white">
             {loading ? (
-                <SkeletonR />
+                SkeletonR
             ) : (
-                <FlashList
-                    data={filtered.length > 0 ? filtered : animeList}
-                    renderItem={renderItem}
-                    contentContainerStyle={{ paddingTop: headeHeight * 1.75, paddingHorizontal: 10, paddingBottom: headeHeight / 2 }}
-                    keyExtractor={(item) => `${item.id}`}
-                    removeClippedSubviews
-                    onEndReached={fetchNextPage}
-                    onEndReachedThreshold={1}
-                    onScroll={Keyboard.dismiss}
-                    scrollEventThrottle={16}
-                    scrollIndicatorInsets={{top: 75}}
-                />
+                <>
+                    {dataToRender.length === 0 ? (
+                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingBottom: insets.bottom }}>
+                            <Text>История просмотра пустая</Text>
+                        </View>
+                    ) : (
+                        <FlashList
+                            data={dataToRender}
+                            renderItem={renderItem}
+                            contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: insets.bottom }}
+                            keyExtractor={(item) => `${item.id}`}
+                            removeClippedSubviews
+                            onEndReached={fetchNextPage}
+                            onEndReachedThreshold={1}
+                            onScroll={Keyboard.dismiss}
+                            scrollEventThrottle={16}
+                            scrollIndicatorInsets={{ top: 75 }}
+                            contentInsetAdjustmentBehavior="automatic"
+                        />
+                    )}
+                </>
             )}
-        </View>
-    )
-}
+        </ThemedView>
+    );
+};
