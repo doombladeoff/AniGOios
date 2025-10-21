@@ -3,9 +3,9 @@ import { getCrunchyrollIData } from "@/API/Crunchyroll/getCrunchyrollData";
 import { getRecommendationsJikan } from "@/API/Jikan/getRecommendationsJikan";
 import { getAnimeList } from "@/API/Shikimori/RequestAnime";
 import { getAnimeYummy } from "@/API/Yummy/getAnimeYummy";
+import { getEpisodesFromYummy } from "@/API/Yummy/getEpisodesFromYummy";
 import { getRecommendationsYummy } from "@/API/Yummy/Recommendations/getRecommendationsYummy";
 import { useAnimeStore } from "@/store/animeStore";
-import { checkAnimeAssets } from "@/utils/anime/checkAnimeAssets";
 import { storage } from "@/utils/storage";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -21,22 +21,20 @@ async function fetchAnimeById(id: number | string, fetchCrunch: boolean) {
 
     if (!animeShiki || !animeListData) return null;
 
+    const [crunchData, yummyRecs, yummyEpisodes] = await Promise.all([
         fetchCrunch ? getCrunchyrollIData(animeListData, animeShiki.malId) : null,
-        checkAnimeAssets(animeShiki.malId),
-        !recommendsJikan.length && getRecommendationsYummy(yummy[0].anime_id)
+        !recommendsJikan.length && getRecommendationsYummy(yummy[0].anime_id),
+        false ? getEpisodesFromYummy({ shikimori_id: animeShiki.malId }) : [],
     ]);
-
-    const { animatedPoster, translatedLogo } = assetsData;
 
     recommendations = recommendsJikan.length > 1 ? recommendsJikan : yummyRecs.length > 1 ? yummyRecs : [];
 
     return {
         ...animeShiki,
         crunchyroll: crunchData,
-        animatedPoster,
-        translatedLogo,
         animeList: animeListData,
         recommendations,
+        yummyEpisodes,
     };
 }
 
@@ -55,8 +53,6 @@ export const useAnimeFetch = (id: number | string) => {
         : storage?.get3DPoster?.() ?? false;
 
     useEffect(() => {
-        let active = true;
-
         const load = async () => {
             if (animeFromStore) {
                 setIsLoading(false);
@@ -66,7 +62,7 @@ export const useAnimeFetch = (id: number | string) => {
             setIsLoading(true);
             try {
                 const data = await fetchAnimeById(id, fetchCrunch);
-                if (data && active) {
+                if (data) {
                     setAnimeStore(Number(id), data);
                 }
             } catch (error) {
@@ -76,13 +72,11 @@ export const useAnimeFetch = (id: number | string) => {
                     params: { errText: String(error) },
                 });
             } finally {
-                if (active) setIsLoading(false);
+                setIsLoading(false);
             }
         };
 
         load();
-
-        return () => { active = false; };
     }, [id]);
 
     const backgroundImage = useMemo(() => {

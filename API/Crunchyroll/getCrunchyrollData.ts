@@ -186,7 +186,10 @@ export const getCrunchyrollIData = async (animeListData: AnimeListData, malId: n
 
     console.log('[Crunchyroll] Get data');
     const cached = storage.getCrunchyroll(malId);
-    if (cached) return cached;
+    if (cached) {
+        console.log('[Crunchyroll] Return stored data');
+        return cached
+    };
 
     const crunchy = new Crunchy({ email: '', password: '' });
     const token = await getValidToken(crunchy);

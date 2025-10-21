@@ -24,15 +24,14 @@ const GradeintColorsLight = ['transparent', 'rgba(255, 255, 255, 0)', 'rgba(255,
 const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id, statusContainer, animationEntering, imagestyle }: CrunchyPosterProps) => {
     const isDarkMode = useTheme().theme === 'dark';
 
-    const { hasTall, hasWide, crunchyId, logo, animeData } = useAnimeStore(useShallow(s => ({
+    const { hasTall, hasWide, crunchyId, animeData } = useAnimeStore(useShallow(s => ({
         hasTall: s.animeMap[id]?.crunchyroll.hasTallThumbnail,
         hasWide: s.animeMap[id]?.crunchyroll.hasWideThumbnail,
         crunchyId: s.animeMap[id]?.crunchyroll.crunchyrollId,
-        logo: s.animeMap[id]?.translatedLogo,
         animeData: s.animeMap[id],
     })));
 
-    const img_logo = logo || animeData.crunchyroll.crunchyImages.titleLogo;
+    const img_logo = animeData.crunchyroll.crunchyImages.titleLogo;
 
     const backgroundImage = useMemo(() => {
         if (hasTall) return animeData.crunchyroll.crunchyImages.tallThumbnail;
@@ -79,7 +78,7 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id, statusCo
                 />
             </Animated.View>
 
-            {showLogo &&
+            {(showLogo && img_logo) &&
                 <Animated.View entering={FadeInDown.duration(700)} style={[style.logoImg, !isDarkMode && { shadowColor: 'black', shadowOpacity: 0.65, shadowRadius: 8, shadowOffset: { width: 0, height: 0 } }]}>
                     <Image source={{ uri: img_logo }}
                         style={{
