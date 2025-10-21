@@ -3,13 +3,15 @@ import { GradientBlur } from '@/components/GradientBlur';
 import Recommendations from '@/components/HomeRecommendations';
 import List from '@/components/List';
 import LatestUpdates from '@/components/List/LatestUpdates';
-import { Page } from '@/components/Page';
+import { Page } from '@/components/Screens/Settings/Page';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useHomeScreenData } from '@/hooks/homeData/useHomeScreenData';
+import { useTheme } from '@/hooks/ThemeContext';
 import { useBottomHeight } from '@/hooks/useBottomHeight';
 import { useHeaderHeight } from '@react-navigation/elements';
+import { configureTips, resetTips } from "expo-ios-popover-tip";
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { Fragment, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { Dimensions, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { easeGradient } from 'react-native-easing-gradient';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -30,6 +32,17 @@ type ListDataT = {
 const isIOS_26 = Platform.Version >= '26.0';
 
 export default function HomeScreen() {
+    const [tipsReady, setTipsReady] = React.useState(false);
+    React.useEffect(() => {
+        async function setup() {
+            await resetTips();
+            await configureTips();
+            setTimeout(() => setTipsReady(true), 500);
+        }
+        setup();
+    });
+
+    const isDarkMode = useTheme().theme === 'dark';
     const headerHeight = useHeaderHeight();
     const insets = useSafeAreaInsets();
     const bottomTabHeight = useBottomHeight();
@@ -40,6 +53,9 @@ export default function HomeScreen() {
             1: { color: 'transparent' }
         },
     });
+
+    const GradientColorsDark = ['black', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0)'] as const;
+    const GradientColorsLight = ['white', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 0)'] as const;
 
     const { animeList, loading, lastUpdates, refreshing, lastAnime, handleLastAnimeUpdate, homeRecs, setRefreshing } = useHomeScreenData();
 
@@ -89,13 +105,15 @@ export default function HomeScreen() {
         );
     }, []);
 
+    if (!tipsReady) return null;
+
     if (loading) {
         return <SkeletonR />
     }
 
     return (
         <Page>
-            <Fragment>
+            <>
                 <GradientBlur
                     colors={colors}
                     locations={locations}
@@ -108,18 +126,17 @@ export default function HomeScreen() {
                     blurIntensity={20}
                 />
                 <LinearGradient
-                    colors={['black', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0)']}
+                    colors={isDarkMode ? GradientColorsDark : GradientColorsLight}
                     style={[StyleSheet.absoluteFill, { width: '100%', height: insets.top * 2, zIndex: 2 }]}
                     pointerEvents='none'
                 />
-
-            </Fragment>
+            </>
 
             <ScrollView
                 contentContainerStyle={{
                     paddingTop: !isIOS_26 ? 10 : 0,
                     paddingBottom: bottomTabHeight,
-                    gap: 15
+                    gap: 15,
                 }}
                 contentInsetAdjustmentBehavior='automatic'
                 showsVerticalScrollIndicator={false}
@@ -140,7 +157,15 @@ export default function HomeScreen() {
                 <LatestUpdates
                     updates={lastUpdates}
                     headerTextStyle={styles.headerList}
-                    containerStye={{ paddingTop: 10, paddingHorizontal: 5, marginBottom: 20 }}
+                    containerStye={{
+                        paddingTop: 10,
+                        paddingHorizontal: 5,
+                        marginBottom: 20,
+                        shadowColor: 'black',
+                        shadowOpacity: 0.65,
+                        shadowRadius: 6,
+                        shadowOffset: { width: 0, height: 0 }
+                    }}
                     imageContainer={styles.imageContainer}
                     imageStyle={styles.imageStyle}
                     imageTextTitle={styles.imageTextTitle}
@@ -161,22 +186,20 @@ export default function HomeScreen() {
                     </Animated.View>
                 }
 
-                <View style={{ gap: 30 }}>
-                    {ListData.map((props, idx) => {
-                        if (props.render)
-                            return (
-                                <List
-                                    key={props.typeRequest}
-                                    useContextMenu
-                                    textStyle={styles.headerList}
-                                    typeRequest={props.typeRequest}
-                                    headerText={props.headerText}
-                                    data={props.data}
-                                    imageContainer={styles.imageContainer}
-                                    imageStyle={styles.imageStyle}
-                                />
-                            )
-                        return null
+                <View style={{ paddingTop: 10 }}>
+                    {ListData.map((props) => {
+                        return (
+                            <List
+                                key={props.typeRequest}
+                                useContextMenu
+                                textStyle={styles.headerList}
+                                typeRequest={props.typeRequest}
+                                headerText={props.headerText}
+                                data={props.data}
+                                imageContainer={styles.imageContainer}
+                                imageStyle={styles.imageStyle}
+                            />
+                        )
                     })}
                 </View>
             </ScrollView>
@@ -186,7 +209,6 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
     headerList: {
-        color: 'white',
         fontSize: 18,
         fontWeight: '600'
     },
@@ -200,9 +222,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: "#1e1e1e",
     },
-
     imageTextTitle: {
-        color: 'white',
         maxWidth: IMAGE_WIDTH,
         minWidth: IMAGE_WIDTH,
         fontSize: 16,
@@ -223,7 +243,6 @@ const styles = StyleSheet.create({
     },
     episodeTextStyle: {
         position: 'absolute',
-        color: 'white',
         backgroundColor: '#1e1e1e',
         padding: 4,
         borderRadius: 6,

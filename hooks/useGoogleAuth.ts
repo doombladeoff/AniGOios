@@ -66,7 +66,7 @@ export const useGoogleAuth = () => {
 
                 setUser(fullUserData);
 
-                router.replace('/(tabs)/(home)/home');
+                router.replace('/(tabs)/(home)');
             } catch (error) {
                 console.error("Failed to handle auth success:", error);
             }
