@@ -16,6 +16,7 @@ import { ThemeProvider } from '@/hooks/ThemeContext';
 import { auth, db } from '@/lib/firebase';
 import { CustomUser, useUserStore } from '@/store/userStore';
 import { storage } from '@/utils/storage';
+import { Image } from 'expo-image';
 
 export default function RootLayout() {
     const [loaded] = useFonts({
@@ -96,8 +97,9 @@ export default function RootLayout() {
 
     if (!loaded || isCheckingAuth) {
         return (
-            <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="small" />
+            <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "#e8b830" }}>
+                <Image source={require('@/assets/images/icon.png')} style={{ width: 200, height: 200}} contentFit='contain' />
+                <ActivityIndicator size='large' style={{top: 60 }} color={'white'} />
             </ThemedView>
         );
     }
