@@ -122,7 +122,6 @@ export default function FavoriteScreen() {
 
     useEffect(() => {
         if (!firstRender.current) {
-            console.log('scrol')
             listRef.current?.scrollToOffset({ offset: 0, animated: false });
             fetchFavorites(true);
         }

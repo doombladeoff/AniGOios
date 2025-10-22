@@ -67,7 +67,7 @@ export default function HomeLayout({ segment }: { segment: string }) {
                 }}
             />
             <Stack.Screen
-                name="favoriteScreen"
+                name="favorite"
                 options={{
                     ...defaultOptions,
                     headerTitle: 'Избранное',
