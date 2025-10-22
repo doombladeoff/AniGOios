@@ -1,3 +1,4 @@
+import { StatusBar } from "expo-status-bar";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Appearance, ColorSchemeName } from "react-native";
 import { MMKV } from "react-native-mmkv";
@@ -54,6 +55,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     return (
         <ThemeContext.Provider value={{ theme, mode, setMode }}>
+            <StatusBar
+                translucent
+                animated
+                style={theme === "dark" ? "light" : "dark"}
+            />
             {children}
         </ThemeContext.Provider>
     );
