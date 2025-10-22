@@ -1,3 +1,4 @@
+import { useTheme } from "@/hooks/ThemeContext";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,6 +19,8 @@ export const CustomTabBar = ({
 }: BottomTabBarProps) => {
     const { width } = useWindowDimensions();
     const [tabBarWidth, setTabBarWidth] = useState(0);
+
+    const isDarkMode = useTheme().theme === 'dark';
 
     const containerWidth = tabBarWidth - 20;
     const tabWidth = containerWidth / state.routes.length;
@@ -40,7 +43,7 @@ export const CustomTabBar = ({
     return (
         <View style={styles.container}>
             <BlurView
-                tint='systemChromeMaterial'
+                tint={isDarkMode ? 'dark' : 'systemChromeMaterial'}
                 intensity={100}
                 style={[
                     styles.tabView,
@@ -77,7 +80,7 @@ export const CustomTabBar = ({
                 })}
             </BlurView>
             <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.35)', 'black']}
+                colors={ isDarkMode ? ['transparent', 'rgba(0,0,0,0.35)', 'black']:  ['transparent', 'rgba(255, 255, 255, 0.35)', 'white']}
                 style={[styles.bottomGradeint, { height: insets.bottom * 2.5 }]}
             />
         </View>

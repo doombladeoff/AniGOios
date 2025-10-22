@@ -1,6 +1,5 @@
 import { IconSymbol } from '@/components/ui/IconSymbol.ios';
 import { CustomTabBar } from '@/components/ui/TabBar/CustomTabBar';
-import { storage } from '@/utils/storage';
 import { Tabs } from 'expo-router';
 import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 import { AnimationSpec } from 'expo-symbols';
@@ -30,7 +29,6 @@ const tabsData: TabsData[] = [
 const iconAnimation = { effect: { direction: 'down', type: 'bounce', wholeSymbol: true } } as AnimationSpec
 
 export default function TabLayout() {
-    const useSearchPageRole = storage.getSearchPageRole() ?? false;
 
     if (Platform.Version < '26.0') {
         return (
@@ -62,20 +60,20 @@ export default function TabLayout() {
     }
 
     return (
-        <NativeTabs tintColor={'white'} disableTransparentOnScrollEdge blurEffect='dark'>
+        <NativeTabs tintColor={'black'} disableTransparentOnScrollEdge blurEffect='dark'>
             <NativeTabs.Trigger name='(home)'>
-                <Label>Главная</Label>
-                <Icon sf='house.fill' />
+                <Label selectedStyle={{ color: 'orange', fontSize: 11, fontWeight: '500' }}>Главная</Label>
+                <Icon sf='house.fill' selectedColor={'orange'} />
             </NativeTabs.Trigger>
 
             <NativeTabs.Trigger name='search'>
-                <Label>Поиск</Label>
-                <Icon sf='magnifyingglass' />
+                <Label selectedStyle={{ color: 'orange', fontSize: 11, fontWeight: '500' }}>Поиск</Label>
+                <Icon sf='magnifyingglass' selectedColor={'orange'} />
             </NativeTabs.Trigger>
 
             <NativeTabs.Trigger name='profile'>
-                <Label>Профиль</Label>
-                <Icon sf='person.fill' />
+                <Label selectedStyle={{ color: 'orange', fontSize: 11, fontWeight: '500' }}>Профиль</Label>
+                <Icon sf='person.fill' selectedColor={'orange'} />
             </NativeTabs.Trigger>
         </NativeTabs>
     )

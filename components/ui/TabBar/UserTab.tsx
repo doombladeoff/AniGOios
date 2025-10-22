@@ -35,10 +35,14 @@ export const UserTab = ({ isFocused, color }: { isFocused: boolean; color: strin
                             </Submenu>
                         </ContextMenu.Items>
                         <ContextMenu.Trigger>
-                            <Image
-                                source={{ uri: auth.currentUser && auth.currentUser.photoURL || '' }}
-                                style={{ width: 28, height: 28, borderRadius: 100, borderWidth: isFocused ? 1 : 0, borderColor: 'red' }}
-                            />
+                            {auth.currentUser && auth.currentUser.photoURL ? (
+                                <Image
+                                    source={{ uri: auth.currentUser && auth.currentUser.photoURL || '' }}
+                                    style={{ width: 28, height: 28, borderRadius: 100, borderWidth: isFocused ? 1 : 0, borderColor: 'red' }}
+                                />
+                            ) : (
+                                <IconSymbol name="person.fill" size={28} color={color} />
+                            )}
                         </ContextMenu.Trigger>
                     </ContextMenu>
                 </Host>

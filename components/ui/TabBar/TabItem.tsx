@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { useTheme } from "@/hooks/ThemeContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { BottomTabNavigationEventMap, BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
 import { NavigationHelpers, NavigationRoute, ParamListBase } from "@react-navigation/native";
@@ -17,6 +18,9 @@ interface TabItemProps {
 function TabItem({ route, isFocused, options, navigation }: TabItemProps) {
     const colorScheme = useColorScheme();
     const themeColors = useMemo(() => Colors[colorScheme ?? 'dark'], [colorScheme]);
+    const isDarkMode = useTheme().theme === 'dark';
+
+    const iconColor = isFocused ? isDarkMode ? 'white' : 'black' : themeColors.tabIconDefault;
 
     const onPress = () => {
         const event = navigation.emit({
@@ -34,13 +38,13 @@ function TabItem({ route, isFocused, options, navigation }: TabItemProps) {
             {options.tabBarIcon && route.name !== "profile" ? (
                 options.tabBarIcon({
                     focused: isFocused,
-                    color: isFocused ? themeColors.tabIconSelected : themeColors.tabIconDefault,
+                    color: iconColor,
                     size: 24,
                 })
             ) : (
                 <UserTab
                     isFocused={isFocused}
-                    color={isFocused ? themeColors.tabIconSelected : themeColors.tabIconDefault}
+                    color={iconColor}
                 />
             )}
         </HapticTab>
