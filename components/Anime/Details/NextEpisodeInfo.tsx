@@ -1,12 +1,13 @@
 import { IconSymbol } from "@/components/ui/IconSymbol.ios";
+import { ThemedText } from "@/components/ui/ThemedText";
 import { useAnimeStore } from "@/store/animeStore";
+import { GlassView } from "expo-glass-effect";
 import { memo } from "react";
-import { StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { SFSymbols6_0 } from "sf-symbols-typescript";
 
 interface NextEpisodeInfoProps {
     id: number;
-    // nextEpisodeAt: string;
     style?: StyleProp<ViewStyle>;
     textStyle?: StyleProp<TextStyle>;
     icon?: SFSymbols6_0;
@@ -32,14 +33,14 @@ const NextEpisodeInfo = (props: NextEpisodeInfoProps) => {
 
 
     return (
-        <View style={props.style}>
-            {props.icon && <IconSymbol name={props.icon} color='white' size={props.iconSize || 28} />}
+        <GlassView style={props.style}>
+            {props.icon && <IconSymbol name={props.icon} size={props.iconSize || 28} />}
             <View>
-                <Text style={props.textStyle}>Следующий эпизод выйдет:</Text>
-                <Text style={props.textStyle}>
-                    {nextEpisodeAt ? getDate() : 'Неизвестно'}</Text>
+                <ThemedText lightColor="black" darkColor="white" style={props.textStyle}>Следующий эпизод выйдет:</ThemedText>
+                <ThemedText lightColor="black" darkColor="white" style={props.textStyle}>
+                    {nextEpisodeAt ? getDate() : 'Неизвестно'}</ThemedText>
             </View>
-        </View>
+        </GlassView>
     )
 }
 

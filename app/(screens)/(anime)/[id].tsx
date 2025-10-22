@@ -205,8 +205,8 @@ export default function AnimeScreen() {
 
                     <NextEpisodeInfo
                         id={Number(id)}
-                        style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, marginHorizontal: 10, gap: 10, backgroundColor: 'rgba(68, 68, 68, 0.5)', padding: 10, borderRadius: 12, zIndex: 23 }}
-                        textStyle={{ fontSize: 15, fontWeight: '500', color: 'white' }}
+                        style={styles.nextExpisode}
+                        textStyle={{ fontSize: 15, fontWeight: '500' }}
                         icon="clock"
                     />
 
@@ -281,5 +281,16 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 16,
         fontWeight: "600",
+    },
+    nextExpisode: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+        marginHorizontal: 10,
+        gap: 10,
+        backgroundColor: 'rgba(68, 68, 68, 0.5)',
+        padding: 10,
+        borderRadius: 12,
+        zIndex: 23
     }
 })
