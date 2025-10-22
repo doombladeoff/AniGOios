@@ -1,5 +1,6 @@
+import { useTheme } from "@/hooks/ThemeContext";
 import { BottomSheet, Button, ContextMenu, Host, HStack, Spacer, Image as UIImage, Switch as UISwitch, Text as UIText, VStack } from "@expo/ui/swift-ui";
-import { background, cornerRadius, fixedSize, frame, padding } from "@expo/ui/swift-ui/modifiers";
+import { background, cornerRadius, fixedSize, foregroundStyle, frame, padding } from "@expo/ui/swift-ui/modifiers";
 import { memo } from "react";
 import { useWindowDimensions } from "react-native";
 
@@ -22,12 +23,14 @@ interface FiltersProps {
 const Filters = ({ isOpened, onOpen, setOrderType, onSwitchValueChange, switchArr, orderType }: FiltersProps) => {
     const { width } = useWindowDimensions();
 
+    const isDarkMode = useTheme().theme === 'dark';
+
     return (
-        <Host style={{ position: 'absolute', width }}>
-            <BottomSheet isOpened={isOpened} onIsOpenedChange={(e) => onOpen(e)} modifiers={[fixedSize(true)]}>
-                <VStack modifiers={[padding({ all: 20 })]} spacing={30}>
+        <Host style={{ position: 'absolute', width, backgroundColor: 'red' }}>
+            <BottomSheet isOpened={isOpened} onIsOpenedChange={(e) => onOpen(e)}>
+                <VStack modifiers={[padding({ all: 20 }), background(isDarkMode ? "rgba(0,0,0,0.5)" : 'rgba(255,255,255,0.5)')]} spacing={30}>
                     <HStack>
-                        <UIText weight="bold" size={18}>
+                        <UIText color={isDarkMode ? 'white' : 'black'} weight="bold" size={18}>
                             Фильтры
                         </UIText>
                         <Spacer />
@@ -37,7 +40,7 @@ const Filters = ({ isOpened, onOpen, setOrderType, onSwitchValueChange, switchAr
                     </HStack>
 
                     <HStack modifiers={[padding({ horizontal: 5 })]}>
-                        <UIText>
+                        <UIText color={isDarkMode ? 'white' : 'black'}>
                             Сортировать по
                         </UIText>
                         <Spacer />
@@ -54,9 +57,9 @@ const Filters = ({ isOpened, onOpen, setOrderType, onSwitchValueChange, switchAr
                                     ))}
                                 </ContextMenu.Items>
                                 <ContextMenu.Trigger>
-                                    <HStack alignment='center' modifiers={[background("rgba(80,80,80,0.6)"), cornerRadius(8), frame({ width: 125, height: 30 })]}>
-                                        <HStack modifiers={[padding({ vertical: 2, horizontal: 4 }), cornerRadius(100)]}>
-                                            <UIText color="white" modifiers={[frame({ width: 100, height: 30 })]} >
+                                    <HStack alignment='center' modifiers={[background("rgba(80,80,80,0.6)"), cornerRadius(8), frame({ width: 125, height: 30 }), fixedSize(true)]}>
+                                        <HStack modifiers={[padding({ vertical: 2, horizontal: 4 }), cornerRadius(100), fixedSize(true)]}>
+                                            <UIText color="white" modifiers={[frame({ width: 100, height: 30 }), fixedSize(true)]} >
                                                 {transpaletSort[orderType].toString()}
                                             </UIText>
                                             <UIImage systemName="chevron.up.chevron.down" size={16} modifiers={[padding({ all: 6 })]} />
@@ -69,7 +72,7 @@ const Filters = ({ isOpened, onOpen, setOrderType, onSwitchValueChange, switchAr
 
                     <VStack spacing={15}>
                         <HStack modifiers={[padding({ horizontal: 10 })]}>
-                            <UIText size={18} weight="bold">Показать</UIText>
+                            <UIText color={isDarkMode ? 'white' : 'black'} size={18} weight="bold">Показать</UIText>
                             <Spacer />
                         </HStack>
                         <VStack modifiers={[background('rgba(80,80,80,0.65)'), cornerRadius(10)]}>
@@ -87,6 +90,7 @@ const Filters = ({ isOpened, onOpen, setOrderType, onSwitchValueChange, switchAr
                                             value={item.value}
                                             onValueChange={() => onSwitchValueChange(item.type as "showPlanned" | "showCompleted" | "showWatching")}
                                             label={item.label}
+                                            modifiers={[foregroundStyle({ type: 'color', color: isDarkMode ? 'white' : 'black' })]}
                                         />
                                     ))
                                 }

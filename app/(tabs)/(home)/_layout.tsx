@@ -1,9 +1,10 @@
 import { UIButton } from "@/components/ui/Button";
 import HeaderBackButton from "@/components/ui/HeaderBackButton";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useTheme } from "@/hooks/ThemeContext";
 import { router, Stack } from "expo-router";
 import { ExtendedStackNavigationOptions } from "expo-router/build/layouts/StackClient";
 import { useMemo } from "react";
-import { Text, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 const defaultOptions: ExtendedStackNavigationOptions = {
@@ -16,19 +17,18 @@ const defaultOptions: ExtendedStackNavigationOptions = {
 }
 
 export default function HomeLayout({ segment }: { segment: string }) {
+    const isDarkMode = useTheme().theme === 'dark';
     const rootScreen = useMemo(() => {
         switch (segment) {
             case "(home)":
                 return (
                     <Stack.Screen
-                        name="home"
+                        name="index"
                         options={{
                             ...defaultOptions,
                             headerLeft: () => (
                                 <Animated.View entering={FadeInUp.delay(1000)}>
-                                    <View>
-                                        <Text style={{ color: 'white', fontSize: 26, fontWeight: '800' }}>AniGO</Text>
-                                    </View>
+                                    <ThemedText style={{ fontSize: 26, fontWeight: '800', paddingHorizontal: 10 }}>AniGO</ThemedText>
                                 </Animated.View>
                             ),
 
@@ -51,14 +51,23 @@ export default function HomeLayout({ segment }: { segment: string }) {
     }, [segment]);
 
     return (
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'black' } }}>
+        <Stack
+            initialRouteName="index"
+            screenOptions={{
+                headerShown: false,
+                headerTintColor: isDarkMode ? 'white' : 'black',
+                contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' }
+            }}>
             {rootScreen}
             <Stack.Screen
                 name="animelist"
-                options={defaultOptions}
+                options={{
+                    ...defaultOptions,
+                    headerTransparent: true,
+                }}
             />
             <Stack.Screen
-                name="favorite"
+                name="favoriteScreen"
                 options={{
                     ...defaultOptions,
                     headerTitle: 'Избранное',
