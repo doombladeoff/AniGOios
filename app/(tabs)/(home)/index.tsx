@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { useHomeScreenData } from '@/hooks/homeData/useHomeScreenData';
 import { useTheme } from '@/hooks/ThemeContext';
 import { useBottomHeight } from '@/hooks/useBottomHeight';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback } from 'react';
@@ -34,6 +35,7 @@ export default function HomeScreen() {
     const isDarkMode = useTheme().theme === 'dark';
     const insets = useSafeAreaInsets();
     const bottomTabHeight = useBottomHeight();
+    const headerHeight = useHeaderHeight();
     const { colors, locations } = easeGradient({
         colorStops: {
             0: { color: 'black' },
@@ -93,18 +95,47 @@ export default function HomeScreen() {
         );
     }, []);
 
-    if (loading) {
-        return (
-            <>
-                {Platform.Version < '26.0' && <BlurView
+    const BackgroundBlur = () => {
+        if (!isIOS_26) {
+            return (
+                <BlurView
                     tint='regular'
                     intensity={100}
                     style={[StyleSheet.absoluteFillObject, {
                         flex: 1,
                         zIndex: 0,
-                        top: 100,
+                        top: headerHeight,
                     }]} />
-                }
+            );
+        }
+
+        return (
+            <>
+                <GradientBlur
+                    colors={colors}
+                    locations={locations}
+                    containerStyle={{
+                        position: 'absolute',
+                        top: 0,
+                        zIndex: 1, width, height: insets.top * 2.5,
+                    }}
+                    tint="light"
+                    blurIntensity={20}
+                />
+                <LinearGradient
+                    colors={isDarkMode ? GradientColorsDark : GradientColorsLight}
+                    style={[StyleSheet.absoluteFill, { width: '100%', height: insets.top * 2, zIndex: 2 }]}
+                    pointerEvents='none'
+                />
+            </>
+
+        );
+    };
+
+    if (loading) {
+        return (
+            <>
+                <BackgroundBlur />
                 <SkeletonR />
             </>
         );
@@ -112,36 +143,7 @@ export default function HomeScreen() {
 
     return (
         <Page>
-            {Platform.Version < '26.0' ? (
-                <BlurView
-                    tint='regular'
-                    intensity={100}
-                    style={[StyleSheet.absoluteFillObject, {
-                        flex: 1,
-                        zIndex: 0,
-                        top: 100,
-                    }]} />
-            ) : (
-                <>
-                    <GradientBlur
-                        colors={colors}
-                        locations={locations}
-                        containerStyle={{
-                            position: 'absolute',
-                            top: 0,
-                            zIndex: 1, width, height: insets.top * 2.5,
-                        }}
-                        tint="light"
-                        blurIntensity={20}
-                    />
-                    <LinearGradient
-                        colors={isDarkMode ? GradientColorsDark : GradientColorsLight}
-                        style={[StyleSheet.absoluteFill, { width: '100%', height: insets.top * 2, zIndex: 2 }]}
-                        pointerEvents='none'
-                    />
-                </>
-            )}
-
+            <BackgroundBlur />
             <ScrollView
                 contentContainerStyle={{
                     paddingTop: !isIOS_26 ? 10 : 0,

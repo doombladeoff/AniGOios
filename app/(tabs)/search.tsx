@@ -162,7 +162,7 @@ export default function SearchScreen() {
                 style={{ flex: 1 }}
                 contentContainerStyle={{
                     paddingHorizontal: 10,
-                    paddingTop: insets.top + 10,
+                    paddingTop: insets.top + 20,
                     paddingBottom: bottomTabHeight,
                 }}
                 scrollIndicatorInsets={{ top: 65, bottom: bottomTabHeight }}
