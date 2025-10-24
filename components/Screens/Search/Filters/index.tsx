@@ -1,8 +1,9 @@
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/hooks/ThemeContext";
 import { useSearchStore } from "@/store/filterStore";
-import { Host, HStack, Picker, Spacer, Button as UIButton, VStack } from "@expo/ui/swift-ui";
+import { Host, HStack, Spacer, Button as UIButton, VStack } from "@expo/ui/swift-ui";
 import { background, padding } from "@expo/ui/swift-ui/modifiers";
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import * as Haptics from 'expo-haptics';
 import { useState } from "react";
@@ -34,8 +35,8 @@ export const ModalFilter = ({ showFilters, setShowFilters, handleApplyFilters }:
         <Modal visible={showFilters} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowFilters(false)}
             backdropColor={isDarkMode ? "#1b1919" : 'white'}
         >
-            <Host style={{ width: useWindowDimensions().width, height: 120, zIndex: 2 }}>
-                <VStack alignment='leading' modifiers={[padding({ horizontal: 20, top: 10 }), background("transparent")]}>
+            <Host style={{ width: useWindowDimensions().width, height: 60, zIndex: 2 }}>
+                <VStack alignment="center" modifiers={[padding({ horizontal: 20, top: 10 }), background("transparent")]}>
                     <HStack>
                         <UIButton color="red" onPress={resetFilter}>
                             Сбросить
@@ -45,18 +46,20 @@ export const ModalFilter = ({ showFilters, setShowFilters, handleApplyFilters }:
                             Готово
                         </UIButton>
                     </HStack>
-                    <Picker
-                        options={['Основные', 'Жанры']}
-                        selectedIndex={selectedIndex}
-                        onOptionSelected={({ nativeEvent: { index } }) => {
-                            setSelectedIndex(index);
-                            Haptics.selectionAsync();
-                        }}
-                        variant="segmented"
-                        modifiers={[padding({ horizontal: 40, vertical: 15 })]}
-                    />
                 </VStack>
             </Host>
+            <SegmentedControl
+                values={['Основные', 'Жанры']}
+                selectedIndex={selectedIndex}
+                onChange={(event) => {
+                    setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
+                    Haptics.selectionAsync();
+                }}
+                tintColor="white"
+                activeFontStyle={{ color: isDarkMode ? 'black' : 'whit' }}
+                fontStyle={{ color: isDarkMode ? 'white' : 'black' }}
+                style={{ width: '70%', alignSelf: 'center', marginBottom: 10 }}
+            />
             <ScrollView contentContainerStyle={{ paddingTop: 10, paddingHorizontal: 15, gap: 20, paddingBottom: insets.bottom }}>
                 {selectedIndex === 0 && (
                     <Animated.View entering={FadeInLeft} style={{ gap: 20 }}>
