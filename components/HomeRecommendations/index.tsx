@@ -21,7 +21,7 @@ const { width, height } = Dimensions.get('screen');
 
 const darkColor = Platform.Version < '26.0' ? '#141414' : 'black'
 const GradientColorsDark = [darkColor, 'transparent', darkColor] as const;
-const GradientColorsLight = ['white', 'transparent', 'white'] as const;
+const GradientColorsLight = ['#f7f8f7', 'transparent', '#f7f8f7'] as const;
 
 export default function Recommendations({ data }: { data: any[] }) {
     const isDarkMode = useTheme().theme === 'dark';
@@ -88,7 +88,7 @@ export default function Recommendations({ data }: { data: any[] }) {
                     zIndex: 2,
                     width: width, height: height / 2
                 }]}
-                    tint='regular'
+                    tint={isDarkMode ? 'dark' : 'systemChromeMaterialLight'}
                     intensity={40}
                 />
                 <LinearGradient colors={isDarkMode ? GradientColorsDark : GradientColorsLight}

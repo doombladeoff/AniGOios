@@ -27,7 +27,7 @@ export default function HomeLayout({ segment }: { segment: string }) {
                         name="index"
                         options={{
                             ...defaultOptions,
-                            ...(Platform.Version < '26.0' && { headerBlurEffect: 'regular' }),
+                            ...(Platform.Version < '26.0' && { headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterialLight' }),
                             headerShadowVisible: false,
                             headerLeft: () => (
                                 <ThemedText style={{ fontSize: 26, fontWeight: '800', paddingHorizontal: 10 }}>AniGO</ThemedText>

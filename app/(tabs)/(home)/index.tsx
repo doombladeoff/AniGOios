@@ -99,7 +99,7 @@ export default function HomeScreen() {
         if (!isIOS_26) {
             return (
                 <BlurView
-                    tint='regular'
+                    tint={isDarkMode ? 'dark' : 'systemChromeMaterialLight'}
                     intensity={100}
                     style={[StyleSheet.absoluteFillObject, {
                         flex: 1,

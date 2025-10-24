@@ -53,7 +53,7 @@ const Input = ({ onOpenFilter }: { onOpenFilter: (v: boolean) => void }) => {
                 </GlassView>
             ) : (
                 <BlurView
-                    tint='systemMaterial'
+                    tint={isDarkMode ? 'dark' : 'systemChromeMaterialLight'}
                     intensity={80}
                     style={[styles.blur, { borderWidth: 0.7, borderColor: 'rgba(255,255,255,0.5)' }]}
                 >

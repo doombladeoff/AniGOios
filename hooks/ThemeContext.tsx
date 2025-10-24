@@ -14,6 +14,15 @@ interface ThemeContextProps {
 const storage = new MMKV();
 const STORAGE_KEY = "APP_THEME_MODE";
 
+const initialMode = (storage.getString(STORAGE_KEY) as ThemeMode) || "system";
+
+const getSystemTheme = (): "light" | "dark" => {
+    const colorScheme: ColorSchemeName = Appearance.getColorScheme();
+    return colorScheme === "dark" ? "dark" : "light";
+};
+
+const initialTheme = initialMode === "system" ? getSystemTheme() : initialMode;
+
 const ThemeContext = createContext<ThemeContextProps>({
     theme: "light",
     mode: "system",
@@ -21,30 +30,23 @@ const ThemeContext = createContext<ThemeContextProps>({
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [mode, setModeState] = useState<ThemeMode>("system");
-    const [theme, setTheme] = useState<"light" | "dark">("light");
-
-    const getSystemTheme = () => {
-        const colorScheme: ColorSchemeName = Appearance.getColorScheme();
-        return colorScheme === "dark" ? "dark" : "light";
-    };
-
-    useEffect(() => {
-        const savedMode = storage.getString(STORAGE_KEY);
-        if (savedMode === "light" || savedMode === "dark" || savedMode === "system") {
-            setModeState(savedMode);
-        }
-    }, []);
+    const [mode, setModeState] = useState<ThemeMode>(initialMode);
+    const [theme, setTheme] = useState<"light" | "dark">(initialTheme);
 
     useEffect(() => {
         if (mode === "system") {
-            setTheme(getSystemTheme());
             const listener = Appearance.addChangeListener(({ colorScheme }) => {
                 setTheme(colorScheme === "dark" ? "dark" : "light");
             });
             return () => listener.remove();
-        } else {
+        }
+    }, [mode]);
+
+    useEffect(() => {
+        if (mode !== "system") {
             setTheme(mode);
+        } else {
+            setTheme(getSystemTheme());
         }
     }, [mode]);
 
@@ -55,11 +57,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     return (
         <ThemeContext.Provider value={{ theme, mode, setMode }}>
-            <StatusBar
-                translucent
-                animated
-                style={theme === "dark" ? "light" : "dark"}
-            />
+            <StatusBar translucent animated style={theme === "dark" ? "light" : "dark"} />
             {children}
         </ThemeContext.Provider>
     );

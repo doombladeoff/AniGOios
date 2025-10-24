@@ -111,7 +111,7 @@ export default function SearchScreen() {
     return (
         <ThemedView darkColor="black" lightColor="white" style={{ flex: 1 }}>
             {Platform.Version < '26.0' && <BlurView
-                tint='regular'
+                tint={isDarkMode ? 'dark' : 'systemChromeMaterialLight'}
                 intensity={100}
                 style={StyleSheet.absoluteFillObject} />
             }
@@ -177,7 +177,7 @@ export default function SearchScreen() {
                         : null
                 }
             />
-            
+
             <ModalFilter
                 setShowFilters={setShowFilters}
                 showFilters={showFilters}
