@@ -1,9 +1,12 @@
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useTheme } from "@/hooks/ThemeContext";
 import { useSearchStore } from "@/store/filterStore";
-import { Host, Picker } from "@expo/ui/swift-ui";
-import { padding } from "@expo/ui/swift-ui/modifiers";
+import { Host, HStack, Picker, Spacer, Button as UIButton, VStack } from "@expo/ui/swift-ui";
+import { background, padding } from "@expo/ui/swift-ui/modifiers";
+import { isLiquidGlassAvailable } from "expo-glass-effect";
 import * as Haptics from 'expo-haptics';
 import { useState } from "react";
-import { Button, Modal, Text, View } from "react-native";
+import { Modal, useWindowDimensions } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, { FadeInLeft, FadeInRight } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -19,6 +22,7 @@ interface ModalFilterProps {
     handleApplyFilters: () => void;
 }
 export const ModalFilter = ({ showFilters, setShowFilters, handleApplyFilters }: ModalFilterProps) => {
+    const isDarkMode = useTheme().theme === 'dark';
     const { resetFilter } = useSearchStore(useShallow(s => ({
         resetFilter: s.resetFilter
     })))
@@ -27,30 +31,38 @@ export const ModalFilter = ({ showFilters, setShowFilters, handleApplyFilters }:
     const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
     return (
-        <Modal visible={showFilters} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowFilters(false)} backdropColor={"#1b1919"}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20, paddingHorizontal: 15 }}>
-                <Button title="Сбросить" color="red" onPress={resetFilter} />
-                <Button title="Готово" onPress={handleApplyFilters} />
-            </View>
-            <Host matchContents>
-                <Picker
-                    options={['Основные', 'Жанры']}
-                    selectedIndex={selectedIndex}
-                    onOptionSelected={({ nativeEvent: { index } }) => {
-                        setSelectedIndex(index);
-                        Haptics.selectionAsync();
-                    }}
-                    variant="segmented"
-                    modifiers={[padding({ horizontal: 40, vertical: 15 })]}
-                />
+        <Modal visible={showFilters} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowFilters(false)}
+            backdropColor={isDarkMode ? "#1b1919" : 'white'}
+        >
+            <Host style={{ width: useWindowDimensions().width, height: 120, zIndex: 2 }}>
+                <VStack alignment='leading' modifiers={[padding({ horizontal: 20, top: 10 }), background("transparent")]}>
+                    <HStack>
+                        <UIButton color="red" onPress={resetFilter}>
+                            Сбросить
+                        </UIButton>
+                        <Spacer />
+                        <UIButton variant={isLiquidGlassAvailable() ? 'glassProminent' : 'default'} onPress={handleApplyFilters}>
+                            Готово
+                        </UIButton>
+                    </HStack>
+                    <Picker
+                        options={['Основные', 'Жанры']}
+                        selectedIndex={selectedIndex}
+                        onOptionSelected={({ nativeEvent: { index } }) => {
+                            setSelectedIndex(index);
+                            Haptics.selectionAsync();
+                        }}
+                        variant="segmented"
+                        modifiers={[padding({ horizontal: 40, vertical: 15 })]}
+                    />
+                </VStack>
             </Host>
-
-            <ScrollView contentContainerStyle={{ paddingTop: 10, paddingHorizontal: 15, backgroundColor: "#1b1919", gap: 20, paddingBottom: insets.bottom }}>
+            <ScrollView contentContainerStyle={{ paddingTop: 10, paddingHorizontal: 15, gap: 20, paddingBottom: insets.bottom }}>
                 {selectedIndex === 0 && (
                     <Animated.View entering={FadeInLeft} style={{ gap: 20 }}>
                         <SortFilter />
                         <KindFilter />
-                        <Text style={{ color: "white", fontSize: 18, fontWeight: "600" }}>Год</Text>
+                        <ThemedText style={{ fontSize: 18, fontWeight: "600" }}>Год</ThemedText>
                         <YearFilter />
                     </Animated.View>
                 )}

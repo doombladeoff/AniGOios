@@ -1,7 +1,9 @@
 import { DropdownMenu } from "@/components/ContextComponent";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { ThemedView } from "@/components/ui/ThemedView";
 import { useSearchStore } from "@/store/filterStore";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 const sortLabels: Record<"ranked" | "name", string> = {
     ranked: "По рейтингу",
@@ -15,13 +17,15 @@ const SortFilter = () => {
 
     return (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={{ color: "white", fontSize: 16, fontWeight: '500' }}>Сортировать</Text>
+            <ThemedText style={{ fontSize: 16, fontWeight: '500' }}>Сортировать</ThemedText>
             <DropdownMenu
                 triggerItem={
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <Text style={{ color: "white" }}>{sortLabels[sort]}</Text>
-                        <IconSymbol name='chevron.up.chevron.down' size={16} color='white' />
-                    </View>
+                    <ThemedView lightColor='rgba(30,30,30,0.1)' darkColor='rgba(200, 200, 200, 0.1)' style={{ padding: 14, borderRadius: 20 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                            <ThemedText>{sortLabels[sort]}</ThemedText>
+                            <IconSymbol name='chevron.up.chevron.down' size={16} />
+                        </View>
+                    </ThemedView>
                 }
                 items={[
                     { title: sortLabels.ranked, onSelect: () => setSort("ranked") },

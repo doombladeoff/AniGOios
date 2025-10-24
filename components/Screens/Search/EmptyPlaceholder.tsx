@@ -1,3 +1,5 @@
+import { ThemedView } from "@/components/ui/ThemedView";
+import { useTheme } from "@/hooks/ThemeContext";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
@@ -5,20 +7,30 @@ import { Dimensions, StyleSheet, Text, View } from "react-native";
 const { width, height } = Dimensions.get("screen");
 
 export const EmptyPlaceholder = () => {
+    const isDarkMode = useTheme().theme === 'dark';
     return (
-        <View style={style.constainer}>
+        <ThemedView darkColor="black" lightColor="white" style={style.constainer}>
             <LinearGradient
-                colors={["rgba(0,0,0,0.0)", "rgba(0,0,0,0.0)", "rgba(0, 0, 0, 0.85)"]}
-                style={style.gradient}
+                colors={isDarkMode ? ["rgba(0,0,0,0.0)", "rgba(0,0,0,0.0)", "rgba(0, 0, 0, 0.85)"] : ['transparent', 'rgba(255, 255, 255, 0)', "rgba(255, 255, 255, 1)"]}
+                style={[style.gradient, { overflow: 'hidden', height: '35%', alignSelf: 'center' }]}
             />
-            <Image
-                source={require('@/assets/images/404.png')}
-                style={style.image}
-            />
+            <View style={{
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.6,
+                shadowRadius: 8,
+                elevation: 5,
+            }}>
+                <Image
+                    source={require('@/assets/images/404.png')}
+                    style={style.image}
+                />
+            </View>
+
             <Text style={style.text}>
                 Попробуйте изменить запрос или фильтры поиска
             </Text>
-        </View>
+        </ThemedView>
     )
 }
 
@@ -26,19 +38,17 @@ const style = StyleSheet.create({
     constainer: {
         alignItems: "center",
         justifyContent: "center",
-        marginTop: height / 8,
         position: "relative",
-        minHeight: height / 2.5,
+        flex: 1,
     },
     gradient: {
         position: "absolute",
         width: "100%",
-        height: "80%",
         zIndex: 2,
     },
     image: {
         width: width / 1.75,
-        height: height / 3,
+        height: height / 2.8,
         opacity: 0.85,
         marginBottom: 24,
         zIndex: 1,

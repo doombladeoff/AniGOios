@@ -1,3 +1,4 @@
+import { useTheme } from "@/hooks/ThemeContext"
 import { useSearchStore } from "@/store/filterStore"
 import { BlurView } from "expo-blur"
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect"
@@ -10,6 +11,7 @@ import { useShallow } from "zustand/shallow"
 import { IconSymbol } from "../../ui/IconSymbol"
 
 const Input = ({ onOpenFilter }: { onOpenFilter: (v: boolean) => void }) => {
+    const isDarkMode = useTheme().theme === 'dark';
     const insets = useSafeAreaInsets();
     const { query, setQuery } = useSearchStore(useShallow(s => ({
         query: s.query,
@@ -21,7 +23,7 @@ const Input = ({ onOpenFilter }: { onOpenFilter: (v: boolean) => void }) => {
             <IconSymbol name="magnifyingglass" size={22} color="#aaa" style={{ marginRight: 8 }} />
             <TextInput
                 value={query}
-                style={styles.input}
+                style={[styles.input, { color: isDarkMode ? 'white' : 'black' }]}
                 placeholder="Поиск аниме"
                 placeholderTextColor="#aaa"
                 onChangeText={setQuery}
@@ -53,12 +55,12 @@ const Input = ({ onOpenFilter }: { onOpenFilter: (v: boolean) => void }) => {
                 <BlurView
                     tint='systemMaterial'
                     intensity={80}
-                    style={styles.blur}
+                    style={[styles.blur, { borderWidth: 0.7, borderColor: 'rgba(255,255,255,0.5)' }]}
                 >
                     {renderInput}
                 </BlurView>
             )}
-        </View >
+        </View>
     )
 }
 
@@ -68,10 +70,11 @@ const styles = StyleSheet.create({
         left: 10,
         right: 10,
         zIndex: 9999,
-        shadowColor: "#000",
-        shadowOpacity: 0.75,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 8 },
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 5,
     },
     blur: {
         flexDirection: "row",
@@ -84,7 +87,6 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        color: 'white',
         fontSize: 17,
         fontWeight: "500",
         backgroundColor: "transparent",

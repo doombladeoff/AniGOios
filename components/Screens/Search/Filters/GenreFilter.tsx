@@ -1,9 +1,10 @@
 import { IconSymbol } from "@/components/ui/IconSymbol.ios";
+import { ThemedText } from "@/components/ui/ThemedText";
 import { AnimeGenre, useSearchStore } from "@/store/filterStore";
 import * as Haptics from 'expo-haptics';
 import { AnimationSpec } from "expo-symbols";
 import React, { useCallback } from "react";
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
 type GenreT = {
@@ -56,17 +57,16 @@ const GenreFilter = () => {
                 <IconSymbol
                     name={genres.includes(item.key.toString()) ? "checkmark.square.fill" : "square"}
                     size={26}
-                    color="white"
                     animationSpec={checkAnimation}
                 />
-                <Text style={styles.itemText}>{item.label}</Text>
+                <ThemedText style={styles.itemText}>{item.label}</ThemedText>
             </Pressable>
         )
     };
 
     return (
         <View>
-            <Text style={styles.headerText}>Жанр</Text>
+            <ThemedText style={styles.headerText}>Жанр</ThemedText>
             <FlatList
                 scrollEnabled={false}
                 data={GenreOptions}
@@ -83,7 +83,6 @@ const GenreFilter = () => {
 const styles = StyleSheet.create({
     headerText: {
         fontSize: 18,
-        color: "white",
         fontWeight: "600",
         marginBottom: 8
     },
@@ -95,7 +94,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
     },
     itemText: {
-        color: "white",
         marginLeft: 8,
         flexShrink: 1
     }

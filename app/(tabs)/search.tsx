@@ -5,26 +5,30 @@ import AnimeItem from "@/components/Screens/Search/AnimeItem";
 import { EmptyPlaceholder } from "@/components/Screens/Search/EmptyPlaceholder";
 import { ModalFilter } from "@/components/Screens/Search/Filters";
 import Input from "@/components/Screens/Search/Input";
+import { ThemedView } from "@/components/ui/ThemedView";
 import Toast from "@/components/ui/Toast";
+import { useTheme } from "@/hooks/ThemeContext";
 import { useBottomHeight } from "@/hooks/useBottomHeight";
 import { auth } from "@/lib/firebase";
 import { addFavoriteAnime } from "@/lib/firebase/userFavorites";
 import { useSearchStore } from "@/store/filterStore";
 import { FlashList, FlashListRef } from "@shopify/flash-list";
+import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Dimensions, Keyboard, Platform, StyleSheet, View } from "react-native";
 import { easeGradient } from "react-native-easing-gradient";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SFSymbols6_0 } from "sf-symbols-typescript";
 import { useShallow } from "zustand/shallow";
 
 const { width, height } = Dimensions.get("screen");
-const isIOS26 = Platform.Version >= '26.0'
 
 export default function SearchScreen() {
     const insets = useSafeAreaInsets();
     const bottomTabHeight = useBottomHeight();
+    const isDarkMode = useTheme().theme === 'dark';
 
     const [showFilters, setShowFilters] = useState(false);
 
@@ -105,7 +109,12 @@ export default function SearchScreen() {
     ), []);
 
     return (
-        <View style={{ flex: 1, backgroundColor: 'black' }}>
+        <ThemedView darkColor="black" lightColor="white" style={{ flex: 1 }}>
+            {Platform.Version < '26.0' && <BlurView
+                tint='regular'
+                intensity={100}
+                style={StyleSheet.absoluteFillObject} />
+            }
             <View style={{ top: insets.top }}>
                 <Toast
                     show={showToast.show}
@@ -119,7 +128,7 @@ export default function SearchScreen() {
 
             <>
                 <LinearGradient
-                    colors={["black", "rgba(0,0,0,0.5)", "rgba(0,0,0,0)"]}
+                    colors={isDarkMode ? ["black", "rgba(0,0,0,0.5)", "rgba(0,0,0,0)"] : ["white", "rgba(255, 255, 255, 0.5)", "rgba(255, 255, 255, 0)"]}
                     style={[StyleSheet.absoluteFill, { width: "100%", height: insets.top * 2.65, zIndex: 200 }]}
                 />
                 <GradientBlur
@@ -137,16 +146,23 @@ export default function SearchScreen() {
 
             <Input onOpenFilter={setShowFilters} />
 
+            {!isLoading && !results.length && (
+                <ThemedView darkColor="black" lightColor="white" style={{ position: 'absolute', height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                    <Animated.View entering={FadeIn}>
+                        <EmptyPlaceholder />
+                    </Animated.View>
+                </ThemedView>
+            )}
+
             <FlashList
                 ref={ref}
                 data={results}
                 keyExtractor={(item: ShikimoriAnime) => `anime-${item.malId}`}
                 renderItem={renderItem}
-
                 style={{ flex: 1 }}
                 contentContainerStyle={{
                     paddingHorizontal: 10,
-                    paddingTop: isIOS26 ? insets.top + 10 : insets.top + 30,
+                    paddingTop: insets.top + 10,
                     paddingBottom: bottomTabHeight,
                 }}
                 scrollIndicatorInsets={{ top: 65, bottom: bottomTabHeight }}
@@ -160,14 +176,13 @@ export default function SearchScreen() {
                         <ActivityIndicator size="small" color="#fff" style={{ height: results.length < 1 ? height : undefined, justifyContent: 'center', alignItems: 'center', top: results.length < 1 ? -150 : undefined }} />
                         : null
                 }
-                ListEmptyComponent={!isLoading ? (<EmptyPlaceholder />) : null}
             />
-
+            
             <ModalFilter
                 setShowFilters={setShowFilters}
                 showFilters={showFilters}
                 handleApplyFilters={handleApplyFilters}
             />
-        </View>
+        </ThemedView>
     );
 }

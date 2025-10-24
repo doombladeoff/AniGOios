@@ -1,11 +1,12 @@
 import { AnimeKindEnum } from "@/API/Shikimori/Shikimori.types";
 import { IconSymbol } from "@/components/ui/IconSymbol.ios";
+import { ThemedText } from "@/components/ui/ThemedText";
 import { TranslatedKind } from "@/constants/TranslatedStatus";
 import { useSearchStore } from "@/store/filterStore";
 import * as Haptics from 'expo-haptics';
 import { AnimationSpec } from "expo-symbols";
 import React, { useCallback } from "react";
-import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
 const screenWidth = Dimensions.get("window").width;
@@ -46,17 +47,16 @@ const KindFilter = () => {
                 <IconSymbol
                     name={kind.includes(item.key) ? "checkmark.square.fill" : "square"}
                     size={26}
-                    color="white"
                     animationSpec={checkAnimation}
                 />
-                <Text style={styles.itemText}>{item.label}</Text>
+                <ThemedText style={styles.itemText}>{item.label}</ThemedText>
             </Pressable>
         )
     };
 
     return (
         <View>
-            <Text style={styles.headerText}>Тип</Text>
+            <ThemedText lightColor="black" darkColor="white" style={styles.headerText}>Тип</ThemedText>
             <FlatList
                 scrollEnabled={false}
                 data={kindList}
@@ -74,7 +74,6 @@ const KindFilter = () => {
 const styles = StyleSheet.create({
     headerText: {
         fontSize: 18,
-        color: "white",
         fontWeight: "600",
         marginBottom: 8
     },
@@ -87,7 +86,6 @@ const styles = StyleSheet.create({
 
     },
     itemText: {
-        color: "white",
         marginLeft: 8,
         flexShrink: 1
     },

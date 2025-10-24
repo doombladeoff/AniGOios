@@ -1,7 +1,8 @@
+import { ThemedText } from "@/components/ui/ThemedText";
 import { useSearchStore } from "@/store/filterStore";
 import { memo, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { Dimensions, Text, View } from "react-native";
+import { Dimensions, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useShallow } from "zustand/shallow";
 import { YearPicker } from "./YearPicker";
@@ -66,7 +67,7 @@ function YearFilter() {
     };
 
     return (
-        <View>
+        <View style={{ alignItems: "center" }}>
             {rangeError ? (
                 <Animated.View
                     entering={FadeIn.duration(300)}
@@ -92,10 +93,10 @@ function YearFilter() {
                         setValue={setValue}
                         onValid={() => handleSubmit(onValid)()}
                     />
-                    <Text style={{ color: 'white' }}>От</Text>
+                    <ThemedText>От</ThemedText>
                 </View>
 
-                <View style={[{ height: 1, backgroundColor: 'white', marginHorizontal: 10, left: 0, marginBottom: 30, width: screenWidth * 0.28 }]} />
+                <View style={[{ height: 1, backgroundColor: 'gray', marginHorizontal: 10, left: 0, marginBottom: 30, width: screenWidth * 0.28 }]} />
 
                 <View style={{ alignItems: 'center', gap: 10 }}>
                     <YearPicker
@@ -105,7 +106,7 @@ function YearFilter() {
                         setValue={setValue}
                         onValid={() => handleSubmit(onValid)()}
                     />
-                    <Text style={{ color: 'white' }}>До</Text>
+                    <ThemedText>До</ThemedText>
                 </View>
             </View>
         </View>
