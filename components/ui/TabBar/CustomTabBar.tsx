@@ -11,6 +11,11 @@ import Animated, {
 } from "react-native-reanimated";
 import TabItem from "./TabItem";
 
+const Gradeint = {
+    dark: ['transparent', 'rgba(0,0,0,0.35)', 'black'] as const,
+    light: ['transparent', 'rgba(255, 255, 255, 0.35)', 'white'] as const
+};
+
 export const CustomTabBar = ({
     state,
     descriptors,
@@ -43,7 +48,7 @@ export const CustomTabBar = ({
     return (
         <View style={styles.container}>
             <BlurView
-                tint={isDarkMode ? 'dark' : 'systemChromeMaterial'}
+                tint={isDarkMode ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
                 intensity={100}
                 style={[
                     styles.tabView,
@@ -80,7 +85,7 @@ export const CustomTabBar = ({
                 })}
             </BlurView>
             <LinearGradient
-                colors={ isDarkMode ? ['transparent', 'rgba(0,0,0,0.35)', 'black']:  ['transparent', 'rgba(255, 255, 255, 0.35)', 'white']}
+                colors={isDarkMode ? Gradeint.dark : Gradeint.light}
                 style={[styles.bottomGradeint, { height: insets.bottom * 2.5 }]}
             />
         </View>
@@ -89,10 +94,11 @@ export const CustomTabBar = ({
 
 const styles = StyleSheet.create({
     container: {
-        shadowColor: "black",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 1,
-        shadowRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.5,
+        shadowRadius: 2,
+        elevation: 5,
         zIndex: 100
     },
     tabView: {
@@ -111,10 +117,11 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         borderRadius: 18,
         zIndex: 0,
-        shadowColor: 'black',
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.75,
-        shadowRadius: 8
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 5,
     },
     bottomGradeint: {
         position: 'absolute',

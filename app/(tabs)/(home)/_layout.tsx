@@ -2,10 +2,11 @@ import { UIButton } from "@/components/ui/Button";
 import HeaderBackButton from "@/components/ui/HeaderBackButton";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/hooks/ThemeContext";
+import { Host, HStack } from "@expo/ui/swift-ui";
 import { router, Stack } from "expo-router";
 import { ExtendedStackNavigationOptions } from "expo-router/build/layouts/StackClient";
 import { useMemo } from "react";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import { Platform } from "react-native";
 
 const defaultOptions: ExtendedStackNavigationOptions = {
     headerBackTitle: "Back",
@@ -26,29 +27,39 @@ export default function HomeLayout({ segment }: { segment: string }) {
                         name="index"
                         options={{
                             ...defaultOptions,
+                            ...(Platform.Version < '26.0' && { headerBlurEffect: 'regular' }),
+                            headerShadowVisible: false,
                             headerLeft: () => (
-                                <Animated.View entering={FadeInUp.delay(1000)}>
-                                    <ThemedText style={{ fontSize: 26, fontWeight: '800', paddingHorizontal: 10 }}>AniGO</ThemedText>
-                                </Animated.View>
+                                <ThemedText style={{ fontSize: 26, fontWeight: '800', paddingHorizontal: 10 }}>AniGO</ThemedText>
                             ),
 
                             headerRight: () => (
-                                <Animated.View hitSlop={20} entering={FadeInUp.delay(1000)} style={{ width: 35, height: 35 }}>
-                                    <UIButton
-                                        width={35}
-                                        height={35}
-                                        onPressBtn={() => router.push({ pathname: '/(tabs)/(home)/favorite' })}
-                                        iconName="bookmark.fill"
-                                        iconSize={22}
-                                        iconColor="orange"
-                                    />
-                                </Animated.View>
+                                <Host matchContents style={{ width: 90, height: 35 }}>
+                                    <HStack spacing={10}>
+                                        <UIButton
+                                            width={35}
+                                            height={35}
+                                            onPressBtn={() => router.push({ pathname: '/calendar' })}
+                                            iconName="calendar"
+                                            iconSize={22}
+                                            iconColor={isDarkMode ? 'white' : 'black'}
+                                        />
+                                        <UIButton
+                                            width={35}
+                                            height={35}
+                                            onPressBtn={() => router.push({ pathname: '/(tabs)/(home)/favorite' })}
+                                            iconName="bookmark.fill"
+                                            iconSize={22}
+                                            iconColor="orange"
+                                        />
+                                    </HStack>
+                                </Host>
                             ),
                         }}
                     />
                 );
         }
-    }, [segment]);
+    }, [segment, isDarkMode]);
 
     return (
         <Stack

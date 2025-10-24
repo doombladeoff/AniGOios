@@ -19,7 +19,7 @@ export const ListHeader = (props: ListHeaderProps) => {
             onPress={props.onPress}
             style={props.containerStyle}>
             <ThemedText style={props.textStyle}>{props.text}</ThemedText>
-            <IconSymbol name={props.iconName} color={props.iconColor} size={16} />
+            <IconSymbol name={props.iconName} color={props.iconColor} size={props.iconSize || 16} />
         </Pressable>
     )
 }

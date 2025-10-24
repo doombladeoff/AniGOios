@@ -1,6 +1,6 @@
 import { useMappingHelper } from "@shopify/flash-list";
 import { Image, ImageContentFit, ImageStyle } from "expo-image";
-import { Pressable, StyleProp, ViewStyle } from "react-native";
+import { Pressable, StyleProp, View, ViewStyle } from "react-native";
 
 interface CardPosterProps {
     img: string;
@@ -30,15 +30,23 @@ export const CardPoster = ({
     const { getMappingKey } = useMappingHelper();
     return (
         <Pressable disabled={!onPress || false} style={container} onPress={onPress}>
-            <Image
-                key={index ? getMappingKey(`${img}`, index) : img}
-                transition={transition}
-                source={{ uri: img }}
-                style={imgStyle}
-                cachePolicy={imgCachePolicy}
-                contentFit={imgFit}
-                priority={imgPriority}
-            />
+            <View style={{
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 5,
+                elevation: 5,
+            }}>
+                <Image
+                    key={index ? getMappingKey(`${img}`, index) : img}
+                    transition={transition}
+                    source={{ uri: img }}
+                    style={imgStyle}
+                    cachePolicy={imgCachePolicy}
+                    contentFit={imgFit}
+                    priority={imgPriority}
+                />
+            </View>
             {children}
         </Pressable>
     )

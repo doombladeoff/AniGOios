@@ -58,7 +58,7 @@ const LatestUpdates = (props: LatestUpdatesProps) => {
                 textStyle={props.headerTextStyle}
                 iconName="arrow.right"
                 iconColor={isDarkMode ? 'white' : 'black'}
-                iconSize={18}
+                iconSize={22}
                 containerStyle={{
                     paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
                 }}

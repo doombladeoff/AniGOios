@@ -105,9 +105,7 @@ function List({
                 />
             </CardPoster>
         ) : (
-            <Animated.View
-                style={{ shadowColor: 'black', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 4 }}
-                entering={index < 4 ? FadeInLeft.delay(100 * (index)).duration(750) : undefined}>
+            <Animated.View entering={index < 4 ? FadeInLeft.delay(100 * (index)).duration(750) : undefined}>
                 <ContextMenu
                     triggerItem={
                         <CardPoster
@@ -159,7 +157,7 @@ function List({
                     text={headerText}
                     textStyle={textStyle}
                     iconName="arrow.right"
-                    iconSize={18}
+                    iconSize={22}
                     containerStyle={styles.headerStyle}
                     onPress={() => router.push({ pathname: '/(tabs)/(home)/animelist', params: { typeRequest: typeRequest, headerText: headerText } })}
                 />
@@ -175,7 +173,7 @@ function List({
                 contentContainerStyle={{
                     paddingLeft: horizontal ? 10 : 0,
                     paddingHorizontal: horizontal ? 5 : 0,
-                    paddingTop: horizontal ? 10 : headerHeight + 5,
+                    paddingTop: horizontal ? 15 : headerHeight + 5,
                     paddingBottom: horizontal ? 15 : bottomTabHeight,
                 }}
                 contentInsetAdjustmentBehavior="automatic"

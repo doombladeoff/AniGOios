@@ -8,8 +8,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { useHomeScreenData } from '@/hooks/homeData/useHomeScreenData';
 import { useTheme } from '@/hooks/ThemeContext';
 import { useBottomHeight } from '@/hooks/useBottomHeight';
-import { useHeaderHeight } from '@react-navigation/elements';
-import { configureTips, resetTips } from "expo-ios-popover-tip";
+import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback } from 'react';
 import { Dimensions, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
@@ -32,18 +31,7 @@ type ListDataT = {
 const isIOS_26 = Platform.Version >= '26.0';
 
 export default function HomeScreen() {
-    const [tipsReady, setTipsReady] = React.useState(false);
-    React.useEffect(() => {
-        async function setup() {
-            await resetTips();
-            await configureTips();
-            setTimeout(() => setTipsReady(true), 500);
-        }
-        setup();
-    });
-
     const isDarkMode = useTheme().theme === 'dark';
-    const headerHeight = useHeaderHeight();
     const insets = useSafeAreaInsets();
     const bottomTabHeight = useBottomHeight();
     const { colors, locations } = easeGradient({
@@ -93,7 +81,7 @@ export default function HomeScreen() {
         );
 
         return (
-            <View style={{ paddingTop: 100, paddingHorizontal: 10, gap: 10 }}>
+            <View style={{ paddingTop: 120, paddingHorizontal: 10, gap: 10 }}>
                 <Skeleton width={100} height={25} radius={8} />
                 {renderRow(0)}
                 <View style={{ paddingVertical: 10 }}>
@@ -105,44 +93,65 @@ export default function HomeScreen() {
         );
     }, []);
 
-    if (!tipsReady) return null;
-
     if (loading) {
-        return <SkeletonR />
-    }
+        return (
+            <>
+                {Platform.Version < '26.0' && <BlurView
+                    tint='regular'
+                    intensity={100}
+                    style={[StyleSheet.absoluteFillObject, {
+                        flex: 1,
+                        zIndex: 0,
+                        top: 100,
+                    }]} />
+                }
+                <SkeletonR />
+            </>
+        );
+    };
 
     return (
         <Page>
-            <>
-                <GradientBlur
-                    colors={colors}
-                    locations={locations}
-                    containerStyle={{
-                        position: 'absolute',
-                        top: 0,
-                        zIndex: 1, width, height: insets.top * 2.5,
-                    }}
-                    tint="light"
-                    blurIntensity={20}
-                />
-                <LinearGradient
-                    colors={isDarkMode ? GradientColorsDark : GradientColorsLight}
-                    style={[StyleSheet.absoluteFill, { width: '100%', height: insets.top * 2, zIndex: 2 }]}
-                    pointerEvents='none'
-                />
-            </>
+            {Platform.Version < '26.0' ? (
+                <BlurView
+                    tint='regular'
+                    intensity={100}
+                    style={[StyleSheet.absoluteFillObject, {
+                        flex: 1,
+                        zIndex: 0,
+                        top: 100,
+                    }]} />
+            ) : (
+                <>
+                    <GradientBlur
+                        colors={colors}
+                        locations={locations}
+                        containerStyle={{
+                            position: 'absolute',
+                            top: 0,
+                            zIndex: 1, width, height: insets.top * 2.5,
+                        }}
+                        tint="light"
+                        blurIntensity={20}
+                    />
+                    <LinearGradient
+                        colors={isDarkMode ? GradientColorsDark : GradientColorsLight}
+                        style={[StyleSheet.absoluteFill, { width: '100%', height: insets.top * 2, zIndex: 2 }]}
+                        pointerEvents='none'
+                    />
+                </>
+            )}
 
             <ScrollView
                 contentContainerStyle={{
                     paddingTop: !isIOS_26 ? 10 : 0,
                     paddingBottom: bottomTabHeight,
-                    gap: 15,
+                    gap: 10,
                 }}
                 contentInsetAdjustmentBehavior='automatic'
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl
-                        progressViewOffset={headerHeight}
                         refreshing={refreshing}
                         size={32}
                         tintColor={'white'}
@@ -161,10 +170,6 @@ export default function HomeScreen() {
                         paddingTop: 10,
                         paddingHorizontal: 5,
                         marginBottom: 20,
-                        shadowColor: 'black',
-                        shadowOpacity: 0.65,
-                        shadowRadius: 6,
-                        shadowOffset: { width: 0, height: 0 }
                     }}
                     imageContainer={styles.imageContainer}
                     imageStyle={styles.imageStyle}
