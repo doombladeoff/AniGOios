@@ -2,6 +2,7 @@ import { useTheme } from "@/hooks/ThemeContext"
 import { useSearchStore } from "@/store/filterStore"
 import { BlurView } from "expo-blur"
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect"
+import { router } from "expo-router"
 import { memo } from "react"
 import { Pressable, StyleSheet, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
@@ -10,7 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useShallow } from "zustand/shallow"
 import { IconSymbol } from "../../ui/IconSymbol"
 
-const Input = ({ onOpenFilter }: { onOpenFilter: (v: boolean) => void }) => {
+const Input = ({ onOpenFilter }: { onOpenFilter?: (v: boolean) => void }) => {
     const isDarkMode = useTheme().theme === 'dark';
     const insets = useSafeAreaInsets();
     const { query, setQuery } = useSearchStore(useShallow(s => ({
@@ -37,7 +38,7 @@ const Input = ({ onOpenFilter }: { onOpenFilter: (v: boolean) => void }) => {
                 </Animated.View>
             )}
             <Animated.View entering={FadeIn} exiting={FadeOut}>
-                <Pressable onPress={() => onOpenFilter(true)} style={{ marginLeft: 8 }}>
+                <Pressable onPress={() => router.push({ pathname: '/search/filter' })} style={{ marginLeft: 8 }}>
                     <IconSymbol name="slider.horizontal.3" size={22} color="#007AFF" />
                 </Pressable>
             </Animated.View>

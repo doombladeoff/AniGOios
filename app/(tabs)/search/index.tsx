@@ -3,7 +3,6 @@ import { ContextMenu } from "@/components/ContextComponent";
 import { GradientBlur } from "@/components/GradientBlur";
 import AnimeItem from "@/components/Screens/Search/AnimeItem";
 import { EmptyPlaceholder } from "@/components/Screens/Search/EmptyPlaceholder";
-import { ModalFilter } from "@/components/Screens/Search/Filters";
 import Input from "@/components/Screens/Search/Input";
 import { ThemedView } from "@/components/ui/ThemedView";
 import Toast from "@/components/ui/Toast";
@@ -29,8 +28,6 @@ export default function SearchScreen() {
     const insets = useSafeAreaInsets();
     const bottomTabHeight = useBottomHeight();
     const isDarkMode = useTheme().theme === 'dark';
-
-    const [showFilters, setShowFilters] = useState(false);
 
     const ref = useRef<FlashListRef<any>>(null);
 
@@ -83,13 +80,6 @@ export default function SearchScreen() {
     useEffect(() => { fetchResults() }, [])
 
     const handleEndReached = () => fetchResults(false);
-
-    const handleApplyFilters = () => {
-        setShowFilters(false);
-        apply();
-        fetchResults(true);
-        ref.current?.scrollToOffset({ offset: 0, animated: true });
-    };
 
     const renderItem = useCallback(({ item, index }: { item: ShikimoriAnime; index: number }) => (
         <View style={{ paddingVertical: 5 }}>
@@ -144,7 +134,7 @@ export default function SearchScreen() {
                 />
             </>
 
-            <Input onOpenFilter={setShowFilters} />
+            <Input />
 
             {!isLoading && !results.length && (
                 <ThemedView darkColor="black" lightColor="white" style={{ position: 'absolute', height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
@@ -176,12 +166,6 @@ export default function SearchScreen() {
                         <ActivityIndicator size="small" color="#fff" style={{ height: results.length < 1 ? height : undefined, justifyContent: 'center', alignItems: 'center', top: results.length < 1 ? -150 : undefined }} />
                         : null
                 }
-            />
-
-            <ModalFilter
-                setShowFilters={setShowFilters}
-                showFilters={showFilters}
-                handleApplyFilters={handleApplyFilters}
             />
         </ThemedView>
     );
