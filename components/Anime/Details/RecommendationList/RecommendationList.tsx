@@ -1,54 +1,48 @@
+import { ThemedText } from "@/components/ui/ThemedText";
 import { useAnimeStore } from "@/store/animeStore";
-import { FlashList } from "@shopify/flash-list";
-import { Image, ImageStyle } from "expo-image";
-import { router } from "expo-router";
-import { memo } from "react";
-import { Pressable, StyleProp, Text, TextStyle, View, ViewStyle } from "react-native";
+import { memo, useMemo } from "react";
+import { StyleSheet, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
+import { RecommendationItem } from "./RecommendationItem";
 
 interface RecommendationListProps {
     id: number;
     showTitle?: boolean;
-    titleStyle?: StyleProp<TextStyle>;
-    containerStyle?: StyleProp<ViewStyle>;
-    imageStyle: StyleProp<ImageStyle>;
-    imageTextStyle?: StyleProp<TextStyle>;
-
 }
 
 const RecommendationList = (props: RecommendationListProps) => {
     const recommendations = useAnimeStore(s => s.animeMap[props.id].recommendations);
-    if (!recommendations || recommendations.length < 1) return null;
 
-    const renderItem = ({ item }: { item: any }) => (
-        <Pressable
-            onPress={() => {
-                const id = item?.entry?.mal_id || item?.remote_ids?.shikimori_id;
-                router.push({ pathname: '/(screens)/(anime)/[id]', params: { id: id } })
-            }}
-            style={{ marginHorizontal: 5 }}
-        >
-            <Image
-                source={{ uri: item?.entry?.images.webp.large_image_url || `https:${item.poster.fullsize}` }}
-                style={props.imageStyle}
-                transition={500}
-            />
-            <Text style={props.imageTextStyle} numberOfLines={2}>{item?.entry?.title || item.title}</Text>
-        </Pressable>
-    );
+    const data = useMemo(() => recommendations ?? [], [recommendations]);
+
+    if (data.length === 0) return null;
 
     return (
         <View>
-            {console.log('redner Recommends')}
-            {props.showTitle && <Text style={props.titleStyle}>Рекомендации</Text>}
-            <FlashList
-                data={recommendations}
+            {props.showTitle && <ThemedText style={styles.text}>Рекомендации</ThemedText>}
+            <FlatList
+                data={data}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={props.containerStyle}
-                renderItem={renderItem}
+                contentContainerStyle={{
+                    paddingHorizontal: 10,
+                    marginVertical: 10,
+                }}
+                renderItem={({ item }) => <RecommendationItem item={item} />}
+                keyExtractor={(item) => item.entry?.mal_id.toString() || item.anime_id.toString()}
             />
         </View>
-    )
+    );
 };
 
-export default memo(RecommendationList)
+const styles = StyleSheet.create({
+    text: {
+        paddingHorizontal: 15,
+        fontSize: 18,
+        fontWeight: '600',
+        zIndex: 22,
+        marginTop: 10
+    }
+});
+
+export default memo(RecommendationList);

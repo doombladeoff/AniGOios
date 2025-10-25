@@ -226,14 +226,7 @@ export default function AnimeScreen() {
 
                     <CharacterList id={Number(id)} />
 
-                    <RecommendationList
-                        id={Number(id)}
-                        showTitle
-                        imageStyle={styles.recommendImg}
-                        titleStyle={styles.recommendTitle}
-                        containerStyle={styles.recommendContainer}
-                        imageTextStyle={styles.recommendImgText}
-                    />
+                    <RecommendationList id={Number(id)} showTitle/>
 
                 </Animated.View>
             </ParallaxScrollView>
@@ -244,30 +237,6 @@ export default function AnimeScreen() {
 };
 
 const styles = StyleSheet.create({
-    recommendContainer: {
-        paddingHorizontal: 10,
-        marginVertical: 10,
-    },
-    recommendImg: {
-        width: 160,
-        height: 220,
-        borderRadius: 12,
-        marginBottom: 5,
-        borderColor: '#1e1e1e'
-    },
-    recommendImgText: {
-        fontSize: 14,
-        fontWeight: '500',
-        maxWidth: 120,
-        paddingLeft: 5
-    },
-    recommendTitle: {
-        paddingHorizontal: 15,
-        fontSize: 18,
-        fontWeight: '600',
-        zIndex: 22,
-        marginTop: 10
-    },
     commentsBtn: {
         paddingVertical: 14,
         borderRadius: 16,
