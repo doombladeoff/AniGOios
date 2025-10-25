@@ -49,15 +49,15 @@ export default function ModalFilter() {
                 headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterialLight',
                 headerTitleStyle: { color: isDarkMode ? 'white' : 'black' },
                 headerLeft: () => (
-                    <Pressable onPress={resetFilter} style={{ flexDirection: 'row', gap: 4 }}>
+                    <Pressable onPress={resetFilter} style={{ flexDirection: 'row', gap: 4, width: 90, alignItems: 'center', justifyContent: 'center' }}>
                         <ThemedText style={{ color: 'red', fontSize: 16 }}>Сбросить</ThemedText>
                     </Pressable>
                 ),
                 headerRight: () => {
                     if (Platform.Version >= '26.0') {
                         return (
-                            <Pressable onPress={handleApplyFilters} style={{ width: 30, height: 30, marginTop: 5 }}>
-                                <IconSymbol name='checkmark' size={24} color={'white'} style={{ marginLeft: 5 }} />
+                            <Pressable onPress={handleApplyFilters} hitSlop={20} style={{ width: 30, height: 30, justifyContent: 'center', alignItems: 'center' }}>
+                                <IconSymbol name='checkmark' size={24} style={{ marginLeft: 5 }} />
                             </Pressable>
                         );
                     }
