@@ -22,12 +22,14 @@ import {
 import { background, cornerRadius, padding } from "@expo/ui/swift-ui/modifiers";
 
 import { useHeaderHeight } from "@react-navigation/elements";
+import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
+    Platform,
     Pressable,
     StyleSheet,
     useWindowDimensions,
@@ -37,8 +39,9 @@ import { easeGradient } from "react-native-easing-gradient";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+
 export default function CharacterScreen() {
-    const { id } = useLocalSearchParams();
+    const { id } = useLocalSearchParams<{ id: string }>();
     const isDarkMode = useTheme().theme === "dark";
 
     const headerHeight = useHeaderHeight();
@@ -53,6 +56,7 @@ export default function CharacterScreen() {
         d1: null,
         d2: null,
     });
+    const { d1, d2 } = character;
 
     const gradientColors = useMemo(
         () => easeGradient({
@@ -86,18 +90,39 @@ export default function CharacterScreen() {
         if (!character.d1) fetchCharacter();
     }, [id]);
 
+    const BackgroundBlur = () => {
+        if (Platform.Version < '26.0') {
+            return (
+                <BlurView
+                    tint={isDarkMode ? 'dark' : 'systemChromeMaterialLight'}
+                    intensity={100}
+                    style={[StyleSheet.absoluteFillObject, {
+                        flex: 1,
+                        zIndex: 0,
+                        top: headerHeight,
+                    }]}
+                    pointerEvents='none'
+                />
+            );
+        }
+        return null
+    };
+
     if (loading) {
         return (
             <ThemedView lightColor="white" darkColor="black" style={styles.loaderContainer}>
+                <BackgroundBlur />
                 <ActivityIndicator size="large" color="white" />
             </ThemedView>
         );
-    }
-
-    const { d1, d2 } = character;
+    };
 
     return (
-        <ThemedView lightColor="white" darkColor="black" style={styles.container}>
+        <ThemedView
+            lightColor="white"
+            darkColor="black"
+            style={styles.container}
+        >
             <Fragment>
                 <GradientBlur
                     colors={gradientColors.colors}

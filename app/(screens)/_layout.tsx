@@ -1,22 +1,44 @@
 
 import HeaderBackButton from "@/components/ui/HeaderBackButton";
+import { useTheme } from "@/hooks/ThemeContext";
 import { Stack } from "expo-router";
 import { Platform } from "react-native";
 
 const isIOS26 = Platform.Version >= "26.0";
 
 export default function ScreensLayout() {
+    const isDarkMode = useTheme().theme === 'dark';
     return (
-        <Stack screenOptions={{
-            headerLeft: () => <HeaderBackButton />,
-        }}>
+        <Stack>
+            {/* characters */}
             <Stack.Screen
-                name="(characters)"
+                name="characters/index"
                 options={{
-                    headerShown: false,
-                    headerLeft: () => <HeaderBackButton />
+                    title: "Персонажи",
+                    headerTitle: 'Персонажи',
+                    headerShown: true,
+                    headerTransparent: true,
+                    headerTitleStyle: { color: isDarkMode ? 'white' : 'black' },
+                    headerBackTitle: 'Назад',
+                    ...(Platform.Version < '26.0' && { headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterialLight' }),
+                    ...(Platform.Version >= '26.0' && { headerLargeTitle: true }),
+                    contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                    headerTintColor: isDarkMode ? 'white' : 'black'
                 }}
             />
+            <Stack.Screen
+                name="characters/[id]"
+                options={{
+                    headerTitle: 'Персонаж',
+                    title: 'Персонаж',
+                    headerTransparent: true,
+                    headerTitleStyle: { color: isDarkMode ? 'white' : 'black' },
+                    headerBackButtonDisplayMode: 'minimal',
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                }}
+            />
+
             <Stack.Screen
                 name="error"
                 options={{
@@ -49,7 +71,10 @@ export default function ScreensLayout() {
             <Stack.Screen
                 name="folder"
                 options={{
-                    ...(isIOS26 && { headerTransparent: true })
+                    ...(isIOS26 && { headerTransparent: true }),
+                    headerTintColor: isDarkMode ? 'white' : 'black'
+                }}
+            />
                 }}
             />
         </Stack>

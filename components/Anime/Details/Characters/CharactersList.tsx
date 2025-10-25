@@ -1,10 +1,10 @@
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useAnimeStore } from "@/store/animeStore";
-import { FlashList } from "@shopify/flash-list";
 import { Link, router } from "expo-router";
 import { memo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import { useShallow } from "zustand/shallow";
 import { CharacterItem } from "./CharacterItem";
 
@@ -18,7 +18,7 @@ const CharacterList = ({ id }: { id: number; }) => {
             item={item}
             index={index}
             onPress={() => router.push({
-                pathname: '/(screens)/(characters)/[id]',
+                pathname: '/(screens)/characters/[id]',
                 params: { id: item.character.id }
             })}
         />
@@ -27,9 +27,9 @@ const CharacterList = ({ id }: { id: number; }) => {
     return (
         <View>
             <View style={styles.containerHaeder}>
-                <ThemedText style={{ fontSize: 18, fontWeight: '500' }}>Персонажи</ThemedText>
+                <ThemedText style={{ fontSize: 18, fontWeight: '600' }}>Персонажи</ThemedText>
                 <Link href={{
-                    pathname: '/(screens)/(characters)/characters',
+                    pathname: '/(screens)/characters',
                     params: {
                         charactersShiki: JSON.stringify(charactersShiki)
                     }
@@ -41,12 +41,13 @@ const CharacterList = ({ id }: { id: number; }) => {
                     </Pressable>
                 </Link>
             </View>
-            <FlashList
+            <FlatList
                 horizontal
                 data={charactersShiki.slice(0, 10)}
                 renderItem={renderItem}
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 10 }}
+                contentContainerStyle={{ paddingHorizontal: 10, paddingTop: 7 }}
+                keyExtractor={(item) => item.id.toString()}
             />
         </View>
 
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginHorizontal: 10,
+        paddingHorizontal: 15,
         marginBottom: 15,
     }
 })
