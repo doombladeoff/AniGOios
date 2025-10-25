@@ -55,7 +55,7 @@ const Screenshots = (props: ScreenshotsListProps) => {
             <ScreenshotsList
                 containerStyle={props.containerStyle}
                 imageStyle={props.imageStyle}
-                screenshots={screenshots}
+                screenshots={screenshots.slice(0, 10)}
                 onPress={setIsVisible}
             />
         </View>
