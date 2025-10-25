@@ -15,7 +15,7 @@ export const GenreItem = (props: GenreItemProps) => {
         <Pressable
             disabled={props.disableNavigation}
             onPress={() => router.push({
-                pathname: '/(screens)/(anime)/animeByGenre',
+                pathname: '/(screens)/anime/animeByGenre',
                 params: { genre_id: props.item.id, genre_name: props.item.russian }
             })}
         >

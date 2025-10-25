@@ -23,13 +23,6 @@ export default function AnimeLayout() {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="animeByGenre"
-                options={{
-                    headerTransparent: true,
-                    headerLeft: () => <HeaderBackButton />
-                }}
-            />
-            <Stack.Screen
                 name="lastUpdates"
                 options={{
                     headerTitle: 'Обновления',
