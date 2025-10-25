@@ -1,14 +1,15 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { ThemedText } from "@/components/ui/ThemedText";
 import { auth, db } from "@/lib/firebase";
 import { deleteCommentFromAnime, deleteCommentFromAnswer } from "@/lib/firebase/comments";
 import { CustomUser } from "@/store/userStore";
 import { formatDate } from "@/utils/formatDate";
-import { GlassView } from "expo-glass-effect";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { doc, onSnapshot } from "firebase/firestore";
 import { memo, useEffect, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, View } from "react-native";
 import { CommentAnimeT } from "./CommentAnime.type";
 
 interface CommentItemProps {
@@ -64,10 +65,10 @@ const CommentItem = memo(({ comment, animeID, disabled = false, type, mainCommen
     };
 
     const handleNavigateUser = () => router.push({ pathname: '/(screens)/(user)/[id]', params: { id: comment.user.id } });
-    const handleNavigateToComment = () => router.push({ pathname: '/(screens)/(anime)/(comments)/[id]', params: { id: comment.id, animeID: animeID } });
+    const handleNavigateToComment = () => router.push({ pathname: '/(screens)/comments/[id]', params: { id: comment.id, animeID: animeID } });
 
     return (
-        <GlassView isInteractive glassEffectStyle={'clear'} style={styles.container}>
+        <GlassView isInteractive glassEffectStyle={'clear'} style={[styles.container, !isLiquidGlassAvailable() && { backgroundColor: 'rgba(0,0,0,0.08)' }]}>
             <Pressable onPress={handleNavigateUser}>
                 <View style={styles.avatar}>
                     <Image source={{ uri: displayPhoto }} style={styles.avatar} transition={500} />
@@ -77,8 +78,8 @@ const CommentItem = memo(({ comment, animeID, disabled = false, type, mainCommen
                 <View style={{ flex: 1, flexShrink: 1, gap: 10 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 5 }}>
-                            <Text style={styles.name}>{displayName}</Text>
-                            <Text style={styles.text}>{formatDate(comment.createdAt)}</Text>
+                            <ThemedText style={styles.name}>{displayName}</ThemedText>
+                            <ThemedText style={styles.text}>{formatDate(comment.createdAt)}</ThemedText>
                         </View>
                         {isOwner && !answerMode &&
                             <Pressable hitSlop={20} onPress={handleDelete}>
@@ -86,7 +87,7 @@ const CommentItem = memo(({ comment, animeID, disabled = false, type, mainCommen
                             </Pressable>
                         }
                     </View>
-                    <Text style={styles.text} numberOfLines={6}>{comment.text}</Text>
+                    <ThemedText style={styles.text} numberOfLines={6}>{comment.text}</ThemedText>
                 </View>
             </Pressable>
         </GlassView>
@@ -111,7 +112,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 0 }
     },
     name: {
-        color: 'white',
         fontWeight: "bold",
         fontSize: 16,
     },

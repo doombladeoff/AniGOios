@@ -1,12 +1,14 @@
 import { CommentAnimeT } from "@/components/Anime/Comments/CommentAnime.type";
 import CommentItem from "@/components/Anime/Comments/CommentItem";
 import WriteComment from "@/components/Anime/Comments/WriteComment";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { ThemedView } from "@/components/ui/ThemedView";
 import { auth, db } from "@/lib/firebase";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useLocalSearchParams } from "expo-router";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown, FadeOutLeft, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -51,19 +53,19 @@ export default function CommentScreen() {
             {auth.currentUser ?
                 <WriteComment animeId={id} type='toAnime' />
                 :
-                <Text style={styles.noLogonText}>
+                <ThemedText style={styles.noLogonText}>
                     Войдите в аккаунт чтобы оставлять комментарии
-                </Text>
+                </ThemedText>
             }
         </View>
     );
 
     return (
-        <View style={{ flex: 1 }}>
+        <ThemedView darkColor="black" style={{ flex: 1 }}>
             <Animated.FlatList
                 scrollEnabled={commentsArr.length > 0}
                 data={commentsArr}
-                contentContainerStyle={{ paddingTop: isIOS26 ? useHeaderHeight() + 10 : 20, paddingBottom: insets.bottom, gap: 15 }}
+                contentContainerStyle={{ paddingTop: useHeaderHeight() + 10, paddingBottom: insets.bottom, gap: 15 }}
                 itemLayoutAnimation={LinearTransition.delay(200)}
                 renderItem={({ item }) => (
                     <Animated.View
@@ -80,13 +82,13 @@ export default function CommentScreen() {
                 ListHeaderComponentStyle={{ marginBottom: 10 }}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.noComments}>
+                        <ThemedText lightColor="black" darkColor="white" style={styles.noComments}>
                             Комментариев нет
-                        </Text>
+                        </ThemedText>
                     </View>
                 }
             />
-        </View>
+        </ThemedView>
     );
 }
 
@@ -106,7 +108,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     noComments: {
-        color: 'white',
         fontSize: 16,
         fontWeight: '500'
     }

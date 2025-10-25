@@ -2,13 +2,15 @@ import { CommentAnimeT } from "@/components/Anime/Comments/CommentAnime.type";
 import CommentItem from "@/components/Anime/Comments/CommentItem";
 import WriteComment from "@/components/Anime/Comments/WriteComment";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { ThemedView } from "@/components/ui/ThemedView";
 import { auth, db } from "@/lib/firebase";
 import { deleteCommentFromAnime } from "@/lib/firebase/comments";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { collection, doc, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, { FadeInDown, FadeOutLeft, LinearTransition } from "react-native-reanimated";
 
@@ -35,6 +37,17 @@ export default function Comment() {
 
     const [comment, setComment] = useState<CommentAnimeT | null>(null);
     const [answers, setAnswers] = useState<CommentAnimeT[]>([]);
+
+    const HeaderRightBtn = () => {
+        if (comment && auth.currentUser?.uid === comment.user.id)
+            return (
+                <Pressable onPress={handleDelete} style={styles.trashBtn}>
+                    <IconSymbol name="trash" size={22} color="red" />
+                </Pressable>
+            );
+
+        return null;
+    };
 
     useEffect(() => {
         if (!animeID || !id) return;
@@ -79,16 +92,10 @@ export default function Comment() {
     if (!comment) return null;
 
     return (
-        <View style={styles.container}>
+        <ThemedView darkColor='black' style={styles.container}>
             <Stack.Screen
                 options={{
-                    ...(auth.currentUser?.uid === comment.user.id && {
-                        headerRight: () => (
-                            <Pressable onPress={handleDelete} style={styles.trashBtn}>
-                                <IconSymbol name="trash" size={22} color="red" />
-                            </Pressable>
-                        ),
-                    }),
+                    headerRight: () => <HeaderRightBtn />
                 }}
             />
 
@@ -100,18 +107,18 @@ export default function Comment() {
                 {auth.currentUser ? (
                     <WriteComment animeId={animeID as string} commentID={id as string} type="toAnswer" />
                 ) : (
-                    <Text style={styles.loginText}>Войдите в аккаунт чтобы оставлять комментарии</Text>
+                    <ThemedText style={styles.loginText}>Войдите в аккаунт чтобы оставлять комментарии</ThemedText>
                 )}
 
                 {answers.length === 0 ? (
                     <View style={styles.empty}>
-                        <Text style={{ color: "white" }}>Ответов нет</Text>
+                        <ThemedText style={{ color: "white" }}>Ответов нет</ThemedText>
                     </View>
                 ) : (
                     <Animated.FlatList
                         data={answers}
                         scrollEnabled={false}
-                        contentContainerStyle={{ paddingVertical: 20 }}
+                        contentContainerStyle={{ paddingVertical: 20, gap: 10 }}
                         itemLayoutAnimation={LinearTransition.delay(200)}
                         renderItem={({ item }) => (
                             <Animated.View
@@ -124,12 +131,12 @@ export default function Comment() {
                             </Animated.View>
                         )}
                         keyExtractor={(item) => item.id}
-                        ListHeaderComponent={<Text style={styles.answersTitle}>Ответы</Text>}
+                        ListHeaderComponent={<ThemedText style={styles.answersTitle}>Ответы</ThemedText>}
                         ListHeaderComponentStyle={{ marginBottom: 10 }}
                     />
                 )}
             </ScrollView>
-        </View>
+        </ThemedView>
     );
 }
 
@@ -146,7 +153,6 @@ const styles = StyleSheet.create({
         paddingVertical: 10
     },
     loginText: {
-        color: "white",
         fontSize: 16,
         fontWeight: "500",
         textAlign: "center",
@@ -160,7 +166,6 @@ const styles = StyleSheet.create({
         height: 200
     },
     answersTitle: {
-        color: "white",
         fontSize: 22,
         fontWeight: "600",
         paddingHorizontal: 20,

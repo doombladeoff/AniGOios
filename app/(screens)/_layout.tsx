@@ -77,6 +77,34 @@ export default function ScreensLayout() {
                     </HeaderButton>
                 }}
             />
+
+            {/* comments */}
+            <Stack.Screen
+                name="comments/index"
+                options={{
+                    headerTitle: 'Комментарии',
+                    title: 'Комментарии',
+                    headerBackTitle: "Назад",
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    headerTransparent: true,
+                    ...(Platform.Version >= '26.0' && {
+                        headerLargeTitle: false,
+                        headerStyle: undefined,
+                    }),
+                    ...(Platform.Version < '26.0' && { headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterial' }),
+                }}
+            />
+            <Stack.Screen
+                name="comments/[id]"
+                options={{
+                    title: '',
+                    headerTitle: '',
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    headerBackButtonDisplayMode: Platform.Version >= '26.0' ? 'minimal' : 'default',
+                    headerTransparent: true,
+                    ...(Platform.Version < '26.0' && { headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterial' }),
+                }}
+            />
             <Stack.Screen
                 name="error"
                 options={{
