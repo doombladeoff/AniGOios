@@ -62,7 +62,7 @@ const LatestUpdates = (props: LatestUpdatesProps) => {
                 containerStyle={{
                     paddingHorizontal: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
                 }}
-                onPress={() => router.push({ pathname: '/(screens)/(anime)/lastUpdates' })}
+                onPress={() => router.push({ pathname: '/anime/lastUpdates' })}
             />
 
             <FlashList

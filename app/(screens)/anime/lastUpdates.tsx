@@ -5,7 +5,7 @@ import { ThemedView } from "@/components/ui/ThemedView";
 import { fetchLastUpdates } from "@/hooks/homeData/fetchLastUpdates";
 import { useTheme } from "@/hooks/ThemeContext";
 import { ContentUnavailableView, Host } from "@expo/ui/swift-ui";
-import { foregroundStyle } from "@expo/ui/swift-ui/modifiers";
+import { background, foregroundStyle } from "@expo/ui/swift-ui/modifiers";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
 import { router, useNavigation } from "expo-router";
@@ -13,7 +13,6 @@ import { MaterialObject } from "kodikwrapper";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("screen");
 const ITEM_WIDTH = width / 3 - 10;
@@ -46,7 +45,6 @@ export default function AnimeLastUpdatesScreen() {
     const { theme } = useTheme();
     const isDarkMode = theme === "dark";
     const navigation = useNavigation();
-    const insets = useSafeAreaInsets();
     const headerHeight = useHeaderHeight();
 
     const [data, setData] = useState<any[]>([]);
@@ -92,7 +90,7 @@ export default function AnimeLastUpdatesScreen() {
                 onChangeText: (e: any) => setQueryText(e.nativeEvent.text),
             },
         });
-    }, [navigation]);
+    }, [navigation, isDarkMode]);
 
     const filtered = useMemo(() => {
         if (!queryText.trim()) return data;
@@ -134,7 +132,7 @@ export default function AnimeLastUpdatesScreen() {
     }, []);
 
     const SkeletonR = () => (
-        <ThemedView darkColor="black" lightColor="white" style={{ flex: 1 }}>
+        <ThemedView darkColor="black" lightColor="white" style={{ flex: 1, paddingTop: Platform.Version >= '26.0' ? headerHeight : 0 }}>
             <Skeleton
                 width={ITEM_WIDTH}
                 height={20}
@@ -201,11 +199,11 @@ export default function AnimeLastUpdatesScreen() {
                 <ContentUnavailableView
                     title="Ничего не найдено"
                     systemImage="magnifyingglass"
-                    modifiers={[foregroundStyle(isDarkMode ? "white" : "black")]}
+                    modifiers={[foregroundStyle(isDarkMode ? "white" : "black"), background(isDarkMode ? 'black' : 'white')]}
                 />
             </Host>
         );
-    }
+    };
 
     if (isLoading) return <SkeletonR />;
 
@@ -214,7 +212,6 @@ export default function AnimeLastUpdatesScreen() {
             data={source}
             style={{ flex: 1, backgroundColor: isDarkMode ? "black" : "white" }}
             contentInsetAdjustmentBehavior="automatic"
-            contentContainerStyle={{ paddingBottom: insets.bottom }}
             renderItem={({ item }) =>
                 typeof item === "string" ? (
                     <ThemedText style={styles.sectionTitle}>{item}</ThemedText>
@@ -242,7 +239,7 @@ const styles = StyleSheet.create({
     img: {
         width: ITEM_WIDTH,
         height: ITEM_HEIGHT,
-        borderRadius: 12,
+        borderRadius: 16,
         backgroundColor: "#1e1e1e",
     },
     episode: {

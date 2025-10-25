@@ -1,7 +1,9 @@
 
 import HeaderBackButton from "@/components/ui/HeaderBackButton";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useTheme } from "@/hooks/ThemeContext";
-import { Stack } from "expo-router";
+import { HeaderButton } from "@react-navigation/elements";
+import { router, Stack } from "expo-router";
 import { Platform } from "react-native";
 
 const isIOS26 = Platform.Version >= "26.0";
@@ -39,6 +41,42 @@ export default function ScreensLayout() {
                 }}
             />
 
+            {/* anime */}
+            <Stack.Screen
+                name="anime/animeByGenre"
+                options={{
+                    title: "",
+                    headerTransparent: true,
+                    headerTitleStyle: { color: isDarkMode ? 'white' : 'black' },
+                    headerBackTitle: 'Назад',
+                    ...(Platform.Version < '26.0' && {
+                        headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterialLight',
+                    }),
+                    ...(Platform.Version >= '26.0' && {
+                        headerBackButtonDisplayMode: 'minimal',
+                    }),
+                    contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                }}
+            />
+            <Stack.Screen
+                name="anime/lastUpdates"
+                options={{
+                    headerTitle: 'Обновления',
+                    headerBackTitle: "Назад",
+                    title: 'Обновления',
+                    headerStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    ...(Platform.Version >= '26.0' && {
+                        headerTransparent: true,
+                        headerLargeTitle: false,
+                        headerStyle: undefined,
+                    }),
+                    headerLeft: () => <HeaderButton onPress={router.back}>
+                        <IconSymbol name="chevron.left" size={22} />
+                    </HeaderButton>
+                }}
+            />
             <Stack.Screen
                 name="error"
                 options={{
