@@ -8,7 +8,7 @@ import { GlassView } from 'expo-glass-effect';
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { memo } from "react";
-import { Platform, StyleSheet, TouchableHighlight, View } from "react-native";
+import { Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Score } from "../../Score";
 
@@ -17,7 +17,12 @@ const AnimeItem = ({ item, index }: { item: ShikimoriAnime, index: number }) => 
     const handleNav = () => router.push({ pathname: '/(screens)/(anime)/[id]', params: { id: item.malId } });
 
     return (
-        <TouchableHighlight underlayColor={isDarkMode ? '#141414' : 'white'} style={{ overflow: 'hidden' }} onPress={handleNav} onLongPress={() => { }}>
+        <Pressable style={({ pressed }) => ({
+            opacity: pressed ? 0.8 : 1
+        })}
+            onPress={handleNav}
+            onLongPress={() => { }}
+        >
             <Animated.View entering={FadeIn}>
                 <GlassView isInteractive style={[styles.container, {
                     ...(Platform.Version < '26.0' && {
@@ -29,10 +34,11 @@ const AnimeItem = ({ item, index }: { item: ShikimoriAnime, index: number }) => 
                     })
                 }]}>
                     <View style={{
-                        shadowColor: 'black',
-                        shadowOpacity: 0.65,
-                        shadowRadius: 6,
-                        shadowOffset: { width: 0, height: 0 }
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.5,
+                        shadowRadius: 5,
+                        elevation: 5,
                     }}>
                         <Image
                             key={`poster-${item.malId}`}
@@ -60,11 +66,7 @@ const AnimeItem = ({ item, index }: { item: ShikimoriAnime, index: number }) => 
                             scoreText={item.score.toFixed(1)}
                             scoreTextStyle={styles.scoreText}
                             containerStyle={[styles.scoreContainer, {
-                                // backgroundColor: item.score <= 5 ? 'red' :
-                                //     item.score < 8 ? 'orange' : '#50ca2bff',
-                                backgroundColor: item.score <= 5 ? '#ff6b6b' :      // низкий рейтинг — мягкий красный
-                                    item.score < 8 ? '#ffa534' :       // средний рейтинг — янтарный / золотистый
-                                        '#4cd964',
+                                backgroundColor: item.score <= 5 ? '#ff6b6b' : item.score < 8 ? '#ffa534' : '#4cd964',
                             }]}
                         />
 
@@ -95,8 +97,8 @@ const AnimeItem = ({ item, index }: { item: ShikimoriAnime, index: number }) => 
                     </View>
                 </GlassView>
             </Animated.View>
-        </TouchableHighlight>
-    )
+        </Pressable>
+    );
 }
 
 const styles = StyleSheet.create({
