@@ -45,7 +45,7 @@ export const ContinueWatching: React.FC<ContinueWatchingProps> = ({
     }));
 
     const handleNavigate = useCallback(() => {
-        router.push({ pathname: '/(screens)/(anime)/animeHistory' })
+        router.push({ pathname: '/(screens)/anime/animeHistory' })
     }, []);
 
     return (

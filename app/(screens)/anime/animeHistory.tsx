@@ -1,5 +1,6 @@
 import { ContinueWatching } from "@/components/ContinueWatching";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { getLastAnime, updateAnimeHistory } from "@/lib/firebase/update/userLastAnime";
 import { LastAnime, useUserStore } from "@/store/userStore";
@@ -7,15 +8,13 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
 import { useNavigation } from "expo-router";
 import { QueryDocumentSnapshot } from "firebase/firestore";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Dimensions, Keyboard, Text, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { Dimensions, Keyboard, Platform, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AnimeHistoryScreen() {
     const navigation = useNavigation();
     const headerHeight = useHeaderHeight();
-    const insets = useSafeAreaInsets();
 
     const user = useUserStore(s => s.user);
 
@@ -38,7 +37,7 @@ export default function AnimeHistoryScreen() {
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false);
+                setTimeout(() => setLoading(false), 500);
             }
         };
 
@@ -98,20 +97,19 @@ export default function AnimeHistoryScreen() {
         </Animated.View>
     ), [handleUpdate]);
 
-    const SkeletonR = useMemo(() => {
-        const fakeRows = new Array(5).fill(0);
+    const SkeletonR = () => {
         return (
-            <View style={{ paddingHorizontal: 10, paddingBottom: insets.bottom }}>
-                {fakeRows.map((_, idx) => (
+            <ThemedView darkColor="black" lightColor="white" style={{ flex: 1, paddingHorizontal: 10, paddingTop: Platform.Version < '26.0' ? 10 : headerHeight }}>
+                {Array.from({ length: 5 }).map((_, idx) => (
                     <View key={idx} style={{ flexDirection: "row", marginBottom: 0 }}>
                         <View style={{ marginBottom: 10 }}>
                             <Skeleton width={Dimensions.get('screen').width - 20} height={130} radius={12} />
                         </View>
                     </View>
                 ))}
-            </View>
+            </ThemedView>
         );
-    }, [headerHeight, insets.bottom]);
+    };
 
     useEffect(() => {
         navigation.setOptions({
@@ -130,33 +128,28 @@ export default function AnimeHistoryScreen() {
 
     const dataToRender = filtered.length > 0 ? filtered : animeList;
 
+    if (loading) return <SkeletonR />;
+
+    if (dataToRender.length === 0) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <ThemedText darkColor="white" lightColor="black">История просмотра пустая</ThemedText>
+            </View>
+        );
+    };
+
     return (
-        <ThemedView style={{ flex: 1 }} darkColor="black" lightColor="white">
-            {loading ? (
-                SkeletonR
-            ) : (
-                <>
-                    {dataToRender.length === 0 ? (
-                        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingBottom: insets.bottom }}>
-                            <Text>История просмотра пустая</Text>
-                        </View>
-                    ) : (
-                        <FlashList
-                            data={dataToRender}
-                            renderItem={renderItem}
-                            contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: insets.bottom }}
-                            keyExtractor={(item) => `${item.id}`}
-                            removeClippedSubviews
-                            onEndReached={fetchNextPage}
-                            onEndReachedThreshold={1}
-                            onScroll={Keyboard.dismiss}
-                            scrollEventThrottle={16}
-                            scrollIndicatorInsets={{ top: 75 }}
-                            contentInsetAdjustmentBehavior="automatic"
-                        />
-                    )}
-                </>
-            )}
-        </ThemedView>
+        <FlashList
+            data={dataToRender}
+            renderItem={renderItem}
+            contentContainerStyle={{ paddingHorizontal: 10 }}
+            keyExtractor={(item) => item.id.toString()}
+            removeClippedSubviews
+            onEndReached={fetchNextPage}
+            onEndReachedThreshold={1}
+            onScroll={Keyboard.dismiss}
+            scrollEventThrottle={16}
+            contentInsetAdjustmentBehavior="automatic"
+        />
     );
 };

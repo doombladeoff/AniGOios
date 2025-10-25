@@ -53,6 +53,21 @@ export default function ScreensLayout() {
                 }}
             />
             <Stack.Screen
+                name="anime/animeHistory"
+                options={{
+                    headerTransparent: Platform.Version >= '26.0' ? true : false,
+                    ...(Platform.Version < '26.0' && {
+                        headerStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                    }),
+                    title: "История просмотра",
+                    headerTitleStyle: { color: isDarkMode ? 'white' : 'black' },
+                    contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                    headerLeft: () => <HeaderButton onPress={router.back} style={{ justifyContent: 'center', alignItems: 'center', width: 35, height: 35 }}>
+                        <IconSymbol name="chevron.left" size={22} />
+                    </HeaderButton>
+                }}
+            />
+            <Stack.Screen
                 name="anime/animeByGenre"
                 options={{
                     title: "",
