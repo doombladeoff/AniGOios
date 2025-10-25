@@ -43,6 +43,16 @@ export default function ScreensLayout() {
 
             {/* anime */}
             <Stack.Screen
+                name="anime/[id]"
+                options={{
+                    headerTransparent: true,
+                    title: '',
+                    headerLeft: () => <HeaderButton onPress={router.back} style={{ justifyContent: 'center', alignItems: 'center', width: 35, height: 35 }}>
+                        <IconSymbol name="chevron.left" size={22} />
+                    </HeaderButton>
+                }}
+            />
+            <Stack.Screen
                 name="anime/animeByGenre"
                 options={{
                     title: "",

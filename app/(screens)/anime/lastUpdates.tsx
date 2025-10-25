@@ -128,7 +128,7 @@ export default function AnimeLastUpdatesScreen() {
 
 
     const handleNavigate = useCallback((id?: number) => {
-        if (id) router.push({ pathname: "/(screens)/(anime)/[id]", params: { id } });
+        if (id) router.push({ pathname: "/(screens)/anime/[id]", params: { id } });
     }, []);
 
     const SkeletonR = () => (

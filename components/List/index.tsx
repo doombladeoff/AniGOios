@@ -56,7 +56,7 @@ function List({
     const anonsCard = typeRequest === 'anons';
 
     const handleNavigate = useCallback((id: number) => {
-        router.push({ pathname: '/(screens)/(anime)/[id]', params: { id } });
+        router.push({ pathname: '/(screens)/anime/[id]', params: { id } });
     }, []);
 
     const contextMenuItems = useMemo(() => (id: number) => [

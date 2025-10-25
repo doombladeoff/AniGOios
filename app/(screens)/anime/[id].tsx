@@ -60,7 +60,7 @@ export default function AnimeScreen() {
     } as ItemsT], [setIsOpened]);
 
     const handleNavToComments = useCallback((() => router.push({
-        pathname: '/(screens)/(anime)/(comments)/comments',
+        pathname: '/(screens)/comments',
         params: { id: animeData.malId }
     })), [animeData]);
 
@@ -226,7 +226,7 @@ export default function AnimeScreen() {
 
                     <CharacterList id={Number(id)} />
 
-                    <RecommendationList id={Number(id)} showTitle/>
+                    <RecommendationList id={Number(id)} showTitle />
 
                 </Animated.View>
             </ParallaxScrollView>

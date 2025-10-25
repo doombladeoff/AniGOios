@@ -28,7 +28,7 @@ const LatestUpdates = (props: LatestUpdatesProps) => {
 
     const renderItem = ({ item, index }: { item: any, index: number }) => {
         const handeNavigate = () => router.push({
-            pathname: '/(screens)/(anime)/[id]',
+            pathname: '/(screens)/anime/[id]',
             params: { id: item.shikimori_id }
         });
 

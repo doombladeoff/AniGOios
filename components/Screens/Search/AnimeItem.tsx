@@ -14,7 +14,7 @@ import { Score } from "../../Score";
 
 const AnimeItem = ({ item, index }: { item: ShikimoriAnime, index: number }) => {
     const isDarkMode = useTheme().theme === 'dark';
-    const handleNav = () => router.push({ pathname: '/(screens)/(anime)/[id]', params: { id: item.malId } });
+    const handleNav = () => router.push({ pathname: '/(screens)/anime/[id]', params: { id: item.malId } });
 
     return (
         <Pressable style={({ pressed }) => ({

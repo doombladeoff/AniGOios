@@ -11,14 +11,6 @@ export default function AnimeLayout() {
         }}
         >
             <Stack.Screen
-                name="[id]"
-                options={{
-                    headerTransparent: true,
-                    headerTitle: '',
-                    headerLeft: () => <HeaderBackButton />,
-                }}
-            />
-            <Stack.Screen
                 name="animeHistory"
                 options={{
                     headerTransparent: Platform.Version >= '26.0' ? true : false,

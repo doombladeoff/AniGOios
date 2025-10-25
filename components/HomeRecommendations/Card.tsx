@@ -121,7 +121,7 @@ export const Card = ({
     return (
         <GestureDetector gesture={gesture}>
             <Animated.View style={[animatedStyle, styles.box]}>
-                <Link href={{ pathname: '/(screens)/(anime)/[id]', params: { id: anim.remote_ids.shikimori_id } }}>
+                <Link href={{ pathname: '/(screens)/anime/[id]', params: { id: anim.remote_ids.shikimori_id } }}>
                     <View style={styles.fullSize}>
                         <Animated.View style={[styles.fullSize, styles.card]}>
                             <Image

@@ -109,7 +109,7 @@ export const ContinueWatching: React.FC<ContinueWatchingProps> = ({
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Pressable onPress={() => {
                                         const animeId = String(id);
-                                        router.push({ pathname: '/(screens)/(anime)/[id]', params: { id: animeId } });
+                                        router.push({ pathname: '/(screens)/anime/[id]', params: { id: animeId } });
                                     }}
                                         style={styles.button}>
                                         <IconSymbol

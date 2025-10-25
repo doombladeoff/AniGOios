@@ -9,7 +9,7 @@ export const RecommendationItem = ({ item }: { item: any }) => {
     const handleNavigate = () => {
         const id = item?.entry?.mal_id || item?.remote_ids?.shikimori_id;
         router.push({
-            pathname: "/(screens)/(anime)/[id]",
+            pathname: "/(screens)/anime/[id]",
             params: { id },
         });
     };
