@@ -23,22 +23,6 @@ export default function AnimeLayout() {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="lastUpdates"
-                options={{
-                    headerTitle: 'Обновления',
-                    headerLargeTitle: true,
-                    title: 'Обновления',
-                    headerStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
-                    headerTintColor: isDarkMode ? 'white' : 'black',
-                    ...(Platform.Version >= '26.0' && {
-                        headerTransparent: true,
-                        headerLargeTitle: false,
-                        headerStyle: undefined,
-                    }),
-                    headerLeft: () => <HeaderBackButton />
-                }}
-            />
-            <Stack.Screen
                 name="animeHistory"
                 options={{
                     headerTransparent: Platform.Version >= '26.0' ? true : false,
