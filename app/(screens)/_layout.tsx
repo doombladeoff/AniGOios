@@ -75,8 +75,6 @@ export default function ScreensLayout() {
                     headerTintColor: isDarkMode ? 'white' : 'black'
                 }}
             />
-                }}
-            />
         </Stack>
     )
 }
