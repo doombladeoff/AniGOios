@@ -62,7 +62,9 @@ export default function ScreensLayout() {
                     title: "История просмотра",
                     headerTitleStyle: { color: isDarkMode ? 'white' : 'black' },
                     contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
-                    headerLeft: () => <HeaderButton onPress={router.back} style={{ justifyContent: 'center', alignItems: 'center', width: 35, height: 35 }}>
+                    headerLeft: () => <HeaderButton onPress={router.back}
+                        style={{ justifyContent: 'center', alignItems: 'center', width: 35, height: 35 }}
+                    >
                         <IconSymbol name="chevron.left" size={22} />
                     </HeaderButton>
                 }}
@@ -97,7 +99,7 @@ export default function ScreensLayout() {
                         headerLargeTitle: false,
                         headerStyle: undefined,
                     }),
-                    headerLeft: () => <HeaderButton onPress={router.back}>
+                    headerLeft: () => <HeaderButton onPress={router.back} style={{ width: 35, height: 35, justifyContent: 'center', alignItems: 'center' }}>
                         <IconSymbol name="chevron.left" size={22} />
                     </HeaderButton>
                 }}
@@ -149,15 +151,6 @@ export default function ScreensLayout() {
             <Stack.Screen
                 name="(user)"
                 options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="(anime)"
-                options={{
-                    headerShown: false,
-                    headerTransparent: true,
-                    title: '',
-                    headerLeft: () => <HeaderBackButton />
-                }}
             />
             <Stack.Screen
                 name="folder"

@@ -1,11 +1,27 @@
 import { IconSymbol } from '@/components/ui/IconSymbol.ios';
 import { CustomTabBar } from '@/components/ui/TabBar/CustomTabBar';
 import { Tabs } from 'expo-router';
-import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 import { AnimationSpec } from 'expo-symbols';
 import React from 'react';
 import { Platform } from 'react-native';
 import { SFSymbols6_0 } from 'sf-symbols-typescript';
+
+import {
+    createNativeBottomTabNavigator,
+    NativeBottomTabNavigationEventMap,
+    NativeBottomTabNavigationOptions,
+} from '@bottom-tabs/react-navigation';
+import { ParamListBase, TabNavigationState } from '@react-navigation/native';
+import { withLayoutContext } from 'expo-router';
+
+const BottomTabNavigator = createNativeBottomTabNavigator().Navigator;
+
+const NativeTab = withLayoutContext<
+    NativeBottomTabNavigationOptions,
+    typeof BottomTabNavigator,
+    TabNavigationState<ParamListBase>,
+    NativeBottomTabNavigationEventMap
+>(BottomTabNavigator);
 
 const iconSize = 28;
 
@@ -20,7 +36,7 @@ type TabsData = {
 }
 
 const tabsData: TabsData[] = [
-    { name: '(home)', title: 'home', icon: 'house.fill', iconSize, color: 'white' },
+    { name: 'home', title: 'home', icon: 'house.fill', iconSize, color: 'white' },
     { name: 'search', title: 'search', icon: 'magnifyingglass', iconSize, color: 'white' },
     { name: '(news)', title: 'news', icon: 'newspaper', iconSize, color: 'white' },
     { name: 'profile', title: 'profile', icon: 'person.fill', iconSize, color: 'white' },
@@ -60,21 +76,41 @@ export default function TabLayout() {
     }
 
     return (
-        <NativeTabs tintColor={'black'} disableTransparentOnScrollEdge blurEffect='dark'>
-            <NativeTabs.Trigger name='(home)'>
-                <Label selectedStyle={{ color: 'orange', fontSize: 11, fontWeight: '500' }}>Главная</Label>
-                <Icon sf='house.fill' selectedColor={'orange'} />
-            </NativeTabs.Trigger>
-
-            <NativeTabs.Trigger name='search'>
-                <Label selectedStyle={{ color: 'orange', fontSize: 11, fontWeight: '500' }}>Поиск</Label>
-                <Icon sf='magnifyingglass' selectedColor={'orange'} />
-            </NativeTabs.Trigger>
-
-            <NativeTabs.Trigger name='profile'>
-                <Label selectedStyle={{ color: 'orange', fontSize: 11, fontWeight: '500' }}>Профиль</Label>
-                <Icon sf='person.fill' selectedColor={'orange'} />
-            </NativeTabs.Trigger>
-        </NativeTabs>
-    )
+        <NativeTab>
+            <NativeTab.Screen
+                name="home"
+                options={{
+                    title: "Главная",
+                    tabBarIcon: () => ({ sfSymbol: "house.fill" }),
+                    tabBarActiveTintColor: 'orange'
+                }}
+            />
+            <NativeTab.Screen
+                name="search"
+                options={{
+                    title: "Поиск",
+                    tabBarIcon: () => ({ sfSymbol: "magnifyingglass" }),
+                    tabBarActiveTintColor: 'orange',
+                    tabBarLabel: 'Поиск',
+                }}
+            />
+            <NativeTab.Screen
+                name="(news)"
+                options={{
+                    title: "Новости",
+                    tabBarIcon: () => ({ sfSymbol: "newspaper" }),
+                    tabBarActiveTintColor: 'orange',
+                    tabBarItemHidden: true,
+                }}
+            />
+            <NativeTab.Screen
+                name="profile"
+                options={{
+                    title: "Профиль",
+                    tabBarIcon: () => ({ sfSymbol: "person.fill" }),
+                    tabBarActiveTintColor: 'orange',
+                }}
+            />
+        </NativeTab>
+    );
 };

@@ -51,6 +51,9 @@
         {
           "enableBackgroundRemoteNotifications": false
         }
+      ],
+      [
+        "react-native-bottom-tabs"
       ]
     ],
     "experiments": {
