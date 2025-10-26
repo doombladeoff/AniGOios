@@ -4,13 +4,12 @@ import Recommendations from '@/components/HomeRecommendations';
 import List from '@/components/List';
 import LatestUpdates from '@/components/List/LatestUpdates';
 import { Page } from '@/components/Screens/Settings/Page';
+import BackgroundBlur from '@/components/ui/BackgroundBlur';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useHomeScreenData } from '@/hooks/homeData/useHomeScreenData';
 import { useTheme } from '@/hooks/ThemeContext';
 import { useBottomHeight } from '@/hooks/useBottomHeight';
 import { useHeaderHeight } from '@react-navigation/elements';
-import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback } from 'react';
 import { Dimensions, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { easeGradient } from 'react-native-easing-gradient';
@@ -95,43 +94,6 @@ export default function HomeScreen() {
         );
     }, []);
 
-    const BackgroundBlur = () => {
-        if (!isIOS_26) {
-            return (
-                <BlurView
-                    tint={isDarkMode ? 'dark' : 'systemChromeMaterialLight'}
-                    intensity={100}
-                    style={[StyleSheet.absoluteFillObject, {
-                        flex: 1,
-                        zIndex: 0,
-                        top: headerHeight,
-                    }]} />
-            );
-        }
-
-        return (
-            <>
-                <GradientBlur
-                    colors={colors}
-                    locations={locations}
-                    containerStyle={{
-                        position: 'absolute',
-                        top: 0,
-                        zIndex: 1, width, height: insets.top * 2.5,
-                    }}
-                    tint="light"
-                    blurIntensity={20}
-                />
-                <LinearGradient
-                    colors={isDarkMode ? GradientColorsDark : GradientColorsLight}
-                    style={[StyleSheet.absoluteFill, { width: '100%', height: insets.top * 2, zIndex: 2 }]}
-                    pointerEvents='none'
-                />
-            </>
-
-        );
-    };
-
     if (loading) {
         return (
             <>
@@ -144,6 +106,22 @@ export default function HomeScreen() {
     return (
         <Page>
             <BackgroundBlur />
+            {isIOS_26 &&
+                <GradientBlur
+                    colors={colors}
+                    locations={locations}
+                    containerStyle={{
+                        position: 'absolute',
+                        top: 0,
+                        zIndex: 1,
+                        width,
+                        height: insets.top
+                    }}
+                    tint="light"
+                    blurIntensity={20}
+                />
+            }
+
             <ScrollView
                 contentContainerStyle={{
                     paddingTop: !isIOS_26 ? 10 : 0,

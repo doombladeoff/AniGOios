@@ -2,6 +2,7 @@ import { GradientBlur } from "@/components/GradientBlur";
 import FavoriteItem from "@/components/Screens/Favorite/FavoriteItem";
 import Filters, { OrderT } from "@/components/Screens/Favorite/Filters";
 import SearchFavorite, { SearchFavoriteHandle } from "@/components/Screens/Favorite/SeacrchFavorite";
+import BackgroundBlur from "@/components/ui/BackgroundBlur";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useTheme } from "@/hooks/ThemeContext";
 import { useBottomHeight } from "@/hooks/useBottomHeight";
@@ -18,8 +19,7 @@ import {
     Dimensions,
     Platform,
     RefreshControl,
-    StyleSheet,
-    View
+    StyleSheet
 } from "react-native";
 import { easeGradient } from "react-native-easing-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -181,7 +181,7 @@ export default function FavoriteScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <>
             <Stack.Screen
                 options={{
                     headerRight: () => (
@@ -207,26 +207,30 @@ export default function FavoriteScreen() {
                 }}
             />
 
-            <GradientBlur
-                colors={colors}
-                locations={locations}
-                containerStyle={{
-                    position: "absolute",
-                    top: 0,
-                    zIndex: 1,
-                    width,
-                    height: insets.top * 2.5,
-                }}
-                tint="light"
-                blurIntensity={20}
-            />
+            {Platform.Version >= '26.0' &&
+                <>
+                    <GradientBlur
+                        colors={colors}
+                        locations={locations}
+                        containerStyle={{
+                            position: "absolute",
+                            top: 0,
+                            zIndex: 1,
+                            width,
+                            height: insets.top * 2.5,
+                        }}
+                        tint="light"
+                        blurIntensity={20}
+                    />
 
-            <LinearGradient
-                colors={isDarkMode ? GRADIENT_DARK_COLOR : GRADIENT_LIGHT_COLOR}
-                style={[StyleSheet.absoluteFill, { height: insets.top * 3, zIndex: 2 }]}
-                pointerEvents="none"
-            />
-
+                    <LinearGradient
+                        colors={isDarkMode ? GRADIENT_DARK_COLOR : GRADIENT_LIGHT_COLOR}
+                        style={[StyleSheet.absoluteFill, { height: insets.top * 3, zIndex: 2 }]}
+                        pointerEvents="none"
+                    />
+                </>
+            }
+            <BackgroundBlur/>
             <FlashList
                 ref={listRef}
                 data={userFavorites}
@@ -234,7 +238,6 @@ export default function FavoriteScreen() {
                 contentInsetAdjustmentBehavior="automatic"
                 contentContainerStyle={{
                     paddingTop: 10,
-                    paddingBottom: bottomHeight,
                 }}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={renderItem}
@@ -271,14 +274,11 @@ export default function FavoriteScreen() {
                 onSwitchValueChange={handleChangeShowFilter}
             />
             <SearchFavorite ref={inputRef} closeSearch={setSearchMode} searchMode={searchMode} renderItem={renderItem} />
-        </View>
+        </>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
     headerButtons: {
         width: 85,
         height: 35

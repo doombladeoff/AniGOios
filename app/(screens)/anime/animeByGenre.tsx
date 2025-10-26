@@ -3,13 +3,13 @@ import { AnimeFields } from "@/API/Shikimori/RequestFields.type";
 import { OrderEnum } from "@/API/Shikimori/RequestInterfaces.interfaces";
 import { ShikimoriAnime } from "@/API/Shikimori/Shikimori.types";
 import AnimeItem from "@/components/Screens/Search/AnimeItem";
+import BackgroundBlur from "@/components/ui/BackgroundBlur";
 import { useTheme } from "@/hooks/ThemeContext";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
-import { BlurView } from "expo-blur";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Platform, StyleSheet, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const fiedls: AnimeFields = {
@@ -84,24 +84,6 @@ export default function AnimeByGenreScreen() {
             </View>
         )
     }, []);
-
-    const BackgroundBlur = () => {
-        if (Platform.Version < '26.0') {
-            return (
-                <BlurView
-                    tint={isDarkMode ? 'dark' : 'systemChromeMaterialLight'}
-                    intensity={100}
-                    style={[StyleSheet.absoluteFillObject, {
-                        flex: 1,
-                        zIndex: 0,
-                        top: headerHeight,
-                    }]}
-                    pointerEvents='none'
-                />
-            );
-        }
-        return null
-    };
 
     if (!data.length) return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
