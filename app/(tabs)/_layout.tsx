@@ -38,7 +38,6 @@ type TabsData = {
 const tabsData: TabsData[] = [
     { name: 'home', title: 'home', icon: 'house.fill', iconSize, color: 'white' },
     { name: 'search', title: 'search', icon: 'magnifyingglass', iconSize, color: 'white' },
-    { name: '(news)', title: 'news', icon: 'newspaper', iconSize, color: 'white' },
     { name: 'profile', title: 'profile', icon: 'person.fill', iconSize, color: 'white' },
 ]
 
@@ -92,15 +91,6 @@ export default function TabLayout() {
                     tabBarIcon: () => ({ sfSymbol: "magnifyingglass" }),
                     tabBarActiveTintColor: 'orange',
                     tabBarLabel: 'Поиск',
-                }}
-            />
-            <NativeTab.Screen
-                name="(news)"
-                options={{
-                    title: "Новости",
-                    tabBarIcon: () => ({ sfSymbol: "newspaper" }),
-                    tabBarActiveTintColor: 'orange',
-                    tabBarItemHidden: true,
                 }}
             />
             <NativeTab.Screen
