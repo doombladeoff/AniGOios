@@ -1,10 +1,9 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useRef } from "react";
 
 import { AnimeStatusEnum } from "@/API/Shikimori/Shikimori.types";
 import Bookmark from "@/components/Anime/Bookmark";
 import {
     CharacterList,
-    Details,
     GenresList,
     NextEpisodeInfo,
     RecommendationList,
@@ -14,8 +13,9 @@ import CustomHeader from "@/components/Anime/Header/CustomHeader";
 import { HeaderRight } from "@/components/Anime/Header/HeaderRight";
 import Player from "@/components/Anime/Player";
 import { CrunchyPoster, Poster3D } from "@/components/Anime/Posters";
-import { ItemsT } from "@/components/ContextComponent/DropdownMenu";
+import { Items } from "@/components/ContextComponent/ContextMenu";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
+import BackgroundBlur from "@/components/ui/BackgroundBlur";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
@@ -38,7 +38,6 @@ export default function AnimeScreen() {
 
     const { id } = useLocalSearchParams();
     const { animeData, isLoading, useCrunch, usePoster3D, backgroundImage } = useAnimeFetch(id as string);
-    const [isOpened, setIsOpened] = useState(false);
 
     const isAnons = animeData?.status === AnimeStatusEnum.anons;
 
@@ -53,11 +52,13 @@ export default function AnimeScreen() {
 
     const fallbackImage = animeData?.poster?.originalUrl;
 
-    const headerRightItems = useMemo(() => [{
-        title: 'Больше информации',
-        onSelect: () => setIsOpened(true),
-        iconName: 'info.circle.fill'
-    } as ItemsT], [setIsOpened]);
+    const headerRightItems: Items[] = [
+        {
+            title: 'Больше информации',
+            onSelect: () => router.push({ pathname: '/anime/details', params: { id: id } }),
+            iconName: 'info.circle.fill'
+        }
+    ];
 
     const handleNavToComments = useCallback((() => router.push({
         pathname: '/(screens)/comments',
@@ -69,6 +70,7 @@ export default function AnimeScreen() {
     if (isLoading) {
         return (
             <ThemedView lightColor="white" darkColor="black" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <BackgroundBlur style={[StyleSheet.absoluteFillObject]} />
                 <ActivityIndicator size='small' color={isDarkMode ? 'white' : 'black'} />
                 <ThemedText lightColor="black" darkColor="white" style={{ textAlign: 'center', marginTop: 20 }}>Загрузка...</ThemedText>
             </ThemedView>
@@ -230,8 +232,6 @@ export default function AnimeScreen() {
 
                 </Animated.View>
             </ParallaxScrollView>
-
-            <Details id={id as string} opened={isOpened} handleShow={() => setIsOpened(false)} />
         </ThemedView>
     )
 };

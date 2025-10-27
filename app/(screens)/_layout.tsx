@@ -104,6 +104,22 @@ export default function ScreensLayout() {
                     </HeaderButton>
                 }}
             />
+            <Stack.Screen
+                name="anime/details"
+                options={{
+                    headerTitle: '',
+                    headerBackTitle: "Назад",
+                    title: '',
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    headerTransparent: true,
+                    headerBackButtonMenuEnabled: true,
+                    ...(Platform.Version >= '26.0' && {
+                        headerLargeTitle: false,
+                        headerStyle: undefined,
+                        headerBackButtonDisplayMode: 'minimal'
+                    }),
+                }}
+            />
 
             {/* comments */}
             <Stack.Screen
