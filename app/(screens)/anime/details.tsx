@@ -1,16 +1,5 @@
 import { AnimeKindEnum, VideoKindEnum } from "@/API/Shikimori/Shikimori.types";
-import { Screenshots } from "@/components/Anime/Details";
-import { Censored } from "@/components/Anime/Details/Censored";
-import { Description } from "@/components/Anime/Details/Description";
-import { DetailsGenre } from "@/components/Anime/Details/DetailGenres";
-import { FandubberList } from "@/components/Anime/Details/FandubberList";
-import { InfoItem } from "@/components/Anime/Details/InfoItem";
-import { RatingStats } from "@/components/Anime/Details/RatingStats";
-import { RelatedList } from "@/components/Anime/Details/RelatedList";
-import { Season } from "@/components/Anime/Details/Season";
-import { Section } from "@/components/Anime/Details/Section";
-import { Title } from "@/components/Anime/Details/Title";
-import { TrailerList } from "@/components/Anime/Details/TrailerList";
+import { Censored, Description, DetailsGenre, FandubberList, InfoItem, RatingStats, RelatedList, Screenshots, Season, Section, Title, TrailerList } from "@/components/Anime/Details";
 import { GradientBlur } from "@/components/GradientBlur";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { TranslatedKind, TranslatedStatus } from "@/constants/TranslatedStatus";
