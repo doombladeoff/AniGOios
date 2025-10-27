@@ -23,7 +23,7 @@ async function fetchAnimeById(id: number | string, fetchCrunch: boolean) {
 
     const [crunchData, yummyRecs, yummyEpisodes] = await Promise.all([
         fetchCrunch ? getCrunchyrollIData(animeListData, animeShiki.malId) : null,
-        !recommendsJikan.length && getRecommendationsYummy(yummy[0].anime_id),
+        (!recommendsJikan.length && yummy.length) ? getRecommendationsYummy(yummy[0].anime_id) : [],
         false ? getEpisodesFromYummy({ shikimori_id: animeShiki.malId }) : [],
     ]);
 
