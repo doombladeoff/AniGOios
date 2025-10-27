@@ -393,7 +393,7 @@ export enum UserRateStatusEnum {
 };
 
 export enum VideoKindEnum {
-    pv = "PV",
+    pv = "pv",
     character_trailer = "Character trailer",
     cm = "CM",
     op = "OP",

@@ -53,6 +53,14 @@ export const ANIME_FIELDS: AnimeFields = {
         relationKind: true,
         relationText: true
     },
+    videos: {
+        id: true,
+        url: true,
+        name: true,
+        kind: true,
+        playerUrl: true,
+        imageUrl: true,
+    },
     screenshots: { id: true, originalUrl: true, x166Url: true, x332Url: true },
     scoresStats: { score: true, count: true },
     statusesStats: { status: true, count: true },

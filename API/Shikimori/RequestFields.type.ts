@@ -101,5 +101,13 @@ export type AnimeFields = {
     scoresStats?: { score?: true; count?: true };
     statusesStats?: { status?: true; count?: true };
     description?: true;
-    opengraphImageUrl?: true
+    opengraphImageUrl?: true;
+    videos?: {
+        id?: true;
+        url?: true;
+        name?: true;
+        kind?: true;
+        playerUrl?: true;
+        imageUrl?: true;
+    }
 };
