@@ -22,7 +22,7 @@ export type ShikimoriAnime = {
     franchise: string;
     genres: Genre[];
     id: number;
-    isCensored: Boolean;
+    isCensored: boolean;
     japanese: string;
     kind: AnimeKindEnum;
     licenseNameRu: string;
@@ -75,7 +75,7 @@ export type Manga = {
     franchise: string;
     genres: Genre[];
     id: number;
-    isCensored: Boolean;
+    isCensored: boolean;
     japanese: string;
     kind: MangaKindEnum;
     licenseNameRu: string;
