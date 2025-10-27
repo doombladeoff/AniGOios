@@ -112,7 +112,7 @@ export default function CalendarScreen() {
                         const response = await axios.get(`https://api.yani.tv/anime/${anime.anime_id}`);
                         if (response.status === 200 && response.data.response.remote_ids.shikimori_id) {
                             router.push({
-                                pathname: '/[id]',
+                                pathname: '/anime/[id]',
                                 params: { id: response.data.response.remote_ids.shikimori_id }
                             })
                         } else {
