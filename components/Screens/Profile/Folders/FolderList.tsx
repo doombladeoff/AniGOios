@@ -45,7 +45,7 @@ function FolderList({ userId, openCreateFolder, editFolder }: FolderListProps) {
     return (
         <View>
             <Text style={{ color: 'white', fontSize: 16, fontWeight: '500', paddingBottom: 10 }}>Папки</Text>
-            <GlassView style={styles.container}>
+            <GlassView tintColor="black" style={styles.container}>
                 {folders.map((item, index) => (
                     <ContextMenu key={`folder-${item.name}-${index}`}
                         triggerItem={
@@ -81,7 +81,6 @@ function FolderList({ userId, openCreateFolder, editFolder }: FolderListProps) {
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
-        backgroundColor: '#1c1c1e',
         padding: 10,
         borderRadius: 14,
         gap: 10,

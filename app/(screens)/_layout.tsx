@@ -186,8 +186,12 @@ export default function ScreensLayout() {
             <Stack.Screen
                 name="folder"
                 options={{
-                    ...(isIOS26 && { headerTransparent: true }),
-                    headerTintColor: isDarkMode ? 'white' : 'black'
+                    title: '',
+                    headerTitle: '',
+                    headerTransparent: true,
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                    ...(Platform.Version < '26.0' && { headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterial' }),
                 }}
             />
         </Stack>

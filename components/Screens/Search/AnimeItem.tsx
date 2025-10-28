@@ -42,7 +42,7 @@ const AnimeItem = ({ item, index }: { item: ShikimoriAnime, index: number }) => 
                     }}>
                         <Image
                             key={`poster-${item.malId}`}
-                            source={{ uri: item.poster.mainUrl }}
+                            source={{ uri: item.poster.mainUrl || item.poster.main2xUrl}}
                             style={[styles.image, {
                                 ...(Platform.Version < '26.0' && {
                                     borderRadius: 12
