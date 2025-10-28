@@ -93,6 +93,7 @@ export function buildAnimeQueryFromObject(fieldsObj: any) {
       $season: SeasonString
       $genre: String
       $score: Int
+      $studio: String
     ) {
       animes(
         search: $search
@@ -107,6 +108,7 @@ export function buildAnimeQueryFromObject(fieldsObj: any) {
         season: $season
         genre: $genre
         score: $score
+        studio: $studio
       ) {
         ${buildFields(fieldsObj)}
       }
@@ -128,6 +130,7 @@ function buildVariables(props: RequestProps) {
         season,
         genre,
         score,
+        studio
     } = props;
 
     const adjustedLimit = Math.min(Math.max(limit, 1), 50);
@@ -142,6 +145,7 @@ function buildVariables(props: RequestProps) {
         ...(!ids && { order: order }),
         ...(season?.length && { season }),
         ...(genre?.length && { genre: genre.join(",") }),
+        ...(studio && { studio }),
         limit: adjustedLimit,
         page,
         ...(score && { score }),
