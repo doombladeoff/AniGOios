@@ -238,7 +238,12 @@ export default function AnimeDetailsScreen() {
                                     <InfoItem
                                         icon="building.2"
                                         label="Студия"
-                                        value={animeData.studios.map((s) => s.name).join(", ")}
+                                        type="link"
+                                        paramsKey="id"
+                                        links={animeData.studios.map(s => ({
+                                            id: s.id,
+                                            name: s.name,
+                                        }))}
                                     />
                                 )}
                             </Section>

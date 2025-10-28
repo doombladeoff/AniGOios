@@ -108,7 +108,7 @@ export default function ScreensLayout() {
                 name="anime/details"
                 options={{
                     headerTitle: '',
-                    headerBackTitle: "Назад",
+                    headerBackTitle: "Аниме",
                     title: '',
                     headerTintColor: isDarkMode ? 'white' : 'black',
                     headerTransparent: true,
@@ -117,6 +117,21 @@ export default function ScreensLayout() {
                         headerLargeTitle: false,
                         headerStyle: undefined,
                         headerBackButtonDisplayMode: 'minimal'
+                    }),
+                }}
+            />
+            <Stack.Screen
+                name="anime/animeByStudio"
+                options={{
+                    title: '',
+                    headerTransparent: true,
+                    headerTitle: '',
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                    headerBackButtonDisplayMode: 'default',
+                    headerBackTitle: 'Назад',
+                    ...(Platform.Version < '26.0' && {
+                        headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterialLight',
                     }),
                 }}
             />
