@@ -23,13 +23,14 @@ import { useAnimeFetch } from "@/hooks/anime/useAnimeFetch";
 import { useTheme } from "@/hooks/ThemeContext";
 import { auth } from "@/lib/firebase";
 import { storage } from "@/utils/storage";
-import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
+import {
+    LiquidGlassView as GlassView,
+    isLiquidGlassSupported
+} from '@callstack/liquid-glass';
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, useAnimatedRef, useScrollOffset } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const isLiquidGlassAv = isLiquidGlassAvailable();
 
 export default function AnimeScreen() {
     const showStatus = storage.getShowStatus() ?? true;
@@ -125,19 +126,19 @@ export default function AnimeScreen() {
                     </View>
                 }
             >
-                <Animated.View entering={FadeIn.duration(700).delay(usePoster3D ? 700 : 500)} style={{ gap: 10, paddingBottom: insets.bottom }}>
+                <Animated.View entering={FadeIn.duration(700).delay(usePoster3D ? 700 : 500)} style={{ gap: 16, paddingBottom: insets.bottom }}>
                     <View style={{ paddingHorizontal: 10, marginTop: usePoster3D ? 20 : 40 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 30, height: 50 }}>
                             {auth.currentUser &&
-                                <GlassView style={{
+                                <GlassView interactive style={{
                                     position: 'absolute',
                                     left: 20,
                                     width: 50, height: 50, justifyContent: 'center', alignItems: 'center', borderRadius: 100,
-                                    shadowColor: 'black',
+                                    shadowColor: '#000',
                                     shadowOpacity: 0.2,
-                                    shadowRadius: 6,
+                                    shadowRadius: 4,
                                     shadowOffset: { width: 0, height: 0 },
-                                    ...(!isLiquidGlassAv && { backgroundColor: 'white' })
+                                    ...(!isLiquidGlassSupported && { backgroundColor: 'white' })
                                 }}>
                                     <Bookmark
                                         id={id as string}
@@ -170,19 +171,19 @@ export default function AnimeScreen() {
                                 </ThemedView>
                             </Pressable>
 
-                            <GlassView isInteractive style={{
+                            <GlassView interactive style={{
                                 position: 'absolute',
                                 right: 20,
                                 borderRadius: 100, justifyContent: 'center', alignItems: 'center', width: 50, height: 50,
-                                shadowColor: 'black',
+                                shadowColor: '#000',
                                 shadowOpacity: 0.2,
-                                shadowRadius: 6,
+                                shadowRadius: 4,
                                 shadowOffset: { width: 0, height: 0 },
-                                ...(!isLiquidGlassAv && { backgroundColor: 'white' })
+                                ...(!isLiquidGlassSupported && { backgroundColor: 'white' })
                             }}>
                                 <Pressable
                                     onPress={handleNavToComments} style={{ padding: 8 }}>
-                                    <IconSymbol name="bubble.left.and.text.bubble.right.fill" size={28} color={isLiquidGlassAv ? isDarkMode ? 'white' : 'black' : 'black'} />
+                                    <IconSymbol name="bubble.left.and.text.bubble.right.fill" size={28} color={isLiquidGlassSupported ? isDarkMode ? 'white' : 'black' : 'black'} />
                                 </Pressable>
                             </GlassView>
                         </View>
@@ -190,9 +191,10 @@ export default function AnimeScreen() {
 
                     <GenresList
                         id={Number(id)}
-                        listStyle={{ paddingHorizontal: 10, marginVertical: isLiquidGlassAv ? 10 : 20 }}
+                        listStyle={{ paddingHorizontal: 10, marginTop: 10, paddingBottom: 0 }}
+                        tintColor={"rgba(219, 45, 105, 0.25)"}
                         genreStyle={{
-                            backgroundColor: "rgba(219, 45, 105, 0.25)",
+                            ...(!isLiquidGlassSupported ? { backgroundColor: "rgba(219, 45, 105, 0.25)" } : undefined),
                             padding: 5,
                             borderRadius: 12,
                             marginRight: 10,

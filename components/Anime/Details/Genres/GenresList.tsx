@@ -13,6 +13,7 @@ interface GenresListProps {
     genreStyle?: StyleProp<ViewStyle>;
     genreTextStyle?: StyleProp<TextStyle>;
     disableNavigation?: boolean;
+    tintColor?: string;
 }
 
 const GenresList = (props: GenresListProps) => {
@@ -28,6 +29,7 @@ const GenresList = (props: GenresListProps) => {
                 genreStyle={props.genreStyle}
                 genreTextStyle={props.genreTextStyle}
                 disableNavigation={props.disableNavigation}
+                tintColor={props.tintColor}
             />
             }
         />
