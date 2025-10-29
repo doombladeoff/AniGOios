@@ -4,7 +4,7 @@ import { ThemedView } from "@/components/ui/ThemedView";
 import { TranslatedKind } from "@/constants/TranslatedStatus";
 import { useTheme } from "@/hooks/ThemeContext";
 import { cleanDescription } from "@/utils/cleanDescription";
-import { GlassView } from 'expo-glass-effect';
+import { LiquidGlassView as GlassView } from '@callstack/liquid-glass';
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { memo } from "react";
@@ -24,15 +24,17 @@ const AnimeItem = ({ item, index }: { item: ShikimoriAnime, index: number }) => 
             onLongPress={() => { }}
         >
             <Animated.View entering={FadeIn}>
-                <GlassView isInteractive style={[styles.container, {
-                    ...(Platform.Version < '26.0' && {
-                        backgroundColor: isDarkMode ? 'black' : 'white',
-                        borderWidth: 0.35,
-                        borderRadius: 20,
-                        borderCurve: 'continuous',
-                        borderColor: 'rgba(255,255,255,0.5)'
-                    })
-                }]}>
+                <GlassView interactive colorScheme={isDarkMode ? 'dark' : 'light'}
+                    tintColor={isDarkMode ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,1)'}
+                    style={[styles.container, {
+                        ...(Platform.Version < '26.0' && {
+                            backgroundColor: isDarkMode ? 'black' : 'white',
+                            borderWidth: 0.35,
+                            borderRadius: 20,
+                            borderCurve: 'continuous',
+                            borderColor: 'rgba(255,255,255,0.5)'
+                        })
+                    }]}>
                     <View style={{
                         shadowColor: '#000',
                         shadowOffset: { width: 0, height: 2 },
@@ -42,7 +44,7 @@ const AnimeItem = ({ item, index }: { item: ShikimoriAnime, index: number }) => 
                     }}>
                         <Image
                             key={`poster-${item.malId}`}
-                            source={{ uri: item.poster.mainUrl || item.poster.main2xUrl}}
+                            source={{ uri: item.poster.mainUrl || item.poster.main2xUrl }}
                             style={[styles.image, {
                                 ...(Platform.Version < '26.0' && {
                                     borderRadius: 12
