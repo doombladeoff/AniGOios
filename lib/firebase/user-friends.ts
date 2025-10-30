@@ -1,5 +1,6 @@
-import { db } from "@/lib/firebase";
-import { arrayRemove, arrayUnion, collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
+import { CustomUser } from "@/store/userStore";
+import { arrayRemove, arrayUnion, collection, doc, endAt, getDoc, getDocs, orderBy, query, startAt, updateDoc, where } from "firebase/firestore";
 
 const path = 'user-collection';
 
@@ -90,3 +91,33 @@ export const getFriendsData = async (friendUids: string[]) => {
 
     return results;
 };
+
+export const getFriendRequests = async (userId: string) => {
+    try {
+        const userDoc = await getDoc(doc(db, path, userId));
+        if (!userDoc.exists()) return null;
+
+        const data = userDoc.data();
+        return {
+            received: data.friendRequestsReceived || [],
+            sent: data.friendRequestsSent || [],
+            friends: data.friends || []
+        };
+    } catch (err) {
+        console.error("Ошибка при получении заявок:", err);
+        return null;
+    }
+};
+
+export const searchUsersByName = async (searchText: string, limitCount = 10): Promise<CustomUser[]> => {
+    if (!searchText.trim())
+        return [];
+    const usersRef = collection(db, "user-collection");
+    const q = query(usersRef, orderBy("displayName"), startAt(searchText), endAt(searchText + "\uf8ff"));
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs
+        .map(doc => ({ id: doc.id, ...(doc.data() as CustomUser) }))
+        .filter(user => user.id !== auth.currentUser?.uid)
+        .slice(0, limitCount);
+}

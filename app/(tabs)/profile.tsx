@@ -85,7 +85,7 @@ export default function ProfileScreen() {
                 </Animated.View>
                 {/* --- Фейк статус --- */}
                 <Animated.View style={[styles.profileInfo, profileInfoAnimated]}>
-                    <ThemedText style={styles.nameText}>{user.displayName || "AkiroX"}</ThemedText>
+                    <ThemedText style={styles.nameText}>{user.displayName}</ThemedText>
                     <ThemedText style={[styles.quote, {
                         color: isDarkMode ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.8)",
                     }]}>“Жизнь — это аниме, в котором ты главный герой.”</ThemedText>

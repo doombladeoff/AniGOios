@@ -64,7 +64,7 @@ const CommentItem = memo(({ comment, animeID, disabled = false, type, mainCommen
         ]);
     };
 
-    const handleNavigateUser = () => router.push({ pathname: '/(screens)/(user)/[id]', params: { id: comment.user.id } });
+    const handleNavigateUser = () => router.push({ pathname: '/(screens)/user/[id]', params: { id: comment.user.id } });
     const handleNavigateToComment = () => router.push({ pathname: '/(screens)/comments/[id]', params: { id: comment.id, animeID: animeID } });
 
     return (

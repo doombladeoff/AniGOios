@@ -180,8 +180,34 @@ export default function ScreensLayout() {
                 }}
             />
             <Stack.Screen
-                name="(user)"
-                options={{ headerShown: false }}
+                name="user/[id]"
+                options={{
+                    headerShown: true,
+                    headerTransparent: true,
+                    headerTitle: '',
+                    headerBackButtonDisplayMode: Platform.Version >= '26.0' ? 'minimal' : 'default',
+                    headerTintColor: 'white'
+                }}
+            />
+            <Stack.Screen
+                name="user/friends"
+                options={{
+                    headerShown: true,
+                    headerTitle: 'Друзья',
+                    title: "Друзья",
+                    ...(Platform.Version >= '26.0' && { headerTransparent: true }),
+                    ...(Platform.Version < '26.0' && { headerStyle: { backgroundColor: isDarkMode ? 'black' : 'white' } }),
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                    headerLeft: () => (
+                        <HeaderButton onPress={router.back}
+                            style={{ justifyContent: 'center', alignItems: 'center', width: 35, height: 35 }}
+                        >
+                            <IconSymbol name="chevron.left" size={22} />
+                        </HeaderButton>
+                    ),
+
+                }}
             />
             <Stack.Screen
                 name="folder"

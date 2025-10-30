@@ -32,6 +32,8 @@ export interface CustomUser extends User {
     yummyToken: string;
     yummyTokenDate: string;
     friends: [];
+    friendRequestsReceived: string[];
+    friendRequestsSent: string[];
     folders: Folder[];
     rang: Rang;
     watchStats: WatchStats;

@@ -1,4 +1,5 @@
 import { ContextMenu } from "@/components/ContextComponent";
+import { ThemedText } from "@/components/ui/ThemedText";
 import { Comment, deleteComment } from "@/lib/firebase/userComments";
 import { useUserStore } from "@/store/userStore";
 import { Image } from "expo-image";
@@ -9,7 +10,7 @@ import Animated, { FadeInDown, FadeOutLeft, LinearTransition } from "react-nativ
 export const Comments = ({ comments, userID }: { comments: Comment[], userID: string }) => {
     const user = useUserStore(s => s.user);
     if (!user) return;
-    if (comments.length < 1) return <Text style={{ color: "white", fontSize: 16, alignSelf: 'center', padding: 20 }}>Комментраиев нет</Text>
+    if (comments.length < 1) return <ThemedText style={{ fontSize: 16, alignSelf: 'center', padding: 20 }}>Комментраиев нет</ThemedText>
     return (
         <Animated.FlatList
             scrollEnabled={false}
@@ -21,7 +22,7 @@ export const Comments = ({ comments, userID }: { comments: Comment[], userID: st
                 return (
                     <Animated.View entering={FadeInDown} exiting={FadeOutLeft}>
                         <ContextMenu triggerItem={
-                            <Link href={{ pathname: '/(screens)/(user)/[id]', params: { id: item.uid } }}>
+                            <Link href={{ pathname: '/(screens)/user/[id]', params: { id: item.uid } }}>
                                 <View style={{ flexDirection: 'row', gap: 10, flexShrink: 1, flex: 1, backgroundColor: 'black', margin: 5 }}
                                 // onPress={handleNav}
                                 >
