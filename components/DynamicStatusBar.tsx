@@ -1,8 +1,9 @@
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import ImageColors from "react-native-image-colors";
 
-export const DynamicStatusBar = ({ uri }: { uri: string }) => {
+export const DynamicStatusBar = ({ uri, headerTintLight, headerTintDark }: { uri: string; headerTintLight?: string; headerTintDark?: string }) => {
     const [isDark, setIsDark] = useState(false);
 
     function getBrightness(color: string) {
@@ -27,9 +28,15 @@ export const DynamicStatusBar = ({ uri }: { uri: string }) => {
     }, [uri]);
 
     return (
-        <StatusBar
-            style={isDark ? 'light' : 'dark'}
-            animated
-        />
+        <>
+            <StatusBar
+                style={isDark ? 'light' : 'dark'}
+                animated
+            />
+            <Stack.Screen
+                options={{ headerTintColor: isDark ? headerTintLight ? headerTintLight : 'white' : headerTintDark ? headerTintDark : 'black' }}
+            />
+        </>
+
     );
 };
