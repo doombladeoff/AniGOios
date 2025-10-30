@@ -7,8 +7,9 @@ import { TextInput } from "react-native-gesture-handler";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useTheme } from "@/hooks/ThemeContext";
 import { BottomSheet, Button, ColorPicker, Host, HStack, Spacer, Image as UIImage, Text as UIText, TextField as UITextField, VStack } from "@expo/ui/swift-ui";
-import { background, cornerRadius, frame, padding } from "@expo/ui/swift-ui/modifiers";
+import { background, cornerRadius, frame, padding, shadow } from "@expo/ui/swift-ui/modifiers";
 
 interface CreateEditFolders {
     userId: string;
@@ -33,6 +34,7 @@ export const CreateFolders = ({
     editFolder,
     closeEditFolder,
 }: CreateEditFolders) => {
+    const isDarkMode = useTheme().theme === 'dark';
     const [folderName, setFolderName] = useState<string>("");
     const [colorFolder, setColorFolder] = useState<string>(
         editFolder.edit ? editFolder.oldColor : "#ffffff"
@@ -182,7 +184,6 @@ export const CreateFolders = ({
                 <VStack modifiers={[frame({ width })]} spacing={30}>
                     <HStack modifiers={[padding({ horizontal: 20, vertical: 15 })]}>
                         <UIText
-                            color="white"
                             size={18}
                             weight="semibold"
                         >
@@ -192,8 +193,8 @@ export const CreateFolders = ({
                         </UIText>
 
                         <Spacer />
-                        <Button onPress={() => openCreateFolder(false)} modifiers={[background("rgba(255,255,255,0.1)"), cornerRadius(100)]}>
-                            <UIImage systemName="xmark" size={18} color={"white"} modifiers={[padding({ all: 8 })]} />
+                        <Button onPress={() => openCreateFolder(false)} modifiers={[background("rgba(255,255,255,0.25)"), cornerRadius(100)]}>
+                            <UIImage systemName="xmark" size={18} modifiers={[padding({ all: 8 })]} />
                         </Button>
                     </HStack>
 
@@ -202,7 +203,7 @@ export const CreateFolders = ({
                             <UIText>Укажите название</UIText>
                             <Spacer />
                         </HStack>
-                        <HStack modifiers={[background('#2d2d2d'), frame({ height: 35 }), cornerRadius(10),]}>
+                        <HStack modifiers={[background(isDarkMode ? '#2d2d2d' : 'white'), frame({ height: 35 }), cornerRadius(10),]}>
                             <UITextField
                                 placeholder="Название папки"
                                 modifiers={[padding({ vertical: 10, horizontal: 10 })]}
@@ -221,8 +222,14 @@ export const CreateFolders = ({
 
                     <HStack modifiers={[cornerRadius(16)]}>
                         <HStack modifiers={[frame({ height: 80 })]}>
-                            <VStack modifiers={[padding({ horizontal: 8, vertical: 4 }), cornerRadius(16), frame({ width: 80, height: 80 }), background('303034'), cornerRadius(16)]} spacing={5}>
-                                <UIImage systemName="folder.fill" size={24} color={colorFolder} />
+                            <VStack modifiers={[
+                                padding({ horizontal: 8, vertical: 4 }),
+                                cornerRadius(16),
+                                frame({ width: 80, height: 80 }),
+                                background(isDarkMode ? '#303034' : 'white'),
+                                cornerRadius(16)
+                            ]} spacing={5}>
+                                <UIImage systemName="folder.fill" size={24} color={colorFolder} modifiers={[shadow({ radius: 2, color: 'black' })]} />
                                 <UIText>Папка</UIText>
                             </VStack>
                         </HStack>

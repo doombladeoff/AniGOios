@@ -1,16 +1,18 @@
 import { ContextMenu } from "@/components/ContextComponent"
 import { IconSymbol } from "@/components/ui/IconSymbol"
+import { ThemedText } from "@/components/ui/ThemedText"
+import { useTheme } from "@/hooks/ThemeContext"
 import { deleteFolder } from "@/lib/firebase/userFolders"
 import { useUserStore } from "@/store/userStore"
-import { GlassView } from "expo-glass-effect"
+import { LiquidGlassView as GlassView, isLiquidGlassSupported } from "@callstack/liquid-glass"
 import { router } from "expo-router"
 import { memo, useCallback } from "react"
-import { Alert, Dimensions, Pressable, StyleSheet, Text, View } from "react-native"
+import { Alert, Dimensions, Pressable, StyleSheet, View } from "react-native"
 import Animated, { FadeIn } from "react-native-reanimated"
 import { useShallow } from "zustand/shallow"
 
 const { width } = Dimensions.get('screen');
-const ITEM_WIDTH = (width / 3) - 20.5;
+const ITEM_WIDTH = (width / 3) - 24;
 
 interface FolderListProps {
     userId: string;
@@ -19,6 +21,7 @@ interface FolderListProps {
 }
 
 function FolderList({ userId, openCreateFolder, editFolder }: FolderListProps) {
+    const isDarkMode = useTheme().theme === 'dark';
     const { folders } = useUserStore(
         useShallow((s) => ({
             folders: s.user?.folders
@@ -44,17 +47,39 @@ function FolderList({ userId, openCreateFolder, editFolder }: FolderListProps) {
 
     return (
         <View>
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: '500', paddingBottom: 10 }}>Папки</Text>
-            <GlassView tintColor="black" style={styles.container}>
+            <ThemedText style={{ fontSize: 18, fontWeight: '700', paddingBottom: 10, paddingLeft: 10 }}>Коллекции</ThemedText>
+            <GlassView
+                colorScheme={isDarkMode ? "dark" : 'light'}
+                effect={'clear'}
+                style={[styles.container, {
+                    ...(!isLiquidGlassSupported && { backgroundColor: isDarkMode ? "#1c1c1e" : "#f0f0f3" }),
+                }]}
+            >
                 {folders.map((item, index) => (
                     <ContextMenu key={`folder-${item.name}-${index}`}
                         triggerItem={
                             <Animated.View entering={FadeIn.delay(100 * index + 1)} style={{ borderRadius: 10, }}>
                                 <Pressable
+                                    onLongPress={null}
                                     onPress={handleNavigate(item.name, item.anime)}
-                                    style={styles.folder}>
-                                    <IconSymbol name="folder.fill" size={28} color={item.color} />
-                                    <Text style={{ color: "white" }} numberOfLines={1}>{item.name}</Text>
+                                    style={[
+                                        styles.folder,
+                                        {
+                                            backgroundColor: isDarkMode ? "#1c1c1e" : "#f0f0f3"
+                                        }
+                                    ]}
+                                >
+                                    <IconSymbol
+                                        name="folder.fill"
+                                        size={28} color={item.color}
+                                        style={{
+                                            shadowColor: "#000",
+                                            shadowOffset: { width: 0, height: 4 },
+                                            shadowRadius: 6,
+                                            shadowOpacity: 0.25,
+                                        }}
+                                    />
+                                    <ThemedText numberOfLines={1}>{item.name}</ThemedText>
                                 </Pressable>
                             </Animated.View>
                         }
@@ -63,18 +88,36 @@ function FolderList({ userId, openCreateFolder, editFolder }: FolderListProps) {
                             { title: 'Удалить', iconName: 'trash.fill', iconColor: 'red', onSelect: () => confirmDelete(item.name), destructive: true },
                         ]}
                     />
-
                 ))}
                 {folders.length < 9 &&
                     <Animated.View entering={FadeIn} key={`create-folder`}>
-                        <Pressable onPress={() => openCreateFolder(true)} style={styles.folder}>
-                            <IconSymbol name="folder.fill.badge.plus" size={28} color="white" />
-                            <Text style={{ color: "white" }} numberOfLines={1}>Создать</Text>
+                        <Pressable onPress={() => openCreateFolder(true)}
+                            style={[
+                                styles.folder,
+                                {
+                                    backgroundColor: isDarkMode ? "#1c1c1e" : "#f0f0f3",
+                                    height: 85,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }
+                            ]}
+                        >
+                            <IconSymbol
+                                name="folder.fill.badge.plus"
+                                size={34} color="white"
+                                style={{
+                                    shadowColor: "#000",
+                                    shadowOffset: { width: 0, height: 4 },
+                                    shadowRadius: 6,
+                                    shadowOpacity: 0.25,
+                                }}
+                            />
+                            {/* <ThemedText numberOfLines={1}>Создать</ThemedText> */}
                         </Pressable>
                     </Animated.View>
                 }
             </GlassView>
-        </View>
+        </View >
     )
 }
 
@@ -82,24 +125,27 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         padding: 10,
-        borderRadius: 14,
+        borderRadius: 20,
         gap: 10,
         flexDirection: 'row',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowRadius: 6,
+        shadowOpacity: 0.25,
     },
     folder: {
-        backgroundColor: '#303034ff',
         padding: 15,
         paddingHorizontal: 30,
-        borderRadius: 10,
+        borderRadius: 14,
         gap: 10,
         minWidth: ITEM_WIDTH,
         maxWidth: ITEM_WIDTH,
         alignItems: 'center',
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.45,
-        shadowRadius: 6
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowRadius: 6,
+        shadowOpacity: 0.25,
     }
 })
 

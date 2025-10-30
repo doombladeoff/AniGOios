@@ -1,33 +1,146 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { useTheme } from "@/hooks/ThemeContext";
 import { useUserStore } from "@/store/userStore";
-import { Host, LinearProgress } from "@expo/ui/swift-ui";
-import { padding, shadow } from "@expo/ui/swift-ui/modifiers";
-import { Text, View } from "react-native";
+import { LiquidGlassView as GlassView, isLiquidGlassSupported } from "@callstack/liquid-glass";
+import React, { useEffect } from "react";
+import { Pressable, useWindowDimensions, View } from "react-native";
+import Animated, {
+    Easing,
+    interpolateColor,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
+} from "react-native-reanimated";
 
 export const Level = () => {
-    const userRang = useUserStore(s => s.user)?.rang;
-    if (!userRang) return;
+    const isDarkMode = useTheme().theme === "dark";
+    const userRang = useUserStore((s) => s.user)?.rang;
+    const { width } = useWindowDimensions();
+
+    if (!userRang) return null;
+
+    const progress = useSharedValue(0);
+    const target = userRang.exp / (userRang.level * 100);
+
+    useEffect(() => {
+        progress.value = withTiming(target, {
+            duration: 1200,
+            easing: Easing.out(Easing.cubic),
+        });
+    }, [target]);
+
+    const barStyle = useAnimatedStyle(() => ({
+        width: `${Math.min(progress.value * 100, 100)}%`,
+        backgroundColor: interpolateColor(
+            progress.value,
+            [0, 0.5, 1],
+            ["#f5a623", "#ffa500", "#ff8800"]
+        ),
+    }));
 
     return (
-        <View>
-            <View style={{ gap: 10, marginVertical: 20 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text style={{ color: 'white', fontSize: 16 }}>{userRang.level} уровень</Text>
-                    <IconSymbol name='trophy.fill' size={24} color={'orange'} />
-                </View>
-                <Host matchContents>
-                    <LinearProgress progress={userRang.exp / (userRang.level * 100)} color={'orange'}
-                        modifiers={[shadow({ radius: 6, color: 'orange' }), padding({ horizontal: 0 })]}
-                    />
-                </Host>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <GlassView
+            colorScheme={isDarkMode ? "dark" : "light"}
+            effect="clear"
+            interactive
+            style={{
+                borderRadius: 20,
+                paddingVertical: 20,
+                paddingHorizontal: 20,
+                ...(!isLiquidGlassSupported && {
+                    backgroundColor: isDarkMode ? "#1c1c1e" : "#f0f0f3",
+                }),
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 4 },
+                shadowRadius: 6,
+                shadowOpacity: 0.25,
+            }}
+        >
+            <Pressable
+                style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+                onPress={null}
+            >
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <ThemedText
+                        style={{
+                            fontSize: 18,
+                            fontWeight: "600",
+                            letterSpacing: 0.3,
+                        }}
+                    >
+                        {userRang.level} уровень
+                    </ThemedText>
 
-                        <Text style={{ color: 'white', fontSize: 16 }}>{userRang.exp} xp</Text>
+                    <View
+                        style={{
+                            backgroundColor: "rgba(255,165,0,0.2)",
+                            borderRadius: 16,
+                            padding: 6,
+                        }}
+                    >
+                        <IconSymbol name="trophy.fill" size={22} color={"orange"} />
                     </View>
-                    <Text style={{ color: 'white', fontSize: 16 }}>{userRang.level * 100} xp</Text>
                 </View>
-            </View>
-        </View>
-    )
+
+                <View
+                    style={{
+                        height: 20,
+                        borderRadius: 12,
+                        backgroundColor: isDarkMode
+                            ? "rgba(255,255,255,0.1)"
+                            : "rgba(0,0,0,0.1)",
+                        marginVertical: 16,
+                        width: width - 70,
+                        alignSelf: "center",
+                    }}
+                >
+                    <Animated.View
+                        style={[
+                            {
+                                height: "100%",
+                                borderRadius: 12,
+                                shadowColor: "#ffa500",
+                                shadowOpacity: 0.4,
+                                shadowRadius: 6,
+                                shadowOffset: { width: 0, height: 2 },
+                            },
+                            barStyle,
+                        ]}
+                    />
+                </View>
+
+                <View
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <ThemedText
+                        style={{
+                            fontSize: 15,
+                            color: isDarkMode ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)",
+                        }}
+                    >
+                        {userRang.exp} XP
+                    </ThemedText>
+                    <ThemedText
+                        style={{
+                            fontSize: 15,
+                            color: isDarkMode ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.5)",
+                        }}
+                    >
+                        {userRang.level * 100} XP
+                    </ThemedText>
+                </View>
+            </Pressable>
+        </GlassView>
+    );
 };

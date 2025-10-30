@@ -1,196 +1,193 @@
-import { Comments, CreateFolders, EditProfile, FolderList, Header, Level, NoLogIn, Stats } from "@/components//Screens/Profile";
+import { CreateFolders, FolderList, Level, NoLogIn, Stats } from "@/components//Screens/Profile";
+import { AnimeStatusChart } from "@/components/Screens/Profile/Stats/Chart/AnimeStatusChart";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { db } from "@/lib/firebase";
+import { ThemedText } from "@/components/ui/ThemedText";
+import { ThemedView } from "@/components/ui/ThemedView";
+import { useTheme } from "@/hooks/ThemeContext";
+import { useBottomHeight } from "@/hooks/useBottomHeight";
 import { useUserStore } from "@/store/userStore";
-import { Comment } from "@/utils/firebase/userComments";
+import { Image } from "expo-image";
 import { router } from "expo-router";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { Dimensions, Pressable, Text, View } from "react-native";
-import Animated, { Extrapolation, FadeIn, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import { useState } from "react";
+import { Platform, Pressable, StyleSheet, View } from "react-native";
+import Animated, { Extrapolation, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get('screen');
 export default function ProfileScreen() {
+    const isDarkMode = useTheme().theme === "dark";
     const insets = useSafeAreaInsets();
-    const user = useUserStore(s => s.user);
-    const [isOpenCreateFolder, setIsOpenCreateFolder] = useState<boolean>(false);
-    const [editFolder, setEditFolder] = useState<{ edit: boolean, name: string, color: string }>({
-        edit: false,
-        name: '',
-        color: '',
-    });
-
-    const [profileEdit, setProfileEdit] = useState(false);
-    const [commentsArr, setComments] = useState<Comment[]>([]);
-
-    useEffect(() => {
-        if (!user) return;
-
-        const commentsRef = collection(db, "user-collection", user?.uid, "comments");
-        const q = query(commentsRef, orderBy("createdAt", "desc"));
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const comments: Comment[] = snapshot.docs.map(doc => {
-                const data = doc.data();
-                return {
-                    id: doc.id,
-                    createdAt: data.createdAt,
-                    text: data.text,
-                    uid: data.uid,
-                    name: data.name,
-                    avatar: data.avatar,
-                    date: data.date,
-                };
-            });
-            setComments(comments);
-        });
-
-        return () => unsubscribe();
-    }, [user]);
+    const user = useUserStore((s) => s.user);
+    const [isOpenCreateFolder, setIsOpenCreateFolder] = useState(false);
+    const [editFolder, setEditFolder] = useState({ edit: false, name: "", color: "" });
 
     const scrollY = useSharedValue(0);
-
     const scrollHandler = useAnimatedScrollHandler({
         onScroll: (event) => {
             scrollY.value = event.contentOffset.y;
         },
     });
 
-    const avatarAnimatedStyle = useAnimatedStyle(() => {
-        const scale = interpolate(
-            scrollY.value,
-            [0, 100],
-            [1, 0.5],
-            Extrapolation.CLAMP
-        );
+    const headerAnimated = useAnimatedStyle(() => ({
+        transform: [
+            { scale: interpolate(scrollY.value, [-100, 0], [1.2, 1], Extrapolation.CLAMP) },
+        ],
+    }));
 
-        const translateX = interpolate(
-            scrollY.value,
-            [0, 100],
-            [0, -width + 100],
-            Extrapolation.CLAMP
-        );
+    const avatarAnimated = useAnimatedStyle(() => ({
+        transform: [
+            { translateY: interpolate(scrollY.value, [0, 150], [0, -50], Extrapolation.CLAMP) },
+            { scale: interpolate(scrollY.value, [0, 150], [1, 0.7], Extrapolation.CLAMP) },
+        ],
+    }));
 
-        const translateY = interpolate(
-            scrollY.value,
-            [0, 100],
-            [0, -40],
-            Extrapolation.CLAMP
-        );
+    const profileInfoAnimated = useAnimatedStyle(() => ({
+        opacity: interpolate(scrollY.value, [0, 80], [1, 0], Extrapolation.CLAMP),
+    }));
 
-        return {
-            transform: [
-                { scale },
-                { translateX },
-                { translateY },
-            ],
-        };
-    });
-
-    const textStyle = useAnimatedStyle(() => {
-        const opacity = interpolate(
-            scrollY.value,
-            [40, 100], // когда начинать появление и когда полностью видно
-            [0, 1],
-            Extrapolation.CLAMP
-        );
-
-        const translateY = interpolate(
-            scrollY.value,
-            [40, 100],
-            [20, 0], // поднимаем из 20 вниз до 0
-            Extrapolation.CLAMP
-        );
-
-        return {
-            opacity,
-            transform: [{ translateY }],
-        };
-    })
-
-    if (!user) return (<NoLogIn />);
+    if (!user) return <NoLogIn />;
 
     return (
-        <Animated.View entering={FadeIn} style={{ flex: 1, backgroundColor: 'black' }}>
-            <View style={{ shadowColor: 'black', shadowOpacity: 1, shadowRadius: 6, shadowOffset: { width: 0, height: 3 } }}>
-                <Header
-                    bannerStyle={{ width: '100%', height: 140, borderRadius: 14, backgroundColor: 'black' }}
-                    avatarContainer={[avatarAnimatedStyle, { position: 'absolute', alignSelf: 'center', top: 120 / 1.75, backgroundColor: 'black', padding: 4, borderRadius: 20 }]}
-                    avatarStyle={{ width: 100, height: 100, borderRadius: 16, padding: 0, backgroundColor: 'black' }}
+        <ThemedView darkColor="#050509" lightColor="#fafafa" style={{ flex: 1 }}>
+            <Animated.View style={[styles.bannerContainer, headerAnimated]}>
+                <Image
+                    source={user.bannerURL ? { uri: user.bannerURL } : require("@/assets/banners/1.jpg")}
+                    style={styles.bannerImage}
                 />
-                <Animated.Text style={[textStyle, { color: 'white', position: 'absolute', alignSelf: 'center', bottom: 25, fontSize: 21, fontWeight: '600' }]}>{user.displayName}</Animated.Text>
+                <View style={styles.bannerOverlay} />
+            </Animated.View>
+
+            {/* --- Навигация --- */}
+            <View style={[styles.topButtons, { top: insets.top }]}>
                 <Pressable
-                    hitSlop={30}
-                    onPress={() => { router.push({ pathname: '/(screens)/(settings)/settings' }) }}
-                    style={{ position: 'absolute', top: insets.top, right: 10, shadowColor: 'black', shadowOpacity: 0.8, shadowRadius: 4, shadowOffset: { width: 0, height: 0 } }}
+                    onPress={null}
+                    style={styles.iconButton}
                 >
-                    <IconSymbol name="gear" size={24} color={'white'} />
+                    <IconSymbol name="bell.badge.fill" size={26} color="white" />
+                </Pressable>
+
+                <Pressable
+                    onPress={() => router.push("/(screens)/(settings)/settings")}
+                    style={styles.iconButton}
+                >
+                    <IconSymbol name="gearshape.2.fill" size={26} color="white" />
                 </Pressable>
             </View>
+
+            {/* --- Аватар и имя --- */}
+            <Animated.View style={[styles.avatarContainer, avatarAnimated]}>
+                <Image
+                    source={{ uri: user.avatarURL || user.photoURL || "https://i.pinimg.com/736x/4d/21/7b/4d217b9d6aebf2f4ef2292f27dcb8c4d.jpg" }}
+                    style={styles.avatar}
+                />
+            </Animated.View>
+            {/* --- Фейк статус --- */}
+            <Animated.View style={[styles.profileInfo, profileInfoAnimated]}>
+                <ThemedText style={styles.nameText}>{user.displayName || "AkiroX"}</ThemedText>
+                <ThemedText style={[styles.quote, {
+                    color: isDarkMode ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.8)",
+                }]}>“Жизнь — это аниме, в котором ты главный герой.”</ThemedText>
+            </Animated.View>
 
             <Animated.ScrollView
                 onScroll={scrollHandler}
                 scrollEventThrottle={16}
                 contentContainerStyle={{
-                    paddingVertical: 10,
-                    paddingBottom: 100
+                    paddingTop: 260,
+                    paddingBottom: Platform.Version >= '26.0' ? insets.bottom + 20 : useBottomHeight() + 20,
                 }}
+                showsVerticalScrollIndicator={false}
+                contentInsetAdjustmentBehavior='automatic'
+                style={{ zIndex: 0 }}
             >
-
-                <View style={{ marginTop: 40, marginHorizontal: 10 }}>
-                    <Stats userID={user.uid} friends={user.friends.length} />
+                <View style={{ marginHorizontal: 16, gap: 20 }}>
+                    <Stats userID={user.uid} friends={user.friends?.length ?? 0} />
                     <Level />
-
+                    <AnimeStatusChart userID={user.uid} />
                     <FolderList
+                        userId={user.uid}
                         editFolder={setEditFolder}
-                        userId={user.uid} openCreateFolder={setIsOpenCreateFolder} />
+                        openCreateFolder={setIsOpenCreateFolder}
+                    />
                 </View>
-
-                {/* <Pressable
-                    onPress={() => setProfileEdit(true)}
-                    style={{
-                        paddingVertical: 14,
-                        borderRadius: 12,
-                        backgroundColor: "#0A84FF",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginTop: 24,
-                    }}
-                >
-                    <Text
-                        style={{
-                            color: "white",
-                            fontSize: 16,
-                            fontWeight: "600",
-                        }}
-                    >
-                        Редактировать
-                    </Text>
-                </Pressable> */}
-
-                <View style={{ marginTop: 15 }}>
-                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '500', marginHorizontal: 10, marginBottom: 10 }}>Комментарии</Text>
-                    <Comments comments={commentsArr} userID={user.uid} />
-                </View>
-
                 <CreateFolders
                     editFolder={{
                         edit: editFolder.edit,
                         oldName: editFolder.name,
                         oldColor: editFolder.color,
                     }}
-                    closeEditFolder={({ edit, name, color }) => setEditFolder({ edit, name: name, color: color })}
+                    closeEditFolder={(v) => setEditFolder(v)}
                     userId={user.uid}
                     isOpen={isOpenCreateFolder}
                     openCreateFolder={setIsOpenCreateFolder}
                 />
-
-                {/* <View style={{ height: 600 }} /> */}
             </Animated.ScrollView>
-
-
-            <EditProfile show={profileEdit} onClose={setProfileEdit} />
-        </Animated.View>
+        </ThemedView>
     );
 }
+
+const styles = StyleSheet.create({
+    bannerContainer: {
+        position: "absolute",
+        width: "100%",
+        height: 170,
+        overflow: "hidden",
+        borderRadius: 20,
+        zIndex: 2
+    },
+    bannerImage: {
+        width: "100%",
+        height: "100%",
+        resizeMode: "cover",
+    },
+    bannerOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(0,0,0,0.3)",
+    },
+    topButtons: {
+        position: "absolute",
+        right: 14,
+        flexDirection: "row",
+        gap: 14,
+        zIndex: 10,
+    },
+    iconButton: {
+        padding: 8,
+        borderRadius: 50,
+        backgroundColor: "rgba(255,255,255,0.15)",
+    },
+    avatarContainer: {
+        position: "absolute",
+        alignSelf: "center",
+        top: 100,
+        borderWidth: 3,
+        borderColor: "#ff5fd2",
+        shadowColor: "#ff5fd2",
+        shadowOpacity: 0.5,
+        shadowRadius: 12,
+        borderRadius: 80,
+        zIndex: 2
+    },
+    avatar: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+    },
+    profileInfo: {
+        position: "absolute",
+        top: 240,
+        alignSelf: "center",
+        alignItems: "center",
+    },
+    nameText: {
+        fontSize: 24,
+        fontWeight: "700",
+        textShadowColor: "#ff5fd2",
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 4,
+    },
+    quote: {
+        fontSize: 13,
+        marginTop: 4,
+        fontStyle: "italic",
+    },
+});
