@@ -1,8 +1,7 @@
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/hooks/ThemeContext";
-import { Link, Stack } from "expo-router";
-import { Platform, Pressable, View } from "react-native";
+import { router, Stack } from "expo-router";
+import { Platform } from "react-native";
 import { BlurEffectTypes } from "react-native-screens";
 
 const isIOS26 = Platform.Version >= '26.0';
@@ -37,24 +36,6 @@ const HeaderLeft = () => (
     </ThemedText>
 );
 
-const HeaderRight = () => {
-    return (
-        <View style={{ width: 90, height: 35, marginHorizontal: 5, justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row' }}>
-            <Link href={'/home/calendar'} asChild>
-                <Pressable style={{ width: 35, height: 35, justifyContent: 'center', alignItems: 'center' }}>
-                    <IconSymbol name="calendar" size={26} />
-                </Pressable>
-            </Link>
-            <View style={{ height: 25, width: 1, backgroundColor: 'rgba(90,90,90,0.5)' }} />
-            <Link href={'/home/favorite'} asChild>
-                <Pressable style={{ width: 35, height: 35, justifyContent: 'center', alignItems: 'center' }}>
-                    <IconSymbol name="bookmark.fill" size={26} color={'orange'} />
-                </Pressable>
-            </Link>
-        </View>
-    );
-};
-
 export default function HomeLayout() {
     const { theme } = useTheme();
     const isDark = theme === "dark";
@@ -64,8 +45,32 @@ export default function HomeLayout() {
             <Stack.Screen
                 name="index"
                 options={{
+                    unstable_headerRightItems: () => [
+                        {
+                            type: 'button',
+                            label: 'Календарь',
+                            icon: {
+                                type: 'sfSymbol',
+                                name: 'calendar',
+                            },
+                            onPress: () => router.push('/home/calendar'),
+                        },
+                        {
+                            type: 'spacing',
+                            spacing: 10,
+                        },
+                        {
+                            type: 'button',
+                            label: 'Избранное',
+                            tintColor: 'orange',
+                            icon: {
+                                type: 'sfSymbol',
+                                name: 'bookmark.fill',
+                            },
+                            onPress: () => router.push('/home/favorite'),
+                        },
+                    ],
                     headerLeft: () => <HeaderLeft />,
-                    headerRight: () => <HeaderRight />,
                     headerShadowVisible: false,
                 }}
             />
