@@ -16,7 +16,6 @@ import { ThemedView } from '@/components/ui/ThemedView';
 import { ThemeProvider, useTheme } from '@/hooks/ThemeContext';
 import { auth, db } from '@/lib/firebase';
 import { CustomUser, useUserStore } from '@/store/userStore';
-import { storage } from '@/utils/storage';
 
 const useNotificationHandler = () => {
     useEffect(() => {
@@ -33,9 +32,9 @@ const useNotificationHandler = () => {
 
 const useAuthCheck = () => {
     const setUser = useUserStore((s) => s.setUser);
+    const isSkip = useUserStore(s => s.skipAuth);
     const [isAuth, setIsAuth] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const isSkip = storage.getSkip();
 
     useEffect(() => {
         if (isSkip) {
@@ -63,6 +62,8 @@ const useAuthCheck = () => {
                         watchStats: { watchedEpisodes: 0, watchTime: 0 },
                         rang: { level: 1, exp: 0 },
                         friends: [],
+                        friendRequestsReceived: [],
+                        friendRequestsSent: [],
                         folders: [],
                         yummyToken: '',
                         yummyTokenDate: '',
@@ -82,7 +83,7 @@ const useAuthCheck = () => {
         });
 
         return () => unsubscribeAuth();
-    }, []);
+    }, [isSkip]);
 
     return { isAuth, isLoading };
 };

@@ -65,8 +65,6 @@ export const useGoogleAuth = () => {
                 };
 
                 setUser(fullUserData);
-
-                router.replace('/(tabs)/(home)');
             } catch (error) {
                 console.error("Failed to handle auth success:", error);
             }
@@ -118,8 +116,6 @@ export const useGoogleAuth = () => {
             loginToFirebase(credentials);
         }
     }, [response, loginToFirebase]);
-
-
 
     return { request, promptAsync, login, register };
 };

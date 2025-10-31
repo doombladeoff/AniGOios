@@ -1,9 +1,9 @@
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { storage } from "@/utils/storage";
-import { router } from "expo-router";
+import { useUserStore } from "@/store/userStore";
 import { Pressable, Text, View } from "react-native";
 
 export const NoLogIn = () => {
+    const setSkipAuth = useUserStore(s => s.setSkipAuth);
     return (
         <View
             style={{
@@ -26,7 +26,7 @@ export const NoLogIn = () => {
             </Text>
 
             <Pressable
-                onPress={() => { storage.setSkip(false); router.replace({ pathname: '/' }) }}
+                onPress={() => setSkipAuth(false)}
                 style={({ pressed }) => [
                     {
                         paddingVertical: 12,

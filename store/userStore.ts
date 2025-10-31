@@ -1,3 +1,4 @@
+import { storage } from '@/utils/storage';
 import { User } from 'firebase/auth';
 import { FieldValue } from 'firebase/firestore';
 import { create } from 'zustand';
@@ -43,13 +44,21 @@ export interface CustomUser extends User {
 interface UserStore {
     user: CustomUser | null | undefined,
     setUser: (v: CustomUser | null) => void,
+    skipAuth: boolean,
+    setSkipAuth: (v: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
     user: null,
+    skipAuth: storage.getSkip() ?? false,
 
     setUser: (v) => {
         set({ user: v })
-    }
+    },
+
+    setSkipAuth: (v) => {
+        storage.setSkip(v);
+        set({ skipAuth: v });
+    },
 
 }));
