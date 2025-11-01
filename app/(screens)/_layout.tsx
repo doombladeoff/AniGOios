@@ -180,6 +180,22 @@ export default function ScreensLayout() {
                 }}
             />
             <Stack.Screen
+                name="settings/index"
+                options={{
+                    headerTransparent: true,
+                    headerTitle: 'Настройки',
+                    title: 'Настройки',
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    ...(Platform.Version < '26.0' && { headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterialLight' }),
+                    headerLeft: () => <HeaderButton onPress={router.back}
+                        style={{ justifyContent: 'center', alignItems: 'center', width: 35, height: 35 }}
+                    >
+                        <IconSymbol name="chevron.left" size={22} />
+                    </HeaderButton>,
+                    contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+                }}
+            />
+            <Stack.Screen
                 name="user/[id]"
                 options={{
                     headerShown: true,

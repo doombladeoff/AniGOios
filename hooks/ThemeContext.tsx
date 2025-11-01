@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { Appearance, ColorSchemeName } from "react-native";
 import { MMKV } from "react-native-mmkv";
 
-type ThemeMode = "light" | "dark" | "system";
+export type ThemeMode = "light" | "dark" | "system";
 
 interface ThemeContextProps {
     theme: "light" | "dark";
