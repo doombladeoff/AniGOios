@@ -193,6 +193,15 @@ export default function ScreensLayout() {
                         <IconSymbol name="chevron.left" size={22} />
                     </HeaderButton>,
                     contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
+            <Stack.Screen
+                name="settings/editProfile"
+                options={{
+                    headerShown: true,
+                    headerTransparent: true,
+                    headerBackButtonDisplayMode: 'minimal',
+                    headerTitle: 'Профиль',
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    headerBackTitle: 'Настройки'
                 }}
             />
             <Stack.Screen
