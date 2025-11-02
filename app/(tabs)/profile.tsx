@@ -7,6 +7,7 @@ import { ThemedView } from "@/components/ui/ThemedView";
 import { useTheme } from "@/hooks/ThemeContext";
 import { useBottomHeight } from "@/hooks/useBottomHeight";
 import { useUserStore } from "@/store/userStore";
+import { LiquidGlassView } from "@callstack/liquid-glass";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -45,7 +46,18 @@ export default function ProfileScreen() {
         opacity: interpolate(scrollY.value, [0, 80], [1, 0], Extrapolation.CLAMP),
     }));
 
-    if (!user) return <NoLogIn />;
+    if (!user) return (
+        <>
+            <LiquidGlassView interactive style={[styles.topButtons, styles.iconButton, { top: insets.top }]}>
+                <Pressable
+                    onPress={() => router.push("/(screens)/settings")}
+                >
+                    <IconSymbol name='gear' size={26} />
+                </Pressable>
+            </LiquidGlassView>
+            <NoLogIn />
+        </>
+    );
 
     return (
         <>
@@ -61,19 +73,29 @@ export default function ProfileScreen() {
 
                 {/* --- Навигация --- */}
                 <View style={[styles.topButtons, { top: insets.top }]}>
-                    <Pressable
-                        onPress={null}
-                        style={styles.iconButton}
-                    >
-                        <IconSymbol name="bell.badge.fill" size={26} color="white" />
-                    </Pressable>
-
-                    <Pressable
-                        onPress={() => router.push("/(screens)/(settings)/settings")}
-                        style={styles.iconButton}
-                    >
-                        <IconSymbol name="gearshape.2.fill" size={26} color="white" />
-                    </Pressable>
+                    <LiquidGlassView interactive style={[styles.iconButton,]}>
+                        <Pressable
+                            onPress={null}
+                        >
+                            <IconSymbol name="bell.badge.fill" size={26} color="white" />
+                        </Pressable>
+                    </LiquidGlassView>
+                    <LiquidGlassView interactive style={[styles.iconButton]}>
+                        <Pressable
+                            onPress={() => router.push("/(screens)/settings")}
+                        >
+                            <IconSymbol name="gear" size={26} color="white" />
+                        </Pressable>
+                    </LiquidGlassView>
+                    {__DEV__ &&
+                        <LiquidGlassView interactive style={[styles.iconButton]}>
+                            <Pressable
+                                onPress={() => router.push("/(screens)/(settings)/settings")}
+                            >
+                                <IconSymbol name="gear.badge" size={26} color="white" />
+                            </Pressable>
+                        </LiquidGlassView>
+                    }
                 </View>
 
                 {/* --- Аватар и имя --- */}
