@@ -5,6 +5,8 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useTheme } from "@/hooks/ThemeContext";
 import { verifyEmail } from "@/lib/firebase/authService";
+import { UpdateUsername } from "@/lib/firebase/update-username";
+import { useAvatarUser } from "@/lib/firebase/user-images/uploadImages";
 import { useUserStore } from "@/store/userStore";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -12,6 +14,8 @@ import { Image } from "expo-image";
 import { Stack } from "expo-router";
 import React, { useState } from "react";
 import {
+    ActivityIndicator,
+    Alert,
     Platform,
     Pressable,
     TextInput,
@@ -28,8 +32,19 @@ import Animated, {
     SlideOutDown,
     useAnimatedScrollHandler,
     useAnimatedStyle,
-    useSharedValue,
+    useSharedValue
 } from "react-native-reanimated";
+
+const isValidName = (name: string) => {
+    if (!name.trim()) return false;
+
+    const withoutEmojis = name.replace(
+        /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDD00-\uDDFF])/g,
+        ""
+    );
+
+    return /[A-Za-zА-Яа-яЁё0-9]/.test(withoutEmojis);
+};
 
 export default function ProfileEditScreen() {
     const isDarkMode = useTheme().theme === "dark";
@@ -37,11 +52,20 @@ export default function ProfileEditScreen() {
 
     const [name, setName] = useState(user?.displayName || '');
     const [status, setStatus] = useState(user?.status || '');
+    const [showLoader, setShowLoader] = useState(false);
+    const {
+        pickImage,
+        saveChanges,
+        hasPendingChanges,
+        pendingChanges,
+    } = useAvatarUser();
+
     const [editPasswordMode, setEditPasswordMode] = useState(false);
     const [pass, setPass] = useState({
         password: '',
         confirmPassword: '',
-    })
+    });
+
     const hasPassword = !!user?.providerData.find(
         (provider) => provider.providerId === "password"
     );
@@ -70,8 +94,59 @@ export default function ProfileEditScreen() {
         };
     });
 
+    if (!user) return;
+
     const handleVerifyEmail = () => verifyEmail();
     const handleAddPassword = () => setEditPasswordMode(true);
+    const handleSaveChanges = async () => {
+        if (showLoader) return;
+
+        const trimmedName = name.trim();
+        if (!isValidName(trimmedName)) {
+            Alert.alert("Ошибка", "Имя не может быть пустым или состоять только из эмодзи");
+            return;
+        }
+
+        const changedFields: string[] = [];
+
+        if (trimmedName !== (user?.displayName?.trim() || '')) {
+            changedFields.push('name');
+        }
+
+        if (hasPendingChanges) {
+            changedFields.push('images');
+        }
+
+        if (changedFields.length === 0) {
+            Alert.alert('Профиль', 'Изменений не обнаружено');
+            return;
+        }
+
+        console.log('Изменения:', changedFields);
+        setShowLoader(true);
+
+        try {
+            if (changedFields.includes('name')) {
+                await UpdateUsername(user?.uid, trimmedName);
+                console.log('Имя обновлено на:', trimmedName);
+            }
+
+            if (changedFields.includes('images')) {
+                await saveChanges();
+                console.log('Изображения успешно сохранены');
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 800));
+            Alert.alert('Профиль', 'Изменения успешно сохранены ✅');
+        } catch (error: any) {
+            console.error('Ошибка при сохранении профиля:', error);
+            Alert.alert('Ошибка', error?.message || 'Не удалось сохранить изменения 😞');
+            setShowLoader(false);
+            return;
+        }
+
+        setShowLoader(false);
+    };
 
     return (
         <>
@@ -81,13 +156,11 @@ export default function ProfileEditScreen() {
                         {
                             type: 'button',
                             label: 'Сохранить',
-                            onPress: () => {
-                                //TODO: Сохранять
-                                alert('Сохранено')
-                            }
+                            onPress: () => handleSaveChanges(),
                         },
                         {
                             type: 'menu',
+                            label: 'Изменить аватар/баннер',
                             icon: {
                                 type: 'sfSymbol',
                                 name: 'camera.fill',
@@ -102,7 +175,7 @@ export default function ProfileEditScreen() {
                                             name: 'photo',
                                         },
                                         label: 'Аватар',
-                                        onPress: () => alert('Аватар')
+                                        onPress: () => pickImage('avatar'),
                                     },
                                     {
                                         type: 'action',
@@ -111,7 +184,7 @@ export default function ProfileEditScreen() {
                                             name: 'photo',
                                         },
                                         label: 'Баннер',
-                                        onPress: () => alert('Баннер')
+                                        onPress: () => pickImage('banner'),
                                     }
                                 ]
                             }
@@ -131,8 +204,8 @@ export default function ProfileEditScreen() {
                         <Animated.View style={[{ width: "100%", height: 220 }, bannerAnimatedStyle]}>
                             <Image
                                 source={
-                                    user?.bannerURL
-                                        ? { uri: user.bannerURL }
+                                    (user?.bannerURL || pendingChanges.bannerUri)
+                                        ? { uri: pendingChanges.bannerUri || user.bannerURL }
                                         : require("@/assets/banners/1.jpg")
                                 }
                                 style={{ width: "100%", height: "100%" }}
@@ -173,13 +246,12 @@ export default function ProfileEditScreen() {
                             shadowRadius: 12,
                         }]}>
                             <Image
-                                source={{ uri: user?.avatarURL || user?.photoURL || "" }}
+                                source={{ uri: pendingChanges.avatarUri || user?.avatarURL || user?.photoURL || "" }}
                                 style={{
                                     width: 110,
                                     height: 110,
                                     borderRadius: 60,
                                     borderWidth: 3,
-                                    // borderColor: isDarkMode ? "#1C1C1E" : "white",
                                     backgroundColor: "#ccc",
                                     borderColor: "#ff5fd2",
                                     shadowColor: "#ff5fd2",
@@ -397,10 +469,15 @@ export default function ProfileEditScreen() {
                         </View>
                     </Animated.View>
                 )}
+                {showLoader && (
+                    <Animated.View style={{ position: 'absolute', width: "100%", height: '100%', zIndex: 99, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: "center", alignItems: "center" }}>
+                        <ActivityIndicator size={'small'} />
+                    </Animated.View>
+                )}
             </ThemedView>
         </>
     );
-}
+};
 
 function ActionItem({
     title,
