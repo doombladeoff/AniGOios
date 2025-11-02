@@ -1,18 +1,16 @@
 import { DropdownMenu } from "@/components/ContextComponent";
+import { DynamicStatusBar } from "@/components/DynamicStatusBar";
+import { Divider } from "@/components/ui/Divider";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { ThemeMode, useTheme } from "@/hooks/ThemeContext";
 import { auth } from "@/lib/firebase";
 import { storage } from "@/utils/storage";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Button, Pressable, ScrollView, StyleSheet, Switch, View } from "react-native";
+import { Alert, Button, Pressable, ScrollView, Switch, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-
-const Divider = () => {
-    return <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(100,100,100, 0.5)', width: '100%' }} />;
-};
 
 const quality = ['720', '480', '360'] as const;
 
@@ -45,8 +43,14 @@ export default function SettingsScreen() {
         );
     };
 
+    const handleLogout = () => {
+        auth.signOut();
+        router.replace({ pathname: '/(auth)' })
+    }
+
     return (
         <>
+            <DynamicStatusBar />
             {auth.currentUser && (
                 <Stack.Screen
                     options={{
@@ -59,7 +63,7 @@ export default function SettingsScreen() {
                                     type: 'sfSymbol',
                                     name: 'rectangle.portrait.and.arrow.right.fill',
                                 },
-                                onPress: () => { }
+                                onPress: () => handleLogout(),
                             }
                         ]
                     }}
@@ -67,25 +71,31 @@ export default function SettingsScreen() {
             )}
             <ScrollView contentInsetAdjustmentBehavior='automatic' contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 40 }}>
                 <View style={{ flexDirection: 'column', gap: 20 }}>
-                    <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.08)' style={{ flex: 1, borderRadius: 20, justifyContent: 'center', padding: 14, gap: 20 }}>
-                        <Pressable style={({ pressed }) => ({ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8, opacity: pressed ? 0.8 : 1 })}>
-                            <ThemedText lightColor='black' darkColor='white' style={{ fontSize: 16 }}>Редактировать профиль</ThemedText>
-                            <IconSymbol name="chevron.right" size={16} />
-                        </Pressable>
-                    </ThemedView>
+                    {auth.currentUser && (
+                        <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.04)' style={{ flex: 1, borderRadius: 28, justifyContent: 'center', padding: 20, paddingVertical: 16, gap: 20 }}>
+                            <Pressable
+                                onPress={() => router.push('/settings/editProfile')}
+                                style={({ pressed }) => ({ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8, opacity: pressed ? 0.8 : 1 })}>
+                                <ThemedText lightColor='black' darkColor='white' style={{ fontSize: 16 }}>Редактировать профиль</ThemedText>
+                                <IconSymbol name="chevron.right" size={16} />
+                            </Pressable>
+                        </ThemedView>
+                    )}
 
-                    <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.08)' style={{ flex: 1, borderRadius: 20, justifyContent: 'center', padding: 14, gap: 14 }}>
-                        <Pressable style={({ pressed }) => ({ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8, opacity: pressed ? 0.8 : 1 })}>
+                    <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.04)' style={{ flex: 1, borderRadius: 28, justifyContent: 'center', padding: 20, paddingVertical: 16, gap: 14 }}>
+                        <Pressable
+                            onPress={() => router.push('/settings/homeRecommends')}
+                            style={({ pressed }) => ({ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8, opacity: pressed ? 0.8 : 1 })}>
                             <ThemedText lightColor='black' darkColor='white' style={{ fontSize: 16 }}>Настройки рекомендаций</ThemedText>
                             <IconSymbol name="chevron.right" size={16} />
                         </Pressable>
                     </ThemedView>
 
                     <View style={{ gap: 10 }}>
-                        <ThemedText style={{ fontSize: 18, fontWeight: '700', paddingLeft: 10 }}>Плеер</ThemedText>
-                        <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.08)' style={{ flex: 1, borderRadius: 20, justifyContent: 'center', padding: 14, gap: 14 }}>
+                        <ThemedText style={{ fontSize: 18, fontWeight: '700', paddingLeft: 10, color: 'rgba(100,100,100,0.8)' }}>Плеер</ThemedText>
+                        <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.04)' style={{ flex: 1, borderRadius: 28, justifyContent: 'center', padding: 20, paddingVertical: 20, gap: 14 }}>
                             <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8 }}>
-                                <ThemedText>Качество видео</ThemedText>
+                                <ThemedText style={{ fontSize: 16 }}>Качество видео</ThemedText>
                                 <DropdownMenu
                                     triggerItem={
                                         <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 4 }}>
@@ -115,8 +125,8 @@ export default function SettingsScreen() {
                     </View>
 
                     <View style={{ gap: 10 }}>
-                        <ThemedText style={{ fontSize: 18, fontWeight: '700', paddingLeft: 10 }}>Тема</ThemedText>
-                        <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.08)' style={{ flex: 1, borderRadius: 20, justifyContent: 'center', padding: 14, gap: 14 }}>
+                        <ThemedText style={{ fontSize: 18, fontWeight: '700', paddingLeft: 10, color: 'rgba(100,100,100,0.8)' }}>Тема</ThemedText>
+                        <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.04)' style={{ flex: 1, borderRadius: 28, justifyContent: 'center', padding: 20, gap: 14 }}>
                             {[
                                 { value: 'light' as ThemeMode, label: 'Светлая' },
                                 { value: 'dark' as ThemeMode, label: 'Тёмная' },
@@ -146,8 +156,8 @@ export default function SettingsScreen() {
 
                     {(__DEV__ || devMode) && (
                         <View style={{ gap: 10 }}>
-                            <ThemedText style={{ fontSize: 18, fontWeight: '700', paddingLeft: 10 }}>DEV</ThemedText>
-                            <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.08)' style={{ flex: 1, borderRadius: 20, justifyContent: 'center', padding: 14, gap: 14 }}>
+                            <ThemedText style={{ fontSize: 18, fontWeight: '700', paddingLeft: 10, color: 'rgba(100,100,100,0.8)' }}>DEV</ThemedText>
+                            <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.04)' style={{ flex: 1, borderRadius: 28, justifyContent: 'center', padding: 20, gap: 14 }}>
                                 <View style={{ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8 }}>
                                     <ThemedText lightColor="black" darkColor='white' style={{ fontSize: 16 }}>Режим разработчика</ThemedText>
                                     <Switch value={devMode} disabled />
