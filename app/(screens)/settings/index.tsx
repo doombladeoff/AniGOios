@@ -91,6 +91,15 @@ export default function SettingsScreen() {
                         </Pressable>
                     </ThemedView>
 
+                    <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.04)' style={{ flex: 1, borderRadius: 28, justifyContent: 'center', padding: 20, paddingVertical: 16, gap: 14 }}>
+                        <Pressable
+                            onPress={() => router.push('/settings/posterEditor')}
+                            style={({ pressed }) => ({ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8, opacity: pressed ? 0.8 : 1 })}>
+                            <ThemedText lightColor='black' darkColor='white' style={{ fontSize: 16 }}>Редактировать постер</ThemedText>
+                            <IconSymbol name="chevron.right" size={16} />
+                        </Pressable>
+                    </ThemedView>
+
                     <View style={{ gap: 10 }}>
                         <ThemedText style={{ fontSize: 18, fontWeight: '700', paddingLeft: 10, color: 'rgba(100,100,100,0.8)' }}>Плеер</ThemedText>
                         <ThemedView darkColor='rgba(255,255,255,0.08)' lightColor='rgba(0,0,0,0.04)' style={{ flex: 1, borderRadius: 28, justifyContent: 'center', padding: 20, paddingVertical: 20, gap: 14 }}>

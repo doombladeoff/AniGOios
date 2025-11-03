@@ -219,6 +219,17 @@ export default function ScreensLayout() {
                 }}
             />
             <Stack.Screen
+                name="settings/posterEditor"
+                options={{
+                    headerShown: true,
+                    headerTransparent: true,
+                    headerBackButtonDisplayMode: 'minimal',
+                    headerTitle: '',
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    headerBackTitle: 'Настройки'
+                }}
+            />
+            <Stack.Screen
                 name="settings/dev/dev-settings"
                 options={{
                     headerShown: true,
