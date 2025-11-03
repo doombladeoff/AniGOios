@@ -60,7 +60,7 @@ export default function EditRecommendationsScreen() {
 
     const headerHeight = useHeaderHeight();
 
-    const yearItem = useMemo(
+    const yearItem: { title: string; onSelect: (type: "to" | "from") => void }[] = useMemo(
         () =>
             Array.from({ length: CURRENT_YEAR - START_YEAR + 1 }, (_, i) => {
                 const year = START_YEAR + i;
@@ -218,7 +218,7 @@ export default function EditRecommendationsScreen() {
                         <Trigger value={minRating.toString()} />,
                         ratingItems.map((a, index) => (
                             <DropdownMenu.CheckboxItem
-                                key={'minrating'}
+                                key={`minrating-${index}`}
                                 value={minRating === Number(a.title)}
                                 onValueChange={a.onSelect}
                             >
@@ -290,10 +290,9 @@ export default function EditRecommendationsScreen() {
                         <Trigger value={years?.year_from?.toString() ?? "Не указан"} />,
                         yearItem.map((a, index) => (
                             <DropdownMenu.CheckboxItem
-                                key={'yearfrom'}
-                                value={a.title === years?.year_from?.toString()}
-                                onValueChange={() => a.onSelect("from")}
-                            >
+                                key={`yearfrom-${a.title}-${index}`}
+                                value={a.title == years?.year_from?.toString()}
+                                onValueChange={() => a.onSelect('from')}>
                                 <DropdownMenu.ItemIndicator />
                                 <DropdownMenu.ItemTitle>{a.title}</DropdownMenu.ItemTitle>
                             </DropdownMenu.CheckboxItem>
@@ -305,7 +304,7 @@ export default function EditRecommendationsScreen() {
                         <Trigger value={years?.year_to?.toString() ?? "Не указан"} />,
                         yearItem.map((a, index) => (
                             <DropdownMenu.CheckboxItem
-                                key={'yearto'}
+                                key={`yearto-${a.title}-${index}`}
                                 value={a.title === years?.year_to?.toString()}
                                 onValueChange={() => a.onSelect("to")}
                             >
