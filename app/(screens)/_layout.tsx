@@ -219,6 +219,17 @@ export default function ScreensLayout() {
                 }}
             />
             <Stack.Screen
+                name="settings/dev/dev-settings"
+                options={{
+                    headerShown: true,
+                    headerTransparent: true,
+                    headerTitle: 'DEV',
+                    headerBackButtonDisplayMode: 'minimal',
+                    headerTintColor: isDarkMode ? 'white' : 'black',
+                    headerBackTitle: 'Настройки'
+                }}
+            />
+            <Stack.Screen
                 name="user/[id]"
                 options={{
                     headerShown: true,

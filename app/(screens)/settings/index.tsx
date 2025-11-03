@@ -163,12 +163,34 @@ export default function SettingsScreen() {
                                     <Switch value={devMode} disabled />
                                 </View>
                                 <Divider />
-                                <Pressable style={({ pressed }) => ({ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8, opacity: pressed ? 0.8 : 1 })}>
+                                <Pressable
+                                    onPress={() => {
+                                        Alert.prompt(
+                                            "Введите ID",
+                                            'id - malID',
+                                            [
+                                                { text: 'Отмена', style: 'cancel' },
+                                                {
+                                                    text: "Перейти",
+                                                    onPress: (v: any) => router.push({ pathname: '/(screens)/anime/[id]', params: { id: Number(v) } }),
+                                                    style: 'default',
+                                                }
+                                            ],
+                                            'plain-text',
+                                            '',
+                                            'numeric'
+                                        );
+                                    }}
+                                    style={({ pressed }) => ({ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8, opacity: pressed ? 0.8 : 1 })}
+                                >
                                     <ThemedText lightColor='black' darkColor='white' style={{ fontSize: 16 }}>Перейти к аниме по ID</ThemedText>
                                     <IconSymbol name="chevron.right" size={16} />
                                 </Pressable>
                                 <Divider />
-                                <Pressable style={({ pressed }) => ({ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8, opacity: pressed ? 0.8 : 1 })}>
+                                <Pressable
+                                    onPress={() => router.push('/settings/dev/dev-settings')}
+                                    style={({ pressed }) => ({ justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', gap: 8, opacity: pressed ? 0.8 : 1 })}
+                                >
                                     <ThemedText lightColor='black' darkColor='white' style={{ fontSize: 16 }}>DEV</ThemedText>
                                     <IconSymbol name="chevron.right" size={16} />
                                 </Pressable>
