@@ -73,29 +73,16 @@ export default function ProfileScreen() {
 
                 {/* --- Навигация --- */}
                 <View style={[styles.topButtons, { top: insets.top }]}>
-                    <LiquidGlassView interactive style={[styles.iconButton,]}>
-                        <Pressable
-                            onPress={null}
-                        >
+                    <Pressable onPress={null}>
+                        <LiquidGlassView interactive style={[styles.iconButton,]}>
                             <IconSymbol name="bell.badge.fill" size={26} color="white" />
-                        </Pressable>
-                    </LiquidGlassView>
-                    <LiquidGlassView interactive style={[styles.iconButton]}>
-                        <Pressable
-                            onPress={() => router.push("/(screens)/settings")}
-                        >
-                            <IconSymbol name="gear" size={26} color="white" />
-                        </Pressable>
-                    </LiquidGlassView>
-                    {__DEV__ &&
-                        <LiquidGlassView interactive style={[styles.iconButton]}>
-                            <Pressable
-                                onPress={() => router.push("/(screens)/(settings)/settings")}
-                            >
-                                <IconSymbol name="gear.badge" size={26} color="white" />
-                            </Pressable>
                         </LiquidGlassView>
-                    }
+                    </Pressable>
+                    <Pressable onPress={() => router.push("/(screens)/settings")}>
+                        <LiquidGlassView interactive style={[styles.iconButton]}>
+                            <IconSymbol name="gear" size={26} color="white" />
+                        </LiquidGlassView>
+                    </Pressable>
                 </View>
 
                 {/* --- Аватар и имя --- */}

@@ -30,7 +30,7 @@ export const HeaderRight = ({ img, customItems }: HeaderRightProps) => {
             iconName: 'pencil.and.scribble',
             onSelect: () =>
                 router.push({
-                    pathname: "/(screens)/(settings)/(edit)/posterEditor",
+                    pathname: "/(screens)/settings/posterEditor",
                     params: { src: JSON.stringify(img) },
                 }),
         },

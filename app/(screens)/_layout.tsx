@@ -173,13 +173,6 @@ export default function ScreensLayout() {
                 }}
             />
             <Stack.Screen
-                name="(settings)"
-                options={{
-                    headerShown: false,
-                    headerLeft: () => <HeaderBackButton />
-                }}
-            />
-            <Stack.Screen
                 name="settings/index"
                 options={{
                     headerTransparent: true,
