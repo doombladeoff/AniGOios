@@ -26,6 +26,7 @@ export const addUser = async (user: any) => {
                 watchTime: 0,
                 watchedEpisodes: 0,
             },
+            status: '',
         });
     }
 };

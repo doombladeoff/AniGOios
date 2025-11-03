@@ -39,6 +39,7 @@ export interface CustomUser extends User {
     rang: Rang;
     watchStats: WatchStats;
     lastAnime: LastAnime | null;
+    status: string;
 }
 
 interface UserStore {

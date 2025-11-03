@@ -105,19 +105,18 @@ export default function ProfileScreen() {
                         style={styles.avatar}
                     />
                 </Animated.View>
-                {/* --- Фейк статус --- */}
                 <Animated.View style={[styles.profileInfo, profileInfoAnimated]}>
                     <ThemedText style={styles.nameText}>{user.displayName}</ThemedText>
                     <ThemedText style={[styles.quote, {
                         color: isDarkMode ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.8)",
-                    }]}>“Жизнь — это аниме, в котором ты главный герой.”</ThemedText>
+                    }]}>{user.status}</ThemedText>
                 </Animated.View>
 
                 <Animated.ScrollView
                     onScroll={scrollHandler}
                     scrollEventThrottle={16}
                     contentContainerStyle={{
-                        paddingTop: 260,
+                        paddingTop: user.status ? 260 : 220,
                         paddingBottom: Platform.Version >= '26.0' ? insets.bottom + 20 : useBottomHeight() + 20,
                     }}
                     showsVerticalScrollIndicator={false}

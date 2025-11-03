@@ -67,6 +67,7 @@ const useAuthCheck = () => {
                         folders: [],
                         yummyToken: '',
                         yummyTokenDate: '',
+                        status: '',
                     };
                     setUser(defaultUser);
                     setIsAuth(true);

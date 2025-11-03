@@ -6,6 +6,7 @@ import { ThemedView } from "@/components/ui/ThemedView";
 import { useTheme } from "@/hooks/ThemeContext";
 import { verifyEmail } from "@/lib/firebase/authService";
 import { UpdateUsername } from "@/lib/firebase/update-username";
+import { UpdateUserStatus } from "@/lib/firebase/update-userstatus";
 import { useAvatarUser } from "@/lib/firebase/user-images/uploadImages";
 import { useUserStore } from "@/store/userStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,6 +17,7 @@ import React, { useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    Keyboard,
     Platform,
     Pressable,
     TextInput,
@@ -99,9 +101,11 @@ export default function ProfileEditScreen() {
     const handleVerifyEmail = () => verifyEmail();
     const handleAddPassword = () => setEditPasswordMode(true);
     const handleSaveChanges = async () => {
+        Keyboard.dismiss();
         if (showLoader) return;
 
         const trimmedName = name.trim();
+        const trimmeStatus = status.trim();
         if (!isValidName(trimmedName)) {
             Alert.alert("Ошибка", "Имя не может быть пустым или состоять только из эмодзи");
             return;
@@ -112,6 +116,11 @@ export default function ProfileEditScreen() {
         if (trimmedName !== (user?.displayName?.trim() || '')) {
             changedFields.push('name');
         }
+
+        if (trimmeStatus !== (user?.status?.trim() || '')) {
+            changedFields.push('status');
+        }
+
 
         if (hasPendingChanges) {
             changedFields.push('images');
@@ -129,6 +138,11 @@ export default function ProfileEditScreen() {
             if (changedFields.includes('name')) {
                 await UpdateUsername(user?.uid, trimmedName);
                 console.log('Имя обновлено на:', trimmedName);
+            }
+
+            if (changedFields.includes('status')) {
+                await UpdateUserStatus(user?.uid, trimmeStatus);
+                console.log('Статус обновлен на:', trimmeStatus);
             }
 
             if (changedFields.includes('images')) {
