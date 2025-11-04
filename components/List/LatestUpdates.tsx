@@ -37,7 +37,7 @@ const LatestUpdates = (props: LatestUpdatesProps) => {
             <Animated.View entering={FadeIn}>
                 <CardPoster
                     index={index}
-                    img={item.material_data?.poster_url || ''}
+                    img={item.material_data?.anime_poster_url || item.material_data?.poster_url || ''}
                     imgStyle={props.imageStyle}
                     container={props.imageContainer}
                     transition={700}

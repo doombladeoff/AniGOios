@@ -161,7 +161,7 @@ export default function AnimeLastUpdatesScreen() {
                 anime ? (
                     <CardPoster
                         key={`${anime.shikimori_id}-${anime.last_episode}-${anime.translation?.id}-${i}`}
-                        img={anime.material_data?.poster_url || ''}
+                        img={anime.material_data?.anime_poster_url || anime.material_data?.poster_url || ''}
                         imgStyle={styles.img}
                         transition={700}
                         imgFit="cover"
