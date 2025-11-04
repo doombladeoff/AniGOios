@@ -3,9 +3,13 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/hooks/ThemeContext";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
-import React, { memo, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
+import Animated, {
+    SharedValue,
+    useAnimatedStyle,
+    withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface HeaderProps {
@@ -16,38 +20,34 @@ interface HeaderProps {
 
 const { width: SCREEN_WIDTH } = Dimensions.get("screen");
 
-const CustomHeader = ({
-    animeData,
-    scrollY,
-}: HeaderProps) => {
+const CustomHeader = ({ animeData, scrollY }: HeaderProps) => {
     const isDarkMode = useTheme().theme === 'dark';
     const insets = useSafeAreaInsets();
 
     const topInset = useMemo(() => insets.top / 1.25, [insets.top]);
 
     const animatedHeader = useAnimatedStyle(() => {
-        const value = interpolate(
-            scrollY.value,
-            [150, 330],
-            [-200, 0],
-            Extrapolation.CLAMP
-        );
+        const visible = scrollY.value >= 330;
 
         return {
-            top: withSpring(value, {
-                damping: 18,
-                stiffness: 100,
-                mass: 1,
-                overshootClamping: false,
-            }),
+            opacity: withTiming(visible ? 1 : 0, { duration: 250 }),
+            transform: [
+                {
+                    translateY: withTiming(visible ? 0 : -60, { duration: 300 }),
+                },
+            ],
         };
     });
 
     return (
-        <Animated.View style={[{ zIndex: 1 }, animatedHeader]}>
-            <BlurView tint={isDarkMode ? 'dark' : 'light'} intensity={100} style={[styles.infoRow, { paddingTop: topInset - 10, }]}>
+        <Animated.View style={[{ zIndex: 10 }, animatedHeader]}>
+            <BlurView
+                tint={isDarkMode ? 'dark' : 'light'}
+                intensity={100}
+                style={[styles.infoRow, { paddingTop: topInset - 10 }]}
+            >
                 <Image
-                    source={{ uri: animeData.poster.mainUrl }}
+                    source={{ uri: animeData?.poster?.mainUrl }}
                     style={styles.posterThumb}
                 />
 
@@ -57,11 +57,17 @@ const CustomHeader = ({
                     </ThemedText>
 
                     <View style={styles.metaRow}>
-                        <ThemedText lightColor="black" darkColor="white" style={styles.metaText}>{animeData?.airedOn?.year}</ThemedText>
-                        <ThemedText lightColor="black" darkColor="white" style={styles.metaText}>•</ThemedText>
+                        <ThemedText lightColor="black" darkColor="white" style={styles.metaText}>
+                            {animeData?.airedOn?.year}
+                        </ThemedText>
+                        <ThemedText lightColor="black" darkColor="white" style={styles.metaText}>
+                            •
+                        </ThemedText>
                         <View style={styles.ratingRow}>
                             <IconSymbol name="star.fill" size={16} color="green" style={styles.starIcon} />
-                            <ThemedText lightColor="black" darkColor="white" style={styles.metaText}>{animeData?.score}</ThemedText>
+                            <ThemedText lightColor="black" darkColor="white" style={styles.metaText}>
+                                {animeData?.score}
+                            </ThemedText>
                         </View>
                     </View>
                 </View>
@@ -79,7 +85,6 @@ const styles = StyleSheet.create({
         height: 140,
         paddingHorizontal: 70,
         gap: 10,
-        zIndex: -1,
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.35,
@@ -120,4 +125,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default memo(CustomHeader);
+export default CustomHeader;
