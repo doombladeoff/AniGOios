@@ -3,7 +3,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
-import Animated, { FadeIn, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInUp, FadeOutUp } from "react-native-reanimated";
 
 const translatedStatus = {
     completed: "Просмотрено",
@@ -55,6 +55,8 @@ export const Status = ({ showType, id, status, textStyle, containerStyle }: Stat
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 setStatus(data.status ?? '');
+            } else {
+                setStatus('')
             }
         });
 
@@ -70,6 +72,7 @@ export const Status = ({ showType, id, status, textStyle, containerStyle }: Stat
     return (
         <Animated.View
             entering={showInHeader ? FadeInUp : FadeIn}
+            exiting={FadeOutUp}
             style={[
                 containerStyle,
                 { top: showInHeader ? headerHeight / 1.55 : 5 }
