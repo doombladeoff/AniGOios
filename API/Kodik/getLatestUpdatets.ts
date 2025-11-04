@@ -6,8 +6,13 @@ export const getLastUpdatets = async (token: string, limit?: number) => {
         if (!token || token === '') throw new Error('Ошибка токена');
 
         const client = Client.fromToken(token);
-        const lastUpdates = await client.list({ limit: limit ? limit : 20, translation_type: 'voice', types: 'anime-serial', translation_id: favoriteVoiceOversID });
-
+        const lastUpdates = await client.list({
+            limit: limit ? limit : 20,
+            translation_type: 'voice',
+            types: 'anime-serial',
+            translation_id: favoriteVoiceOversID,
+            with_material_data: true
+        });
         return lastUpdates.results;
     } catch (error) {
         console.error('[KODIK API ERROR]: ', error);

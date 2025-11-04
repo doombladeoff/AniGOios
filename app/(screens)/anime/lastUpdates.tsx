@@ -22,8 +22,6 @@ const VISIBLE_ROWS = 4;
 const availableHeight = height - (HEADER_HEIGHT + TITLE_HEIGHT);
 const ITEM_HEIGHT = availableHeight / VISIBLE_ROWS;
 
-type Anime = MaterialObject & { poster: { originalUrl: string } };
-
 const chunk = <T,>(arr: T[], size: number): T[][] => {
     return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
         arr.slice(i * size, i * size + size)
@@ -37,7 +35,7 @@ const normalize = (text?: string) =>
         .replace(/[\u0300-\u036f]/g, "")
         .trim() ?? "";
 
-const groupRows = (animes: Anime[]): Anime[][] => {
+const groupRows = (animes: MaterialObject[]): MaterialObject[][] => {
     return chunk(animes, 3);
 };
 
@@ -98,7 +96,7 @@ export default function AnimeLastUpdatesScreen() {
 
         const result: any[] = [];
         let currentTitle: string | null = null;
-        let buffer: Anime[] = [];
+        let buffer: MaterialObject[] = [];
 
         for (const item of data) {
             if (typeof item === "string") {
@@ -157,13 +155,13 @@ export default function AnimeLastUpdatesScreen() {
         </ThemedView>
     );
 
-    const renderRow = ({ item }: { item: Anime[] }) => (
+    const renderRow = ({ item }: { item: MaterialObject[] }) => (
         <Animated.View entering={FadeInDown} style={styles.row}>
             {item.map((anime, i) =>
                 anime ? (
                     <CardPoster
                         key={`${anime.shikimori_id}-${anime.last_episode}-${anime.translation?.id}-${i}`}
-                        img={anime.poster?.originalUrl}
+                        img={anime.material_data?.poster_url || ''}
                         imgStyle={styles.img}
                         transition={700}
                         imgFit="cover"

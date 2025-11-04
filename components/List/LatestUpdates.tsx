@@ -2,6 +2,7 @@ import { useTheme } from "@/hooks/ThemeContext";
 import { FlashList } from "@shopify/flash-list";
 import { ImageStyle } from "expo-image";
 import { router } from "expo-router";
+import { MaterialObject } from "kodikwrapper";
 import { memo } from "react";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -10,7 +11,7 @@ import { CardPoster } from "./Item/CardPoster";
 import { ListHeader } from "./ListHeader";
 
 interface LatestUpdatesProps {
-    updates: any[];
+    updates: MaterialObject[];
     showHeader?: boolean;
     headerTextStyle?: StyleProp<TextStyle>;
     containerStye?: StyleProp<ViewStyle>;
@@ -26,7 +27,7 @@ const LatestUpdates = (props: LatestUpdatesProps) => {
 
     if (!props.updates || props.updates.length < 1) return null;
 
-    const renderItem = ({ item, index }: { item: any, index: number }) => {
+    const renderItem = ({ item, index }: { item: MaterialObject, index: number }) => {
         const handeNavigate = () => router.push({
             pathname: '/(screens)/anime/[id]',
             params: { id: item.shikimori_id }
@@ -36,7 +37,7 @@ const LatestUpdates = (props: LatestUpdatesProps) => {
             <Animated.View entering={FadeIn}>
                 <CardPoster
                     index={index}
-                    img={item?.poster?.originalUrl}
+                    img={item.material_data?.poster_url || ''}
                     imgStyle={props.imageStyle}
                     container={props.imageContainer}
                     transition={700}
