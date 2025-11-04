@@ -1,12 +1,6 @@
 import { getLastUpdatets } from "@/API/Kodik/getLatestUpdatets";
-import { getToken } from "@/API/Kodik/getToken";
 import { getAnimeList } from "@/API/Shikimori/RequestAnime";
 import { todayString, yesterdayString } from "@/utils/getDate";
-
-// interface FetchLastUpdatesProps {
-//     type?: "slice" | "full";
-//     limit?: number;
-// }
 
 type PosterField =
     | "originalUrl"
@@ -58,11 +52,7 @@ export const fetchLastUpdates = async (
     { type, limit }: FetchLastUpdatesProps
 ): Promise<FetchLastUpdatesReturn> => {
     try {
-        const token = await getToken();
-        if (!token) return [];
-
-        const response = await getLastUpdatets(token, limit);
-        console.log(response)
+        const response = await getLastUpdatets(process.env.EXPO_PUBLIC_KODIK_TOKEN!, limit);
         if (!response) return [];
 
         switch (type) {

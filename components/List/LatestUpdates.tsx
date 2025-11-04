@@ -4,7 +4,7 @@ import { ImageStyle } from "expo-image";
 import { router } from "expo-router";
 import { memo } from "react";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import Animated, { FadeInLeft } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { ThemedText } from "../ui/ThemedText";
 import { CardPoster } from "./Item/CardPoster";
 import { ListHeader } from "./ListHeader";
@@ -33,7 +33,7 @@ const LatestUpdates = (props: LatestUpdatesProps) => {
         });
 
         return (
-            <Animated.View entering={index < 4 ? FadeInLeft.delay(100 * (index)).duration(750) : undefined}>
+            <Animated.View entering={FadeIn}>
                 <CardPoster
                     index={index}
                     img={item?.poster?.originalUrl}

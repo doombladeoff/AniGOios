@@ -176,7 +176,6 @@ export default function HomeScreen() {
                         return (
                             <List
                                 key={props.typeRequest}
-                                useContextMenu
                                 textStyle={styles.headerList}
                                 typeRequest={props.typeRequest}
                                 headerText={props.headerText}

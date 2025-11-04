@@ -1,3 +1,4 @@
+import { getAnimeList } from "@/API/Shikimori/RequestAnime";
 import { AnimeFields } from "@/API/Shikimori/RequestFields.type";
 import { getHomeRecs } from "@/API/Yummy/Recommendations/getHomeRecs";
 import { filmsProps, onScreenProps, topProps } from "@/constants/RequestProps";
@@ -5,10 +6,9 @@ import { auth } from "@/lib/firebase";
 import { getLastAnime, updateAnimeHistory } from "@/lib/firebase/update/userLastAnime";
 import { LastAnime, useUserStore } from "@/store/userStore";
 import { MaterialObject } from "kodikwrapper";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { fetchLastUpdates } from "./fetchLastUpdates";
-import { fetchListWithBanners } from "./fetchListWithBanners";
 
 const fields: AnimeFields = {
     id: true,
@@ -55,9 +55,9 @@ export function useHomeScreenData() {
     const fetchAnimeLists = async () => {
         try {
             const [topRated, onScreen, films, lastUpd, homeRecs] = await Promise.all([
-                fetchListWithBanners(topProps, fields),
-                fetchListWithBanners(onScreenProps, fields),
-                fetchListWithBanners(filmsProps, fields),
+                getAnimeList(topProps, fields),
+                getAnimeList(onScreenProps, fields),
+                getAnimeList(filmsProps, fields),
                 fetchLastUpdates({ type: 'slice' }),
                 getHomeRecs()
             ]);
@@ -69,7 +69,7 @@ export function useHomeScreenData() {
         } catch (error) {
             console.error('Ошибка при загрузке аниме:', error);
         } finally {
-            setTimeout(() => setLoading(false), 1000);
+            setLoading(false);
         }
     };
 
@@ -77,23 +77,23 @@ export function useHomeScreenData() {
         fetchAnimeLists()
     }, []);
 
-    useEffect(() => {
-        const fetchLastAnime = async () => {
-            console.log('fetch last user anime');
-            if (!auth.currentUser) return [];
-            try {
-                const last = await getLastAnime(auth.currentUser.uid);
-                return last.data || []
-            } catch (error) {
-                console.error(error)
-                return []
-            }
-        };
+    const fetchLastAnime = async () => {
+        console.log('fetch last user anime');
+        if (!auth.currentUser) return [];
+        try {
+            const last = await getLastAnime(auth.currentUser.uid);
+            return last.data || []
+        } catch (error) {
+            console.error(error)
+            return []
+        }
+    };
 
+    useEffect(() => {
         fetchLastAnime().then((r) => setLastAnime(r));
     }, [user]);
 
-    const refreshingFetch = async () => {
+    const refreshingFetch = useCallback(async () => {
         console.log('fetch last updated and home recs', { refreshing: refreshing });
         const [rLastUpdates, rHomeRecs] = await Promise.all([
             fetchLastUpdates({ type: 'slice' }),
@@ -101,12 +101,16 @@ export function useHomeScreenData() {
         ]);
         setLastUpdates(rLastUpdates as LastUpdatesT[]);
         setHomeRecs(rHomeRecs);
-        setTimeout(() => setRefreshing(false), 4000);
-    };
+    }, []);
 
     useEffect(() => {
         if (!refreshing) return;
-        refreshingFetch();
+
+        refreshingFetch()
+            .catch((err) => {
+                console.error('Ошибка при запросе обновлении данных', err)
+            })
+            .finally(() => setRefreshing(false));
     }, [refreshing]);
 
     const handleLastAnimeUpdate = (id: number, watchedEpisodes: number) => {

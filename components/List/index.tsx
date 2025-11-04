@@ -4,22 +4,14 @@ import { useHeaderHeight } from "@react-navigation/elements"
 import { FlashList, FlashListProps } from "@shopify/flash-list"
 import { ImageStyle } from "expo-image"
 import { router } from "expo-router"
-import { memo, useCallback, useMemo } from "react"
+import { memo, useCallback } from "react"
 import { Dimensions, StyleProp, StyleSheet, TextStyle, View, ViewStyle } from "react-native"
-import Animated, { FadeInLeft } from "react-native-reanimated"
-import { SFSymbols6_0 } from "sf-symbols-typescript"
-import { ContextMenu } from "../ContextComponent"
 import { CardPoster } from "./Item/CardPoster"
-import { Preview } from "./Item/Preview"
 import ScoreBadge from "./Item/ScoreBadge"
 import { ListHeader } from "./ListHeader"
 
-interface ShikimoriAnimeB extends ShikimoriAnime {
-    bannerImage: string;
-}
-
-interface ListProps extends Omit<FlashListProps<ShikimoriAnimeB>, 'renderItem'> {
-    data: ShikimoriAnimeB[];
+interface ListProps extends Omit<FlashListProps<ShikimoriAnime>, 'renderItem'> {
+    data: ShikimoriAnime[];
     headerText: string;
     textStyle?: StyleProp<TextStyle>;
     horizontal?: boolean;
@@ -43,7 +35,6 @@ function List({
     numColumns = 3,
     showHeader = true,
     typeRequest,
-    useContextMenu = false,
     textStyle,
     imageContainer,
     imageStyle,
@@ -59,18 +50,9 @@ function List({
         router.push({ pathname: '/(screens)/anime/[id]', params: { id } });
     }, []);
 
-    const contextMenuItems = useMemo(() => (id: number) => [
-        {
-            title: 'Смотреть',
-            iconColor: 'white',
-            iconName: 'play.fill' as SFSymbols6_0,
-            onSelect: () => handleNavigate(id),
-        }
-    ], [handleNavigate]);
-
-    const renderItem = ({ item, index }: { item: ShikimoriAnimeB; index: number }) => {
+    const renderItem = ({ item, index }: { item: ShikimoriAnime; index: number }) => {
         const handlePress = () => handleNavigate(item.malId);
-        return !useContextMenu ? (
+        return (
             <CardPoster
                 index={index}
                 img={item.poster?.mainUrl}
@@ -95,59 +77,20 @@ function List({
                 onPress={handlePress}
             >
                 <ScoreBadge
-                    score={item.score}
+                    score={Number(item?.score.toFixed(1))}
                     anons={anonsCard}
-                    containerStyle={[styles.scoreContainer, !horizontal && {
-                        left: 8, top: 10
-                    }]}
+                    containerStyle={[
+                        styles.scoreContainer,
+                        !horizontal && {
+                            left: 8,
+                            top: 10
+                        }
+                    ]}
                     textStyle={styles.scoreText}
                     horizontal={horizontal}
                 />
             </CardPoster>
-        ) : (
-            <Animated.View entering={index < 4 ? FadeInLeft.delay(100 * (index)).duration(750) : undefined}>
-                <ContextMenu
-                    triggerItem={
-                        <CardPoster
-                            index={index}
-                            img={item.poster?.main2xUrl}
-                            imgStyle={[imageStyle, { backgroundColor: "#1e1e1e", }]}
-                            transition={700}
-                            imgFit='cover'
-                            imgCachePolicy={'disk'}
-                            imgPriority={(anonsCard && horizontal) ? 'low' : 'high'}
-                            container={[
-                                styles.container,
-                                imageContainer,
-                            ]}
-                            onPress={handlePress}
-                        >
-                            <ScoreBadge
-                                score={item.score}
-                                anons={anonsCard}
-                                containerStyle={styles.scoreContainer}
-                                textStyle={styles.scoreText}
-                                horizontal={horizontal}
-                            />
-                        </CardPoster>
-                    }
-                    previewItem={
-                        <View style={{ minWidth: width, maxWidth: width }}>
-                            <Preview
-                                bannerImg={item.bannerImage}
-                                img={item.poster.originalUrl}
-                                width={width}
-                                title={item.russian}
-                                score={item.score}
-                                isAnons={typeRequest === 'anons'}
-                                description={item.description}
-                            />
-                        </View>
-                    }
-                    items={contextMenuItems(item.malId)}
-                />
-            </Animated.View>
-        )
+        );
     };
 
     return (
@@ -168,7 +111,7 @@ function List({
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
                 numColumns={horizontal ? 1 : numColumns ? numColumns : 3}
-                keyExtractor={(item) => `${item.malId}-anime`}
+                keyExtractor={(item) => item.malId.toString()}
                 data={data}
                 contentContainerStyle={{
                     paddingLeft: horizontal ? 10 : 0,
@@ -177,7 +120,6 @@ function List({
                     paddingBottom: horizontal ? 15 : bottomTabHeight,
                 }}
                 contentInsetAdjustmentBehavior="automatic"
-                maxItemsInRecyclePool={15}
                 renderItem={renderItem}
                 {...rest}
             />
