@@ -1,7 +1,6 @@
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { Dimensions, StyleSheet, View } from "react-native";
-import { easeGradient } from "react-native-easing-gradient";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { Easing, SharedValue, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -33,32 +32,49 @@ export const Card = ({
     N,
     useFlip
 }: CardProps) => {
-    const backGradient = easeGradient({
-        colorStops: {
-            0: { color: 'rgba(0,0,0,1)' },
-            0.5: { color: 'rgba(0,0,0,1)' },
-            1: { color: 'rgba(0,0,0,1)' }
-        }
-    });
-
     const isSwiping = useSharedValue(false);
+    const scaleCard = useSharedValue(1);
 
     const gesture = Gesture.Pan()
         .onStart((e) => {
             isSwiping.value = true;
+
         })
+
+        .onBegin(() => {
+            scaleCard.value = withTiming(0.98, { duration: 100 })
+        })
+        .onFinalize(() => (
+            scaleCard.value = withTiming(1, { duration: 150 })
+
+        ))
+
         .onUpdate((e) => {
             if (activeIndex.value % N === index) {
                 translateX.value = e.translationX;
             }
         })
         .onEnd(() => {
-            if (activeIndex.value % N === index && translateX.value < -SWIPE_THRESHOLD) {
-                translateX.value = withTiming(-width, { duration: 250 }, () => {
-                    scheduleOnRN(onSwiped);
-                    translateX.value = 0;
-                    isSwiping.value = false;
-                });
+            const isActive = activeIndex.value % N === index;
+            const distance = translateX.value;
+
+            if (isActive) {
+                const direction =
+                    distance < -SWIPE_THRESHOLD ? -1 :
+                        distance > SWIPE_THRESHOLD ? 1 : 0;
+
+                if (direction !== 0) {
+                    const targetX = direction * width;
+                    translateX.value = withTiming(targetX, { duration: 250 }, () => {
+                        scheduleOnRN(onSwiped);
+                        translateX.value = 0;
+                        isSwiping.value = false;
+                    });
+                } else {
+                    translateX.value = withSpring(0, {}, () => {
+                        isSwiping.value = false;
+                    });
+                }
             } else {
                 translateX.value = withSpring(0, {}, () => {
                     isSwiping.value = false;
@@ -66,8 +82,11 @@ export const Card = ({
             }
         });
 
-
     const wiggleX = useSharedValue(0);
+
+    const animatedScaleStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scaleCard.value }],
+    }));
 
     const animatedStyle = useAnimatedStyle(() => {
         const pos = (index - activeIndex.value + N) % N;
@@ -122,13 +141,19 @@ export const Card = ({
         <GestureDetector gesture={gesture}>
             <Animated.View style={[animatedStyle, styles.box]}>
                 <Link href={{ pathname: '/(screens)/anime/[id]', params: { id: anim.remote_ids.shikimori_id } }}>
-                    <View style={styles.fullSize}>
-                        <Animated.View style={[styles.fullSize, styles.card]}>
-                            <Image
-                                source={{ uri: `https:${anim.poster.huge}` }}
-                                style={styles.img}
-                                transition={600}
-                            />
+                    <View
+                        style={[
+                            styles.fullSize,
+                        ]}
+                    >
+                        <Animated.View style={[animatedScaleStyle, styles.box]}>
+                            <View style={[styles.fullSize, styles.card]}>
+                                <Image
+                                    source={{ uri: `https:${anim.poster.huge}` }}
+                                    style={styles.img}
+                                    transition={600}
+                                />
+                            </View>
                         </Animated.View>
                     </View>
                 </Link>
