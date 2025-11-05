@@ -49,17 +49,14 @@ export default function FolderScreen() {
     const [loading, setLoading] = useState(true);
 
     const fetch = async () => {
-        try {
-            if (!ids || !user) return;
+        if (!ids || !user) return setLoading(false);
 
-            const result = await getAnimeList({ ids: ids as string }, fileds);
-            return setAnime(result);
-        } catch (error) {
-            console.error("Failed to fetch anime:", error);
-            return [];
-        } finally {
-            setLoading(false);
-        }
+        await getAnimeList({ ids: ids as string }, fileds)
+            .then((res) => {
+                setAnime(res);
+            })
+            .catch(err => console.log('Ошибка в поулчении данных', err))
+        setLoading(false);
     }
 
     useEffect(() => { fetch(); }, [])

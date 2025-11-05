@@ -1,17 +1,26 @@
 
 import HeaderBackButton from "@/components/ui/HeaderBackButton";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { ThemedView } from "@/components/ui/ThemedView";
 import { useTheme } from "@/hooks/ThemeContext";
 import { HeaderButton } from "@react-navigation/elements";
 import { router, Stack } from "expo-router";
 import { Platform } from "react-native";
+import { Pressable } from "react-native-gesture-handler";
 
 const isIOS26 = Platform.Version >= "26.0";
 
 export default function ScreensLayout() {
     const isDarkMode = useTheme().theme === 'dark';
     return (
-        <Stack>
+        <Stack initialRouteName="homeScreen">
+            <Stack.Screen
+                name="homeScreen"
+                options={{
+                    headerShown: false,
+                }}
+            />
+
             {/* characters */}
             <Stack.Screen
                 name="characters/index"
@@ -47,9 +56,32 @@ export default function ScreensLayout() {
                 options={{
                     headerTransparent: true,
                     title: '',
-                    headerLeft: () => <HeaderButton onPress={router.back} style={{ justifyContent: 'center', alignItems: 'center', width: 35, height: 35 }}>
-                        <IconSymbol name="chevron.left" size={22} />
-                    </HeaderButton>
+                    headerTintColor: isDarkMode ? 'white' : 'white',
+                    headerBackButtonDisplayMode: 'minimal',
+                    headerLeft: () => (
+                        <Pressable
+                            hitSlop={30}
+                            onPress={() => router.back()}
+                            style={({ pressed }) => ({
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                width: 35, height: 35,
+                                opacity: pressed ? 0.8 : 1
+                            })}
+                        >
+                            {!isIOS26 ? (
+                                <ThemedView
+                                    darkColor='rgba(0,0,0,0.5)'
+                                    lightColor='rgba(255,255,255,0.4)'
+                                    style={{ padding: 8, borderRadius: 100 }}
+                                >
+                                    <IconSymbol name="chevron.left" size={22} />
+                                </ThemedView>
+                            ) : (
+                                <IconSymbol name="chevron.left" size={22} />
+                            )}
+                        </Pressable>
+                    )
                 }}
             />
             <Stack.Screen
@@ -274,6 +306,6 @@ export default function ScreensLayout() {
                     ...(Platform.Version < '26.0' && { headerBlurEffect: isDarkMode ? 'dark' : 'systemChromeMaterial' }),
                 }}
             />
-        </Stack>
+        </Stack >
     )
 }
