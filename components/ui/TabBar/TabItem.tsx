@@ -42,10 +42,7 @@ function TabItem({ route, isFocused, options, navigation }: TabItemProps) {
                     size: 24,
                 })
             ) : (
-                <UserTab
-                    isFocused={isFocused}
-                    color={iconColor}
-                />
+                <UserTab color={iconColor} />
             )}
         </HapticTab>
     );

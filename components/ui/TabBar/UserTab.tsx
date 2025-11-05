@@ -1,51 +1,46 @@
-import { auth } from "@/lib/firebase";
-import { useAnimeStore } from "@/store/animeStore";
-import { Button, ContextMenu, Host, Submenu } from "@expo/ui/swift-ui";
+import { useUserStore } from "@/store/userStore";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { View } from "react-native";
 import { IconSymbol } from "../IconSymbol";
 
-export const UserTab = ({ isFocused, color }: { isFocused: boolean; color: string }) => {
+export const UserTab = ({ color }: { color: string }) => {
+    const user = useUserStore(s => s.user);
+
     return (
         <>
-            {auth.currentUser ? (
-                <Host style={{ width: 28, height: 28 }}>
-                    <ContextMenu activationMethod='longPress'>
-                        <ContextMenu.Items>
-                            {__DEV__ &&
-                                <Button role='destructive' onPress={() => useAnimeStore.getState().clearAnimeMap()}>
-                                    Очистить AnimeMap
-                                </Button>
-                            }
-                            <Submenu
-                                key={'settings'}
-                                button={<Button systemImage={'gear'}>Settings</Button>}>
-                                <Button
-                                    onPress={() => router.push({ pathname: '/settings' })}
-                                >
-                                    Настройки
-                                </Button>
-                                <Button
-                                    variant="bordered"
-                                    systemImage="applepencil.and.scribble"
-                                    onPress={() => router.push({ pathname: '/dev-settings' })}
-                                >
-                                    DEV настройки
-                                </Button>
-                            </Submenu>
-                        </ContextMenu.Items>
-                        <ContextMenu.Trigger>
-                            {auth.currentUser && auth.currentUser.photoURL ? (
+            {user ? (
+                <View style={{ width: 28, height: 28 }}>
+                    {user ? (
+                        <>
+                            {(user.avatarURL || user.photoURL) ? (
                                 <Image
-                                    source={{ uri: auth.currentUser && auth.currentUser.photoURL || '' }}
-                                    style={{ width: 28, height: 28, borderRadius: 100, borderWidth: isFocused ? 1 : 0, borderColor: 'red' }}
+                                    source={{ uri: user.avatarURL || user.photoURL || '' }}
+                                    style={{
+                                        width: 28,
+                                        height: 28,
+                                        borderRadius: 100,
+                                        backgroundColor: 'gray'
+                                    }}
+                                    transition={300}
+                                    cachePolicy={'memory-disk'}
                                 />
                             ) : (
-                                <IconSymbol name="person.fill" size={28} color={color} />
+                                <IconSymbol
+                                    name="person.fill"
+                                    size={28}
+                                    color={color}
+                                />
                             )}
-                        </ContextMenu.Trigger>
-                    </ContextMenu>
-                </Host>
+                        </>
+
+                    ) : (
+                        <IconSymbol
+                            name="person.fill"
+                            size={28}
+                            color={color}
+                        />
+                    )}
+                </View>
             ) : (
                 <IconSymbol
                     size={28}
@@ -54,5 +49,5 @@ export const UserTab = ({ isFocused, color }: { isFocused: boolean; color: strin
                 />
             )}
         </>
-    )
-}
+    );
+};
