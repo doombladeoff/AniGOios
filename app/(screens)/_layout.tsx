@@ -49,7 +49,6 @@ export default function ScreensLayout() {
                     contentStyle: { backgroundColor: isDarkMode ? 'black' : 'white' },
                 }}
             />
-
             {/* anime */}
             <Stack.Screen
                 name="anime/[id]"
@@ -58,30 +57,33 @@ export default function ScreensLayout() {
                     title: '',
                     headerTintColor: isDarkMode ? 'white' : 'white',
                     headerBackButtonDisplayMode: 'minimal',
-                    headerLeft: () => (
-                        <Pressable
-                            hitSlop={30}
-                            onPress={() => router.back()}
-                            style={({ pressed }) => ({
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                width: 35, height: 35,
-                                opacity: pressed ? 0.8 : 1
-                            })}
-                        >
-                            {!isIOS26 ? (
-                                <ThemedView
-                                    darkColor='rgba(0,0,0,0.5)'
-                                    lightColor='rgba(255,255,255,0.4)'
-                                    style={{ padding: 8, borderRadius: 100 }}
-                                >
+                    headerBackTitle: 'Назад',
+                    ...(!isIOS26 && {
+                        headerLeft: () => (
+                            <Pressable
+                                hitSlop={30}
+                                onPress={() => router.back()}
+                                style={({ pressed }) => ({
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    width: 35, height: 35,
+                                    opacity: pressed ? 0.8 : 1
+                                })}
+                            >
+                                {!isIOS26 ? (
+                                    <ThemedView
+                                        darkColor='rgba(0,0,0,0.5)'
+                                        lightColor='rgba(255,255,255,0.4)'
+                                        style={{ padding: 8, borderRadius: 100 }}
+                                    >
+                                        <IconSymbol name="chevron.left" size={22} />
+                                    </ThemedView>
+                                ) : (
                                     <IconSymbol name="chevron.left" size={22} />
-                                </ThemedView>
-                            ) : (
-                                <IconSymbol name="chevron.left" size={22} />
-                            )}
-                        </Pressable>
-                    )
+                                )}
+                            </Pressable>
+                        ),
+                    })
                 }}
             />
             <Stack.Screen
