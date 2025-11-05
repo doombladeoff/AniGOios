@@ -102,7 +102,7 @@ function List({
                     iconName="arrow.right"
                     iconSize={22}
                     containerStyle={styles.headerStyle}
-                    onPress={() => router.push({ pathname: '/(tabs)/home/animelist', params: { typeRequest: typeRequest, headerText: headerText } })}
+                    onPress={() => router.push({ pathname: '/homeScreen/home/animelist', params: { typeRequest: typeRequest, headerText: headerText } })}
                 />
             }
 

@@ -77,7 +77,7 @@ const useAuthCheck = () => {
                     setUser(combinedUser);
                     setIsAuth(true);
                 }
-                setIsLoading(false);
+                setTimeout(() => setIsLoading(false), 300);
             });
 
             return () => unsubscribeSnapshot();
@@ -106,8 +106,7 @@ const AuthenticatedLayout = ({ isAuth }: { isAuth: boolean }) => {
             </Stack.Protected>
 
             <Stack.Protected guard={isAuth}>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="(screens)" options={{ headerShown: false }} />
+                <Stack.Screen name="(screens)" options={{ headerShown: false, animation: 'fade' }} />
                 <Stack.Screen name="+not-found" />
             </Stack.Protected>
         </Stack>

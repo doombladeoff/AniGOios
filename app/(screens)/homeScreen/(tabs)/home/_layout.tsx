@@ -53,7 +53,7 @@ export default function HomeLayout() {
                                 type: 'sfSymbol',
                                 name: 'calendar',
                             },
-                            onPress: () => router.push('/home/calendar'),
+                            onPress: () => router.push('/homeScreen/home/calendar'),
                         },
                         {
                             type: 'spacing',
@@ -67,7 +67,7 @@ export default function HomeLayout() {
                                 type: 'sfSymbol',
                                 name: 'bookmark.fill',
                             },
-                            onPress: () => router.push('/home/favorite'),
+                            onPress: () => router.push('/homeScreen/home/favorite'),
                         },
                     ],
                     headerLeft: () => <HeaderLeft />,

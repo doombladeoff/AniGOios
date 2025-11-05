@@ -38,7 +38,7 @@ const Input = ({ onOpenFilter }: { onOpenFilter?: (v: boolean) => void }) => {
                 </Animated.View>
             )}
             <Animated.View entering={FadeIn} exiting={FadeOut}>
-                <Pressable onPress={() => router.push({ pathname: '/search/filter' })} style={{ marginLeft: 8 }}>
+                <Pressable onPress={() => router.push({ pathname: '/homeScreen/search/filter' })} style={{ marginLeft: 8 }}>
                     <IconSymbol name="slider.horizontal.3" size={22} color="#007AFF" />
                 </Pressable>
             </Animated.View>
