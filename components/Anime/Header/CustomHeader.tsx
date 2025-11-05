@@ -3,7 +3,7 @@ import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/hooks/ThemeContext";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
-import React, { useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Animated, {
     SharedValue,
@@ -125,4 +125,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CustomHeader;
+export default memo(CustomHeader);

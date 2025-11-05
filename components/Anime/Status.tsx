@@ -64,18 +64,19 @@ export const Status = ({ showType, id, status, textStyle, containerStyle }: Stat
     }, [id, auth.currentUser?.uid, status]);
 
     const resolvedStatus = status ?? statusHeader;
-    if (!resolvedStatus) return null;
 
     const bgColor = statusColors[resolvedStatus] ?? "transparent";
     const fontSize = status ? 12 : 15;
+
+    if (!resolvedStatus) return null;
 
     return (
         <Animated.View
             entering={showInHeader ? FadeInUp : FadeIn}
             exiting={FadeOutUp}
             style={[
+                { top: showInHeader ? headerHeight / 1.55 : 5 },
                 containerStyle,
-                { top: showInHeader ? headerHeight / 1.55 : 5 }
             ]}
         >
             <View style={[styles.statusView, { backgroundColor: bgColor }]}>

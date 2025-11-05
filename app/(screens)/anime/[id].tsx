@@ -1,7 +1,5 @@
-import React, { useCallback, useRef } from "react";
-
 import { AnimeStatusEnum } from "@/API/Shikimori/Shikimori.types";
-import Bookmark from "@/components/Anime/Bookmark";
+import { Controls } from "@/components/Anime/Controls";
 import {
     CharacterList,
     GenresList,
@@ -10,36 +8,32 @@ import {
     Screenshots
 } from "@/components/Anime/Details";
 import CustomHeader from "@/components/Anime/Header/CustomHeader";
-import { HeaderRight } from "@/components/Anime/Header/HeaderRight";
+import { default as HeaderRightMenu } from "@/components/Anime/Header/HeaderRightMenu";
 import Player from "@/components/Anime/Player";
 import { CrunchyPoster, Poster3D } from "@/components/Anime/Posters";
-import { Items } from "@/components/ContextComponent/ContextMenu";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import BackgroundBlur from "@/components/ui/BackgroundBlur";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useAnimeFetch } from "@/hooks/anime/useAnimeFetch";
 import { useTheme } from "@/hooks/ThemeContext";
-import { auth } from "@/lib/firebase";
-import { storage } from "@/utils/storage";
+import { cleanDescription } from "@/utils/cleanDescription";
 import {
-    LiquidGlassView as GlassView,
     isLiquidGlassSupported
 } from '@callstack/liquid-glass';
+import { Host } from "@expo/ui/swift-ui";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
+import React, { useCallback, useMemo, useRef } from "react";
+import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, useAnimatedRef, useScrollOffset } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AnimeScreen() {
-    const showStatus = storage.getShowStatus() ?? true;
     const isDarkMode = useTheme().theme === 'dark';
     const insets = useSafeAreaInsets();
 
-    const { id } = useLocalSearchParams();
-    const { animeData, isLoading, useCrunch, usePoster3D, backgroundImage } = useAnimeFetch(id as string);
-
+    const { id } = useLocalSearchParams<{ id: string }>();
+    const { animeData, isLoading, useCrunch, usePoster3D } = useAnimeFetch(id as string);
     const isAnons = animeData?.status === AnimeStatusEnum.anons;
 
     //Player
@@ -52,21 +46,36 @@ export default function AnimeScreen() {
     }, []);
 
     const fallbackImage = animeData?.poster?.originalUrl;
-
-    const headerRightItems: Items[] = [
-        {
-            title: 'Больше информации',
-            onSelect: () => router.push({ pathname: '/anime/details', params: { id: id } }),
-            iconName: 'info.circle.fill'
-        }
-    ];
-
-    const handleNavToComments = useCallback((() => router.push({
-        pathname: '/(screens)/comments',
-        params: { id: animeData.malId }
-    })), [animeData]);
-
     const scrollOffset = useScrollOffset(scrollRef);
+
+    const handleNavigateToDetails = () => {
+        router.push({
+            pathname: '/anime/details',
+            params: { id: id }
+        })
+    };
+
+    const headerRight = useMemo(() => (
+        <>
+            {Platform.Version < '26.0' ? (
+                <Host style={{ width: 40, height: 40, justifyContent: 'center', alignItems: 'center' }}>
+                    <ThemedView
+                        darkColor='rgba(0,0,0,0.5)'
+                        lightColor='rgba(255,255,255,0.4)'
+                        style={{ width: 40, height: 40, padding: 0, borderRadius: 100, justifyContent: 'center', alignItems: 'center' }}
+                    >
+                        <HeaderRightMenu id={id as string} />
+                    </ThemedView>
+                </Host>
+            ) : (
+                <Host style={{ width: 35, height: 35, justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={{ width: 35, height: 35, justifyContent: 'center', alignItems: 'center' }}>
+                        <HeaderRightMenu id={id as string} />
+                    </View>
+                </Host>
+            )}
+        </>
+    ), [id]);
 
     if (isLoading) {
         return (
@@ -79,189 +88,98 @@ export default function AnimeScreen() {
     };
 
     return (
-        <ThemedView lightColor="white" darkColor="black" style={{ flex: 1 }}>
-            <Stack.Screen
-                options={{
-                    headerRight: () => <HeaderRight
-                        img={{ crunch: backgroundImage || '', def: animeData?.poster?.originalUrl }}
-                        customItems={headerRightItems}
-                    />
-                }}
-            />
+        <>
+            <Stack.Screen options={{ headerRight: () => headerRight }} />
 
-            <CustomHeader
-                animeData={animeData}
-                fallbackImage={fallbackImage}
-                scrollY={scrollOffset}
-            />
+            <ThemedView lightColor="white" darkColor="black" style={{ flex: 1 }}>
+                <CustomHeader
+                    animeData={animeData}
+                    fallbackImage={fallbackImage}
+                    scrollY={scrollOffset}
+                />
 
-            <ParallaxScrollView
-                ref={scrollRef}
-                scrollEventThrottle={16}
-                entering={FadeIn.duration(500)}
-                showsVerticalScrollIndicator={false}
-                style={{ backgroundColor: isDarkMode ? 'black' : 'white' }}
-                headerBackgroundColor={{ dark: 'black', light: 'white' }}
-                HEADER_HEIGHT={
-                    useCrunch ? 600 :
-                        usePoster3D ? 470 : 0}
-                useScale={useCrunch ? true : false}
-                headerImage={
-                    <View>
-                        {useCrunch && (
-                            <CrunchyPoster
-                                id={Number(id)}
-                                showStatus={showStatus}
-                            />
-                        )}
+                <ParallaxScrollView
+                    ref={scrollRef}
+                    scrollEventThrottle={16}
+                    entering={FadeIn.duration(500)}
+                    showsVerticalScrollIndicator={false}
+                    headerBackgroundColor={{ dark: 'black', light: 'white' }}
+                    overScrollMode='never'
+                    removeClippedSubviews
+                    HEADER_HEIGHT={
+                        useCrunch ? 600 :
+                            usePoster3D ? 470 : 0}
+                    useScale={useCrunch}
+                    headerImage={
+                        <View>
+                            {useCrunch && (
+                                <CrunchyPoster id={Number(id)} />
+                            )}
 
-                        {usePoster3D && (
-                            <Poster3D
-                                img={animeData?.poster.main2xUrl}
-                                imgSmall={animeData?.poster.mainUrl}
-                                showStatus={showStatus}
-                                id={id as string}
-                            />
-                        )}
-                    </View>
-                }
-            >
-                <Animated.View entering={FadeIn.duration(700).delay(usePoster3D ? 700 : 500)} style={{ gap: 16, paddingBottom: insets.bottom }}>
-                    <View style={{ paddingHorizontal: 10, marginTop: usePoster3D ? 20 : 40 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 30, height: 50 }}>
-                            {auth.currentUser &&
-                                <GlassView interactive style={{
-                                    position: 'absolute',
-                                    left: 20,
-                                    width: 50, height: 50, justifyContent: 'center', alignItems: 'center', borderRadius: 100,
-                                    shadowColor: '#000',
-                                    shadowOpacity: 0.2,
-                                    shadowRadius: 4,
-                                    shadowOffset: { width: 0, height: 0 },
-                                    ...(!isLiquidGlassSupported && { backgroundColor: 'white' })
-                                }}>
-                                    <Bookmark
-                                        id={id as string}
-                                        isAnons={isAnons}
-                                    />
-                                </GlassView>
-                            }
-                            <Pressable disabled={isAnons} onPress={handleScrollToContent} style={{ height: 40, alignSelf: 'center', position: 'absolute' }}>
-                                <ThemedView
-                                    lightColor="black"
-                                    darkColor="white"
-                                    style={{
-                                        alignItems: 'center',
-                                        ...(isAnons && { backgroundColor: 'red' }),
-                                        flexDirection: 'row',
-                                        gap: 10,
-                                        padding: 12,
-                                        paddingHorizontal: 40, borderRadius: 12,
-                                        shadowColor: 'black',
-                                        shadowOpacity: 0.6,
-                                        shadowRadius: 6,
-                                        shadowOffset: { width: 0, height: 0 },
-                                    }}
-                                >
-                                    {!isAnons && <IconSymbol name="play.fill" color={isDarkMode ? 'black' : 'white'} size={18} />}
-                                    <ThemedText
-                                        lightColor="white"
-                                        darkColor="black"
-                                        style={{ fontSize: 16, fontWeight: '500' }}>{!isAnons ? "Смотреть" : "Анонс"}</ThemedText>
-                                </ThemedView>
-                            </Pressable>
-
-                            <GlassView interactive style={{
-                                position: 'absolute',
-                                right: 20,
-                                borderRadius: 100, justifyContent: 'center', alignItems: 'center', width: 50, height: 50,
-                                shadowColor: '#000',
-                                shadowOpacity: 0.2,
-                                shadowRadius: 4,
-                                shadowOffset: { width: 0, height: 0 },
-                                ...(!isLiquidGlassSupported && { backgroundColor: 'white' })
-                            }}>
-                                <Pressable
-                                    onPress={handleNavToComments} style={{ padding: 8 }}>
-                                    <IconSymbol name="bubble.left.and.text.bubble.right.fill" size={28} color={isLiquidGlassSupported ? isDarkMode ? 'white' : 'black' : 'black'} />
-                                </Pressable>
-                            </GlassView>
-                        </View>
-                    </View>
-
-                    <GenresList
-                        id={Number(id)}
-                        listStyle={{ paddingHorizontal: 10, marginTop: 10, paddingBottom: 0 }}
-                        tintColor={"rgba(219, 45, 105, 0.25)"}
-                        genreStyle={{
-                            ...(!isLiquidGlassSupported ? { backgroundColor: "rgba(219, 45, 105, 0.25)" } : undefined),
-                            padding: 5,
-                            borderRadius: 12,
-                            marginRight: 10,
-                        }}
-                        genreTextStyle={{
-                            padding: 5,
-                            color: "#DB2D69",
-                            fontSize: 14,
-                            fontWeight: "500",
-                        }}
-                    />
-
-                    <NextEpisodeInfo
-                        id={Number(id)}
-                        style={styles.nextExpisode}
-                        textStyle={{ fontSize: 15, fontWeight: '500' }}
-                        icon="clock"
-                    />
-
-                    <Screenshots
-                        id={Number(id)}
-                        containerStyle={{ paddingHorizontal: 10, paddingTop: 10 }}
-                        imageStyle={{ width: 280, height: 160, borderRadius: 12, marginLeft: 0, margin: 10, backgroundColor: 'gray' }}
-                        headerText="Скриншоты"
-                        headerTextStyle={{ paddingHorizontal: 15, fontSize: 18, fontWeight: '600', zIndex: 22, marginTop: 10 }}
-                    />
-
-                    {(!isAnons) &&
-                        <View onLayout={(e) => playerPosition.current = e.nativeEvent.layout.y * 1.75}>
-                            <Player id={id as string} />
+                            {usePoster3D && (
+                                <Poster3D id={id as string} />
+                            )}
                         </View>
                     }
+                >
+                    <Animated.View entering={FadeIn.duration(700).delay(usePoster3D ? 700 : 500)} style={{ gap: 16, paddingBottom: insets.bottom }}>
+                        <Controls watchPress={handleScrollToContent} id={id} />
 
-                    <CharacterList id={Number(id)} />
+                        <GenresList
+                            id={Number(id)}
+                            listStyle={{ paddingHorizontal: 10, marginTop: 10, paddingBottom: 0 }}
+                            tintColor={"rgba(219, 45, 105, 0.25)"}
+                            genreStyle={{
+                                ...(!isLiquidGlassSupported ? { backgroundColor: "rgba(219, 45, 105, 0.25)" } : undefined),
+                                padding: 5,
+                                borderRadius: 12,
+                                marginRight: 10,
+                            }}
+                            genreTextStyle={{
+                                padding: 5,
+                                color: "#DB2D69",
+                                fontSize: 14,
+                                fontWeight: "500",
+                            }}
+                        />
 
-                    <RecommendationList id={Number(id)} showTitle />
+                        {animeData.description && (
+                            <View style={{ paddingHorizontal: 15 }}>
+                                <ThemedText numberOfLines={4}>{cleanDescription(animeData?.description)}</ThemedText>
+                                <Pressable
+                                    onPress={handleNavigateToDetails}
+                                    style={{ marginTop: 20 }}
+                                >
+                                    <Text style={{ color: 'orange', fontSize: 14 }}>Подробнее</Text>
+                                </Pressable>
+                            </View>
+                        )}
 
-                </Animated.View>
-            </ParallaxScrollView>
-        </ThemedView>
-    )
+                        <NextEpisodeInfo id={Number(id)} icon="clock" />
+
+                        <Screenshots
+                            id={Number(id)}
+                            containerStyle={{ paddingHorizontal: 10, paddingTop: 10 }}
+                            imageStyle={{ width: 280, height: 160, borderRadius: 26, marginLeft: 0, margin: 10, backgroundColor: 'gray' }}
+                            headerText="Скриншоты"
+                            headerTextStyle={{ paddingHorizontal: 15, fontSize: 18, fontWeight: '600', zIndex: 22, marginTop: 10 }}
+                        />
+
+                        {(!isAnons) &&
+                            <View onLayout={(e) => {
+                                playerPosition.current = e.nativeEvent.layout.y + insets.top;
+                            }}>
+                                <Player id={id as string} />
+                            </View>
+                        }
+
+                        <CharacterList id={Number(id)} />
+
+                        <RecommendationList id={Number(id)} showTitle />
+
+                    </Animated.View>
+                </ParallaxScrollView>
+            </ThemedView>
+        </>
+    );
 };
-
-const styles = StyleSheet.create({
-    commentsBtn: {
-        paddingVertical: 14,
-        borderRadius: 16,
-        backgroundColor: "#0A84FF",
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 24,
-        marginHorizontal: 10,
-    },
-    commentsTextBtn: {
-        color: "white",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    nextExpisode: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 10,
-        marginHorizontal: 10,
-        gap: 10,
-        backgroundColor: 'rgba(68, 68, 68, 0.5)',
-        padding: 10,
-        borderRadius: 12,
-        zIndex: 23
-    }
-})

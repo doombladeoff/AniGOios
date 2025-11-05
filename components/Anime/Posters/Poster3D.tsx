@@ -1,43 +1,44 @@
-import { Card } from "@/components/Anime/Card";
 import { useTheme } from "@/hooks/ThemeContext";
+import { useAnimeStore } from "@/store/animeStore";
+import { storage } from "@/utils/storage";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { memo } from "react";
-import { ColorValue, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Status } from "../Status";
 
 interface Poster3DProps {
-    showStatus: boolean;
-    img: string;
-    imgSmall: string;
+    img?: string;
+    imgSmall?: string;
     id: string
 };
 
-const GradeintColorsDark = ['transparent', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,1)'] as [ColorValue, ColorValue, ...ColorValue[]];
-const GradeintColorsLight = ['transparent', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.45)', 'rgba(255, 255, 255, 1)'] as [ColorValue, ColorValue, ...ColorValue[]];
+const GradeintColorsDark = ['transparent', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,1)'] as const;
+const GradeintColorsLight = ['transparent', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.45)', 'rgba(255, 255, 255, 1)'] as const;
 
-const Poster3D = ({ showStatus, img, imgSmall, id }: Poster3DProps) => {
+const Poster3D = ({ img, imgSmall, id }: Poster3DProps) => {
+    const showStatus = storage.getShowStatus() ?? true;
+    const { poster } = useAnimeStore((s) => s.animeMap[Number(id)]);
+
     const insets = useSafeAreaInsets();
     const GradientColors = useTheme().theme === 'dark' ? GradeintColorsDark : GradeintColorsLight;
-    
+
     return (
         <View>
             <Animated.View entering={FadeIn.duration(1000)} style={[styles.container, { marginVertical: insets.top }, styles.shadow]}>
-                <Card>
-                    {showStatus && <Status id={id} showType="poster" containerStyle={styles.statusContainer} />}
-                    <Image
-                        source={{ uri: img }}
-                        style={{ width: 240, height: 340, borderRadius: 12 }}
-                        priority={'high'}
-                        transition={500}
-                        contentFit="cover"
-                    />
-                </Card>
+                {showStatus && <Status id={id} showType="poster" containerStyle={styles.statusContainer} />}
+                <Image
+                    source={{ uri: poster.main2xUrl || img }}
+                    style={{ width: 240, height: 340, borderRadius: 26 }}
+                    priority={'high'}
+                    transition={500}
+                    contentFit="cover"
+                />
             </Animated.View>
             <LinearGradient colors={GradientColors} style={styles.gradient} />
-            <Image priority={'high'} transition={300} source={{ uri: imgSmall }} style={styles.backImage} blurRadius={30} contentFit='cover' />
+            <Image priority={'high'} transition={300} source={{ uri: poster.mainUrl || imgSmall }} style={styles.backImage} blurRadius={15} contentFit='cover' />
         </View>
     )
 }
@@ -51,10 +52,10 @@ const styles = StyleSheet.create({
         zIndex: 100
     },
     shadow: {
-        shadowColor: 'black',
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
-        shadowOffset: { height: 2, width: 0 }
+        shadowColor: '#000',
+        shadowOpacity: 0.6,
+        shadowRadius: 16,
+        shadowOffset: { height: 0, width: 0 }
     },
     gradient: {
         position: 'absolute',
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
         transform: [{ rotateX: '0deg' }]
     },
     statusContainer: {
-        top: 4,
+        top: 40,
         zIndex: 200,
         position: "absolute",
         alignSelf: "center",

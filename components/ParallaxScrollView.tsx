@@ -34,8 +34,10 @@ const ParallaxScrollView = forwardRef<Animated.ScrollView, Props>(
         const innerRef = useAnimatedRef<Animated.ScrollView>();
         const scrollRef = (ref as React.RefObject<Animated.ScrollView>) || innerRef;
 
+        const scale = useScale ? [2, 1, 1] : [1, 1, 1];
         const scrollOffset = useScrollOffset(scrollRef);
         const headerAnimatedStyle = useAnimatedStyle(() => {
+            // console.log(scrollOffset.value)
             return {
                 transform: [
                     {
@@ -49,7 +51,7 @@ const ParallaxScrollView = forwardRef<Animated.ScrollView, Props>(
                     {
                         scale: interpolate(scrollOffset.value,
                             [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-                            useScale ? [2, 1, 1] : [1, 1, 1]),
+                            scale),
                     },
                 ],
             };
@@ -66,7 +68,7 @@ const ParallaxScrollView = forwardRef<Animated.ScrollView, Props>(
                     <Animated.View
                         style={[
                             styles.header,
-                            { height: HEADER_HEIGHT, },
+                            { height: HEADER_HEIGHT },
                             headerAnimatedStyle,
                         ]}>
                         {headerImage}
@@ -85,11 +87,12 @@ const styles = StyleSheet.create({
     },
     header: {
         overflow: 'hidden',
-        zIndex: 2
+        zIndex: 0,
     },
     content: {
         flex: 1,
         gap: 16,
         overflow: 'hidden',
+        zIndex: 3,
     },
 });

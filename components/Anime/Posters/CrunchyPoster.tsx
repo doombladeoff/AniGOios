@@ -1,16 +1,17 @@
 import { useTheme } from "@/hooks/ThemeContext"
 import { useAnimeStore } from "@/store/animeStore"
+import { storage } from "@/utils/storage"
 import { Image, ImageStyle } from "expo-image"
 import { LinearGradient } from "expo-linear-gradient"
 import { memo, useEffect, useMemo, useState } from "react"
-import { ColorValue, Dimensions, Image as RNImage, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
+import { Dimensions, Image as RNImage, StyleProp, StyleSheet, View, ViewStyle } from "react-native"
 import Animated, { EntryOrExitLayoutType, FadeInDown } from "react-native-reanimated"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useShallow } from "zustand/shallow"
 import { Status } from "../Status"
 
 interface CrunchyPosterProps {
     id: number;
-    showStatus: boolean;
     statusHeader?: string;
     showLogo?: boolean;
     statusContainer?: StyleProp<ViewStyle>;
@@ -18,11 +19,12 @@ interface CrunchyPosterProps {
     imagestyle?: StyleProp<ImageStyle>;
 }
 
-const GradeintColorsDark = ['transparent', 'rgba(0,0,0,0.15)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,1)'] as [ColorValue, ColorValue, ...ColorValue[]];
-const GradeintColorsLight = ['transparent', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.45)', 'rgba(255, 255, 255, 1)'] as [ColorValue, ColorValue, ...ColorValue[]];
+const GradeintColorsDark = ['transparent', 'rgba(0,0,0,0.15)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,1)'] as const;
+const GradeintColorsLight = ['transparent', 'rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.45)', 'rgba(255, 255, 255, 1)'] as const;
 
-const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id, statusContainer, animationEntering, imagestyle }: CrunchyPosterProps) => {
+const CrunchyPoster = ({ showLogo = true, id, statusContainer, animationEntering, imagestyle }: CrunchyPosterProps) => {
     const isDarkMode = useTheme().theme === 'dark';
+    const showStatus = storage.getShowStatus() ?? true;
 
     const { hasTall, hasWide, crunchyId, animeData } = useAnimeStore(useShallow(s => ({
         hasTall: s.animeMap[id]?.crunchyroll.hasTallThumbnail,
@@ -57,10 +59,12 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id, statusCo
 
     return (
         <View>
-            {showStatus && <Status id={String(id)} showType="header" containerStyle={statusContainer || style.statusContainer} />}
+            {showStatus && <Status id={String(id)} showType="header" containerStyle={[statusContainer || style.statusContainer, {
+                top: useSafeAreaInsets().top + 10,
+            }]} />}
             <LinearGradient
                 colors={isDarkMode ? GradeintColorsDark : GradeintColorsLight}
-                style={[StyleSheet.absoluteFill, { width: '100%', height: '100%', zIndex: 1 }]}
+                style={[StyleSheet.absoluteFill, { width: '100%', height: '80%', top: '20%', zIndex: 1 }]}
                 pointerEvents='none'
             />
 
@@ -70,7 +74,7 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id, statusCo
                     style={[imagestyle || {
                         width: '100%',
                         height: '100%',
-                        backgroundColor: 'black'
+                        backgroundColor: 'black',
                     }]}
                     contentFit="cover"
                     contentPosition={'top'}
@@ -79,19 +83,20 @@ const CrunchyPoster = ({ showStatus, statusHeader, showLogo = true, id, statusCo
             </Animated.View>
 
             {(showLogo && img_logo) &&
-                <Animated.View entering={FadeInDown.duration(700)} style={[style.logoImg, !isDarkMode && { shadowColor: 'black', shadowOpacity: 0.65, shadowRadius: 8, shadowOffset: { width: 0, height: 0 } }]}>
+                <Animated.View entering={FadeInDown.duration(700)} style={[style.logoImg, !isDarkMode && { shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 6, shadowOffset: { width: 0, height: 0 } }]}>
                     <Image source={{ uri: img_logo }}
                         style={{
                             width: size.width,
                             height: size.height,
-                            backgroundColor: 'transparent', margin: 10
+                            backgroundColor: 'transparent',
+                            margin: 10
                         }}
                         transition={400}
                         contentFit='contain' />
                 </Animated.View>
             }
         </View>
-    )
+    );
 };
 
 const style = StyleSheet.create({
@@ -102,7 +107,6 @@ const style = StyleSheet.create({
         position: 'absolute'
     },
     statusContainer: {
-        top: 4,
         zIndex: 200,
         position: "absolute",
         alignSelf: "center",
