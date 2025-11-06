@@ -19,10 +19,10 @@ async function fetchAnimeById(id: number | string, fetchCrunch: boolean) {
         getAnimeYummy(id as string),
     ]);
 
-    if (!animeShiki || !animeListData) return null;
+    if (!animeShiki) return null;
 
     const [crunchData, yummyRecs, yummyEpisodes] = await Promise.all([
-        fetchCrunch ? getCrunchyrollIData(animeListData, animeShiki.malId) : null,
+        (fetchCrunch && animeListData) ? getCrunchyrollIData(animeListData, animeShiki.malId) : null,
         (!recommendsJikan.length && yummy.length) ? getRecommendationsYummy(yummy[0].anime_id) : [],
         false ? getEpisodesFromYummy({ shikimori_id: animeShiki.malId }) : [],
     ]);
@@ -32,7 +32,7 @@ async function fetchAnimeById(id: number | string, fetchCrunch: boolean) {
     return {
         ...animeShiki,
         crunchyroll: crunchData,
-        animeList: animeListData,
+        ...(animeListData && { animeList: animeListData }),
         recommendations,
         yummyEpisodes,
     };

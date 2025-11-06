@@ -48,12 +48,12 @@ export default function AnimeScreen() {
     const fallbackImage = animeData?.poster?.originalUrl;
     const scrollOffset = useScrollOffset(scrollRef);
 
-    const handleNavigateToDetails = () => {
+    const handleNavigateToDetails = useCallback(() => {
         router.push({
             pathname: '/anime/details',
-            params: { id: id }
-        })
-    };
+            params: { id }
+        });
+    }, [id]);
 
     const headerRight = useMemo(() => (
         <>
@@ -143,7 +143,7 @@ export default function AnimeScreen() {
                             }}
                         />
 
-                        {animeData.description && (
+                        {animeData?.description && (
                             <View style={{ paddingHorizontal: 15 }}>
                                 <ThemedText numberOfLines={4}>{cleanDescription(animeData?.description)}</ThemedText>
                                 <Pressable
