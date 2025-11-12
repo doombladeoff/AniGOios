@@ -79,7 +79,7 @@ export default function AnimeScreen() {
         </>
     ), [id]);
 
-    if (!isLoading) {
+    if (isLoading) {
         return (
             <ThemedView lightColor="white" darkColor="black" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <Background top={-headerHeight} />
