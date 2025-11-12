@@ -1,3 +1,4 @@
+import { AnimeStatusEnum } from "@/API/Shikimori/Shikimori.types";
 import { useTheme } from "@/hooks/ThemeContext";
 import { auth, db } from "@/lib/firebase";
 import {
@@ -27,10 +28,11 @@ interface ControlsPorps {
 };
 
 export const Controls = ({ watchPress, id }: ControlsPorps) => {
-    const { russian, poster } = useAnimeStore((s) => s.animeMap[id as number]);
+    const { russian, poster, status } = useAnimeStore((s) => s.animeMap[id as number]);
+    const isAnons = status === AnimeStatusEnum.anons;
     const isDarkMode = useTheme().theme === 'dark';
 
-    const accent = "#ff6b35";
+    const accent = !isAnons ? "#ff6b35" : 'red';
     const glassColor = isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.6)";
     const textColor = isDarkMode ? "#FFF" : "#1A1A1A";
 
@@ -82,9 +84,10 @@ export const Controls = ({ watchPress, id }: ControlsPorps) => {
     return (
         <View style={style.container}>
             <Pressable
+                disabled={isAnons}
                 onPress={watchPress}
                 style={({ pressed }) => ({
-                    opacity: pressed ? 0.9 : 1,
+                    opacity: isAnons ? 0.7 : pressed ? 0.9 : 1,
                     flex: 1,
                 })}
             >
@@ -107,7 +110,7 @@ export const Controls = ({ watchPress, id }: ControlsPorps) => {
                             fontSize: 16,
                         }}
                     >
-                        Смотреть
+                        {!isAnons ? 'Смотреть' : 'Анонс'}
                     </ThemedText>
                 </LiquidGlassView>
             </Pressable>
