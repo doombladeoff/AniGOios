@@ -1,4 +1,5 @@
 import { getAnime } from '@/API/Yummy/getAnimeYummy';
+import { getYummySchedule, ScheduleAnime, ScheduleSectionType } from '@/API/Yummy/getSchedule';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { ThemedView } from '@/components/ui/ThemedView';
 import { useTheme } from '@/hooks/ThemeContext';
@@ -17,7 +18,6 @@ import {
     StyleSheet,
     View
 } from 'react-native';
-import { RefreshControl } from 'react-native-gesture-handler';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('screen');
@@ -25,84 +25,17 @@ const ITEM_MARGIN = 5;
 const NUM_COLUMNS = 3;
 const ITEM_WIDTH = (width - ITEM_MARGIN * 2 * NUM_COLUMNS) / NUM_COLUMNS;
 
-const WEEK_DAYS = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
-
-type Anime = {
-    anime_id: number;
-    title: string;
-    episodes: {
-        next_date: number;
-    };
-    poster: {
-        fullsize: string;
-        big: string;
-        small: string;
-        medium: string;
-        huge: string;
-        mega: string;
-    },
-};
-
-type SectionType = {
-    title: string;
-    data: Anime[][];
-};
-
 export default function CalendarScreen() {
     const isDarkMode = useTheme().theme === 'dark';
     const headerHeight = useHeaderHeight();
     const bottomHeight = useBottomHeight();
-    const [sections, setSections] = useState<SectionType[]>([]);
+    const [sections, setSections] = useState<ScheduleSectionType[]>([]);
     const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-
-    const fetchSchedule = async () => {
-        try {
-            const res = await fetch('https://api.yani.tv/anime/schedule');
-            const json = await res.json();
-            const data: Anime[] = Array.isArray(json) ? json : json.response || [];
-            const now = Math.floor(Date.now() / 1000);
-
-            const scheduleByDay: Record<string, Anime[]> = {
-                Понедельник: [],
-                Вторник: [],
-                Среда: [],
-                Четверг: [],
-                Пятница: [],
-                Суббота: [],
-                Воскресенье: [],
-            };
-
-            data.forEach(anime => {
-                if (anime.episodes?.next_date && anime.episodes.next_date > now) {
-                    const date = new Date(anime.episodes.next_date * 1000);
-                    const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
-                    const dayName = WEEK_DAYS[dayIndex];
-                    scheduleByDay[dayName].push(anime);
-                }
-            });
-
-            const sectionsData: SectionType[] = WEEK_DAYS.map(day => {
-                const items = scheduleByDay[day];
-                const chunked: Anime[][] = [];
-                for (let i = 0; i < items.length; i += NUM_COLUMNS) {
-                    chunked.push(items.slice(i, i + NUM_COLUMNS));
-                }
-                return { title: day, data: chunked };
-            }).filter(s => s.data.length > 0);
-
-            setSections(sectionsData);
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setRefreshing(false);
-            setLoading(false);
-        }
-    };
 
     useEffect(() => {
-        if (loading)
-            fetchSchedule();
+        getYummySchedule()
+            .then((r) => setSections(r))
+            .finally(() => setLoading(false))
     }, []);
 
     const handleNavigate = async (id: number | string) => {
@@ -120,21 +53,15 @@ export default function CalendarScreen() {
         }
     };
 
-    const renderRow = (rowData: Anime[]) => (
+    const renderRow = (rowData: ScheduleAnime[]) => (
         <Animated.View entering={FadeIn} style={styles.row}>
             {rowData.map(anime => (
                 <Pressable
                     key={anime.title}
                     onPress={() => handleNavigate(anime.anime_id)}
-                    style={styles.item}
+                    style={({ pressed }) => ([styles.item, { opacity: pressed ? 0.9 : 1 }])}
                 >
-                    <View style={{
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 4 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 5,
-                        elevation: 5,
-                    }}>
+                    <View style={styles.shadow}>
                         <Image
                             source={{ uri: `https:${anime.poster.big}` }}
                             style={styles.image}
@@ -185,12 +112,6 @@ export default function CalendarScreen() {
                 contentInsetAdjustmentBehavior='automatic'
                 contentContainerStyle={{ paddingBottom: bottomHeight }}
                 scrollIndicatorInsets={{ bottom: bottomHeight }}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={() => { setRefreshing(true); fetchSchedule() }}
-                    />
-                }
             />
         </ThemedView>
     );
@@ -226,5 +147,12 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'left',
         marginTop: 5,
+    },
+    shadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 5,
     }
 });
