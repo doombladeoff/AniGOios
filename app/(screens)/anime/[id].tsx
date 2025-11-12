@@ -22,15 +22,17 @@ import {
     isLiquidGlassSupported
 } from '@callstack/liquid-glass';
 import { Host } from "@expo/ui/swift-ui";
+import { useHeaderHeight } from "@react-navigation/elements";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useMemo, useRef } from "react";
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Platform, Pressable, Text, View } from "react-native";
 import Animated, { FadeIn, useAnimatedRef, useScrollOffset } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AnimeScreen() {
     const isDarkMode = useTheme().theme === 'dark';
     const insets = useSafeAreaInsets();
+    const headerHeight = useHeaderHeight();
 
     const { id } = useLocalSearchParams<{ id: string }>();
     const { animeData, isLoading, useCrunch, usePoster3D } = useAnimeFetch(id as string);
@@ -77,10 +79,10 @@ export default function AnimeScreen() {
         </>
     ), [id]);
 
-    if (isLoading) {
+    if (!isLoading) {
         return (
             <ThemedView lightColor="white" darkColor="black" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Background style={[StyleSheet.absoluteFillObject]} />
+                <Background top={-headerHeight} />
                 <ActivityIndicator size='small' color={isDarkMode ? 'white' : 'black'} />
                 <ThemedText lightColor="black" darkColor="white" style={{ textAlign: 'center', marginTop: 20 }}>Загрузка...</ThemedText>
             </ThemedView>
