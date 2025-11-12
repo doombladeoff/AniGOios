@@ -3,7 +3,7 @@ import { AnimeFields } from "@/API/Shikimori/RequestFields.type";
 import { ShikimoriAnime } from "@/API/Shikimori/Shikimori.types";
 import { FolderItem } from "@/components/Screens/Folders/FolderItem";
 import { HeaderBack, HeaderDelete, HeaderDone, HeaderMenu } from "@/components/Screens/Folders/FoldersHeader";
-import BackgroundBlur from "@/components/ui/BackgroundBlur";
+import Background from "@/components/ui/Background";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { useTheme } from "@/hooks/ThemeContext";
 import { removeAnimeFromFolder } from "@/lib/firebase/userFolders";
@@ -150,7 +150,7 @@ export default function FolderScreen() {
     if (loading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 15 }}>
-                <BackgroundBlur />
+                <Background />
                 <ActivityIndicator size={'small'} />
                 <ThemedText>Загрузка</ThemedText>
             </View>
@@ -166,7 +166,7 @@ export default function FolderScreen() {
                         headerLeft: () => <HeaderBack />
                     }}
                 />
-                <BackgroundBlur />
+                <Background />
                 <ContentUnavailableView
                     systemImage='questionmark.folder.fill'
                     title="Папка пуста"
@@ -202,7 +202,7 @@ export default function FolderScreen() {
                     ),
                 }}
             />
-            <BackgroundBlur />
+            <Background />
             <Animated.FlatList
                 itemLayoutAnimation={LinearTransition}
                 data={anime}

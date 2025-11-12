@@ -1,5 +1,5 @@
 import CharacterCard from "@/components/Anime/Details/Characters/CharacterCard";
-import BackgroundBlur from "@/components/ui/BackgroundBlur";
+import Background from "@/components/ui/Background";
 import { useTheme } from "@/hooks/ThemeContext";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useLocalSearchParams } from "expo-router";
@@ -18,7 +18,7 @@ export default function CharactersScreen() {
 
     return (
         <>
-            <BackgroundBlur />
+            <Background />
             <Animated.FlatList
                 entering={FadeIn}
                 exiting={FadeOut}

@@ -1,18 +1,17 @@
 import { getAnime } from '@/API/Yummy/getAnimeYummy';
 import { getYummySchedule, ScheduleAnime, ScheduleSectionType } from '@/API/Yummy/getSchedule';
+import Background from '@/components/ui/Background';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { ThemedView } from '@/components/ui/ThemedView';
 import { useTheme } from '@/hooks/ThemeContext';
 import { useBottomHeight } from '@/hooks/useBottomHeight';
 import { useHeaderHeight } from '@react-navigation/elements';
-import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Dimensions,
-    Platform,
     Pressable,
     SectionList,
     StyleSheet,
@@ -73,26 +72,10 @@ export default function CalendarScreen() {
         </Animated.View>
     );
 
-    const BackgroundBlur = () => {
-        if (Platform.Version < '26.0') {
-            return (
-                <BlurView
-                    tint={isDarkMode ? 'dark' : 'systemChromeMaterialLight'}
-                    intensity={100}
-                    style={[StyleSheet.absoluteFillObject, {
-                        flex: 1,
-                        zIndex: 0,
-                        top: headerHeight,
-                    }]} />
-            );
-        }
-        return null
-    }
-
     if (loading) {
         return (
             <ThemedView darkColor='black' style={styles.center}>
-                <BackgroundBlur />
+                <Background />
                 <ActivityIndicator size="large" />
             </ThemedView>
         );
@@ -100,7 +83,7 @@ export default function CalendarScreen() {
 
     return (
         <ThemedView darkColor='black' style={{ flex: 1 }}>
-            <BackgroundBlur />
+            <Background />
             <SectionList
                 sections={sections}
                 keyExtractor={(item) => item.map(a => a.anime_id).toString()}

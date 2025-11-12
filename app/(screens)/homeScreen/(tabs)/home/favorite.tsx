@@ -2,7 +2,7 @@ import { GradientBlur } from "@/components/GradientBlur";
 import FavoriteItem from "@/components/Screens/Favorite/FavoriteItem";
 import Filters, { OrderT } from "@/components/Screens/Favorite/Filters";
 import SearchFavorite, { SearchFavoriteHandle } from "@/components/Screens/Favorite/SeacrchFavorite";
-import BackgroundBlur from "@/components/ui/BackgroundBlur";
+import Background from "@/components/ui/Background";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useTheme } from "@/hooks/ThemeContext";
 import { useBottomHeight } from "@/hooks/useBottomHeight";
@@ -230,7 +230,7 @@ export default function FavoriteScreen() {
                     />
                 </>
             }
-            <BackgroundBlur/>
+            <Background/>
             <FlashList
                 ref={listRef}
                 data={userFavorites}

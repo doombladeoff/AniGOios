@@ -4,7 +4,7 @@ import Recommendations from '@/components/HomeRecommendations';
 import List from '@/components/List';
 import LatestUpdates from '@/components/List/LatestUpdates';
 import { Page } from '@/components/Screens/Settings/Page';
-import BackgroundBlur from '@/components/ui/BackgroundBlur';
+import Background from '@/components/ui/Background';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useHomeScreenData } from '@/hooks/homeData/useHomeScreenData';
 import { useTheme } from '@/hooks/ThemeContext';
@@ -97,7 +97,7 @@ export default function HomeScreen() {
     if (loading) {
         return (
             <>
-                <BackgroundBlur />
+                <Background />
                 <SkeletonR />
             </>
         );
@@ -105,7 +105,7 @@ export default function HomeScreen() {
 
     return (
         <Page>
-            <BackgroundBlur />
+            <Background />
             {isIOS_26 &&
                 <GradientBlur
                     colors={colors}

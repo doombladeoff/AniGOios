@@ -3,7 +3,7 @@ import { AnimeFields } from "@/API/Shikimori/RequestFields.type";
 import { OrderEnum } from "@/API/Shikimori/RequestInterfaces.interfaces";
 import { ShikimoriAnime } from "@/API/Shikimori/Shikimori.types";
 import AnimeItem from "@/components/Screens/Search/AnimeItem";
-import BackgroundBlur from "@/components/ui/BackgroundBlur";
+import Background from "@/components/ui/Background";
 import { useTheme } from "@/hooks/ThemeContext";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
@@ -87,7 +87,7 @@ export default function AnimeByGenreScreen() {
 
     if (!data.length) return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <BackgroundBlur />
+            <Background />
             <ActivityIndicator size={'small'} />
         </View>
     )
@@ -95,7 +95,7 @@ export default function AnimeByGenreScreen() {
     return (
         <>
             <Stack.Screen options={{ headerTitle: genre_name }} />
-            <BackgroundBlur />
+            <Background />
             <FlashList
                 data={data}
                 renderItem={renderItem}

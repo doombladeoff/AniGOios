@@ -1,25 +1,21 @@
 import { useTheme } from "@/hooks/ThemeContext";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { BlurTint, BlurView } from "expo-blur";
-import { Platform, StyleProp, StyleSheet, ViewStyle } from "react-native";
+import { Platform, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 
-interface BackgroundBlurProps {
-    tint?: BlurTint;
-    intensity?: number;
+interface BackgroundProps {
     style?: StyleProp<ViewStyle>;
 }
 
-const BackgroundBlur = ({ tint, intensity, style }: BackgroundBlurProps) => {
+const Background = ({ style }: BackgroundProps) => {
     const isDarkMode = useTheme().theme === 'dark';
     const headerHeight = useHeaderHeight();
 
     if (Platform.Version < '26.0') {
         return (
-            <BlurView
-                tint={tint ? tint : isDarkMode ? 'dark' : 'systemChromeMaterialLight'}
-                intensity={intensity ? intensity : 100}
+            <View
                 style={style ? style :
                     [StyleSheet.absoluteFillObject, {
+                        backgroundColor: isDarkMode ? "rgb(20,20,20)" : 'rgb(247,248,247)',
                         flex: 1,
                         zIndex: 0,
                         top: headerHeight,
@@ -31,4 +27,4 @@ const BackgroundBlur = ({ tint, intensity, style }: BackgroundBlurProps) => {
     return null
 };
 
-export default BackgroundBlur;
+export default Background;

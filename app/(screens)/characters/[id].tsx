@@ -2,7 +2,7 @@ import { getCharacterJikan } from "@/API/Jikan/getCharacterJikan";
 import { getCharacterShiki } from "@/API/Shikimori/getCharacterShiki";
 import { VoiceOversStack } from "@/components/Anime/Details/Characters";
 import { GradientBlur } from "@/components/GradientBlur";
-import BackgroundBlur from "@/components/ui/BackgroundBlur";
+import Background from "@/components/ui/Background";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
@@ -92,7 +92,7 @@ export default function CharacterScreen() {
     if (loading) {
         return (
             <ThemedView lightColor="white" darkColor="black" style={styles.loaderContainer}>
-                <BackgroundBlur />
+                <Background />
                 <ActivityIndicator size="large" color="white" />
             </ThemedView>
         );

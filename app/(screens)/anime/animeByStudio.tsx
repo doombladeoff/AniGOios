@@ -3,7 +3,7 @@ import { AnimeFields } from "@/API/Shikimori/RequestFields.type";
 import { KindShiki } from "@/API/Shikimori/RequestInterfaces.interfaces";
 import { ShikimoriAnime } from "@/API/Shikimori/Shikimori.types";
 import AnimeItem from "@/components/Screens/Search/AnimeItem";
-import BackgroundBlur from "@/components/ui/BackgroundBlur";
+import Background from "@/components/ui/Background";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { FlashList } from "@shopify/flash-list";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -107,7 +107,7 @@ export default function AnimeStudiosScreen() {
                     headerTitle: name || "Студия",
                 }}
             />
-            <BackgroundBlur />
+            <Background />
             <FlashList
                 data={anime}
                 renderItem={renderItem}

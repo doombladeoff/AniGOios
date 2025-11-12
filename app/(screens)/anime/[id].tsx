@@ -12,7 +12,7 @@ import { default as HeaderRightMenu } from "@/components/Anime/Header/HeaderRigh
 import Player from "@/components/Anime/Player";
 import { CrunchyPoster, Poster3D } from "@/components/Anime/Posters";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import BackgroundBlur from "@/components/ui/BackgroundBlur";
+import Background from "@/components/ui/Background";
 import { ThemedText } from "@/components/ui/ThemedText";
 import { ThemedView } from "@/components/ui/ThemedView";
 import { useAnimeFetch } from "@/hooks/anime/useAnimeFetch";
@@ -80,7 +80,7 @@ export default function AnimeScreen() {
     if (isLoading) {
         return (
             <ThemedView lightColor="white" darkColor="black" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <BackgroundBlur style={[StyleSheet.absoluteFillObject]} />
+                <Background style={[StyleSheet.absoluteFillObject]} />
                 <ActivityIndicator size='small' color={isDarkMode ? 'white' : 'black'} />
                 <ThemedText lightColor="black" darkColor="white" style={{ textAlign: 'center', marginTop: 20 }}>Загрузка...</ThemedText>
             </ThemedView>
