@@ -20,7 +20,6 @@ interface CardProps {
     onSwiped: () => void;
     anim: any;
     N: number;
-    useFlip?: boolean;
 };
 
 export const Card = ({
@@ -30,25 +29,13 @@ export const Card = ({
     onSwiped,
     anim,
     N,
-    useFlip
 }: CardProps) => {
     const isSwiping = useSharedValue(false);
-    const scaleCard = useSharedValue(1);
-
     const gesture = Gesture.Pan()
         .onStart((e) => {
             isSwiping.value = true;
 
         })
-
-        .onBegin(() => {
-            scaleCard.value = withTiming(0.98, { duration: 100 })
-        })
-        .onFinalize(() => (
-            scaleCard.value = withTiming(1, { duration: 150 })
-
-        ))
-
         .onUpdate((e) => {
             if (activeIndex.value % N === index) {
                 translateX.value = e.translationX;
@@ -83,10 +70,6 @@ export const Card = ({
         });
 
     const wiggleX = useSharedValue(0);
-
-    const animatedScaleStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scaleCard.value }],
-    }));
 
     const animatedStyle = useAnimatedStyle(() => {
         const pos = (index - activeIndex.value + N) % N;
@@ -136,26 +119,19 @@ export const Card = ({
         };
     });
 
-
     return (
         <GestureDetector gesture={gesture}>
             <Animated.View style={[animatedStyle, styles.box]}>
                 <Link href={{ pathname: '/(screens)/anime/[id]', params: { id: anim.remote_ids.shikimori_id } }}>
-                    <View
-                        style={[
-                            styles.fullSize,
-                        ]}
-                    >
-                        <Animated.View style={[animatedScaleStyle, styles.box]}>
-                            <View style={[styles.fullSize, styles.card]}>
-                                <Image
-                                    source={{ uri: `https:${anim.poster.huge}` }}
-                                    style={styles.img}
-                                    transition={600}
-                                />
-                            </View>
-                        </Animated.View>
-                    </View>
+                    <Animated.View style={[styles.box]}>
+                        <View style={[styles.fullSize, styles.card]}>
+                            <Image
+                                source={{ uri: `https:${anim.poster.huge}` }}
+                                style={styles.img}
+                                transition={600}
+                            />
+                        </View>
+                    </Animated.View>
                 </Link>
             </Animated.View>
         </GestureDetector>
