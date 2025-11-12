@@ -1,8 +1,9 @@
+import { getAnime } from '@/API/Yummy/getAnimeYummy';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { ThemedView } from '@/components/ui/ThemedView';
 import { useTheme } from '@/hooks/ThemeContext';
+import { useBottomHeight } from '@/hooks/useBottomHeight';
 import { useHeaderHeight } from '@react-navigation/elements';
-import axios from 'axios';
 import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
@@ -50,6 +51,7 @@ type SectionType = {
 export default function CalendarScreen() {
     const isDarkMode = useTheme().theme === 'dark';
     const headerHeight = useHeaderHeight();
+    const bottomHeight = useBottomHeight();
     const [sections, setSections] = useState<SectionType[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -80,7 +82,6 @@ export default function CalendarScreen() {
                 }
             });
 
-            // Преобразуем в секции и группируем по 3 элемента
             const sectionsData: SectionType[] = WEEK_DAYS.map(day => {
                 const items = scheduleByDay[day];
                 const chunked: Anime[][] = [];
@@ -104,24 +105,29 @@ export default function CalendarScreen() {
             fetchSchedule();
     }, []);
 
+    const handleNavigate = async (id: number | string) => {
+        const data = await getAnime(id);
+        if (!data) return;
+
+        const shikimoriId = data.response?.remote_ids?.shikimori_id;
+        if (shikimoriId) {
+            router.push({
+                pathname: "/anime/[id]",
+                params: { id: shikimoriId },
+            });
+        } else {
+            console.warn("[YummyAPI] Нет Shikimori ID");
+        }
+    };
+
     const renderRow = (rowData: Anime[]) => (
         <Animated.View entering={FadeIn} style={styles.row}>
             {rowData.map(anime => (
-                <Pressable onPress={async () => {
-                    try {
-                        const response = await axios.get(`https://api.yani.tv/anime/${anime.anime_id}`);
-                        if (response.status === 200 && response.data.response.remote_ids.shikimori_id) {
-                            router.push({
-                                pathname: '/anime/[id]',
-                                params: { id: response.data.response.remote_ids.shikimori_id }
-                            })
-                        } else {
-                            throw new Error('Ошибка запроса');
-                        }
-                    } catch (error) {
-                        console.error(error)
-                    }
-                }} key={anime.title} style={styles.item}>
+                <Pressable
+                    key={anime.title}
+                    onPress={() => handleNavigate(anime.anime_id)}
+                    style={styles.item}
+                >
                     <View style={{
                         shadowColor: '#000',
                         shadowOffset: { width: 0, height: 4 },
@@ -160,7 +166,7 @@ export default function CalendarScreen() {
         return (
             <ThemedView darkColor='black' style={styles.center}>
                 <BackgroundBlur />
-                <ActivityIndicator size="large" color="black" />
+                <ActivityIndicator size="large" />
             </ThemedView>
         );
     }
@@ -177,6 +183,8 @@ export default function CalendarScreen() {
                 )}
                 stickySectionHeadersEnabled={false}
                 contentInsetAdjustmentBehavior='automatic'
+                contentContainerStyle={{ paddingBottom: bottomHeight }}
+                scrollIndicatorInsets={{ bottom: bottomHeight }}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}

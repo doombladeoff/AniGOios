@@ -8,4 +8,17 @@ export const getAnimeYummy = async (id: number | string) => {
     } catch (error) {
         console.error(error)
     }
-}
+};
+
+export const getAnime = async (id: number | string) => {
+    try {
+        const response = await axios.get(`https://api.yani.tv/anime/${id}`);
+        if (response.status === 200 && response.data) {
+            return response.data
+        }
+        else
+            throw new Error('Ошибка запроса');
+    } catch (error) {
+        console.error('[YummyAPI] Ошибка получения данных:', error);
+    }
+};
