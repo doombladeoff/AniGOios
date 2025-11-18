@@ -21,7 +21,7 @@ const RecommendationList = (props: RecommendationListProps) => {
         <View>
             {props.showTitle && <ThemedText style={styles.text}>Рекомендации</ThemedText>}
             <FlatList
-                data={data}
+                data={data.slice(0, 10)}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{
@@ -29,7 +29,7 @@ const RecommendationList = (props: RecommendationListProps) => {
                     marginVertical: 10,
                 }}
                 renderItem={({ item }) => <RecommendationItem item={item} />}
-                keyExtractor={(item) => item.entry?.mal_id.toString() || item.anime_id.toString()}
+                keyExtractor={(item, index) => item?.id.toString() || item.entry?.mal_id.toString() || item?.anime_id.toString() || `rec-item-${index}`}
             />
         </View>
     );

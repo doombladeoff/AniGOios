@@ -1,40 +1,31 @@
 import { getAnimeByMalId } from "@/API/Anilist/getAnimeById";
 import { getCrunchyrollIData } from "@/API/Crunchyroll/getCrunchyrollData";
-import { getRecommendationsJikan } from "@/API/Jikan/getRecommendationsJikan";
+import { getRecommendationsById } from "@/API/Shikimori/getRecommendationsById";
 import { getAnimeList } from "@/API/Shikimori/RequestAnime";
-import { getAnimeYummy } from "@/API/Yummy/getAnimeYummy";
-import { getEpisodesFromYummy } from "@/API/Yummy/getEpisodesFromYummy";
-import { getRecommendationsYummy } from "@/API/Yummy/Recommendations/getRecommendationsYummy";
 import { useAnimeStore } from "@/store/animeStore";
 import { storage } from "@/utils/storage";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 
 async function fetchAnimeById(id: number | string, fetchCrunch: boolean) {
-    let recommendations = [];
-    const [animeShiki, animeListData, recommendsJikan, yummy] = await Promise.all([
+    const [animeShiki, animeListData, recommendationsShikimori] = await Promise.all([
         getAnimeList({ ids: id as string }).then((res) => res[0]),
         getAnimeByMalId(Number(id)),
-        getRecommendationsJikan(id as string),
-        getAnimeYummy(id as string),
+        getRecommendationsById(id),
     ]);
 
     if (!animeShiki) return null;
 
-    const [crunchData, yummyRecs, yummyEpisodes] = await Promise.all([
-        (fetchCrunch && animeListData) ? getCrunchyrollIData(animeListData, animeShiki.malId) : null,
-        (!recommendsJikan.length && yummy.length) ? getRecommendationsYummy(yummy[0].anime_id) : [],
-        false ? getEpisodesFromYummy({ shikimori_id: animeShiki.malId }) : [],
-    ]);
-
-    recommendations = recommendsJikan.length > 1 ? recommendsJikan : yummyRecs.length > 1 ? yummyRecs : [];
+    let crunchData = null;
+    if (fetchCrunch && animeListData) {
+        crunchData = await getCrunchyrollIData(animeListData, animeShiki.malId);
+    }
 
     return {
         ...animeShiki,
         crunchyroll: crunchData,
         ...(animeListData && { animeList: animeListData }),
-        recommendations,
-        yummyEpisodes,
+        recommendations: recommendationsShikimori,
     };
 }
 
@@ -52,30 +43,30 @@ export const useAnimeFetch = (id: number | string) => {
         ? true
         : storage?.get3DPoster?.() ?? false;
 
+    const load = async () => {
+        if (animeFromStore) {
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const data = await fetchAnimeById(id, fetchCrunch);
+            if (data) {
+                setAnimeStore(Number(id), data);
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.error("Ошибка при загрузке аниме по id:", error);
+            router.replace({
+                pathname: "/(screens)/error",
+                params: { errText: String(error) },
+            });
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const load = async () => {
-            if (animeFromStore) {
-                setIsLoading(false);
-                return;
-            }
-
-            setIsLoading(true);
-            try {
-                const data = await fetchAnimeById(id, fetchCrunch);
-                if (data) {
-                    setAnimeStore(Number(id), data);
-                }
-            } catch (error) {
-                console.error("Ошибка при загрузке аниме по id:", error);
-                router.replace({
-                    pathname: "/(screens)/error",
-                    params: { errText: String(error) },
-                });
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         load();
     }, [id]);
 

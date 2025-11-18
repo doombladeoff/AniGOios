@@ -7,7 +7,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 export const RecommendationItem = ({ item }: { item: any }) => {
 
     const handleNavigate = () => {
-        const id = item?.entry?.mal_id || item?.remote_ids?.shikimori_id;
+        const id = item?.id || item?.entry?.mal_id || item?.remote_ids?.shikimori_id;
         router.push({
             pathname: "/(screens)/anime/[id]",
             params: { id },
@@ -15,10 +15,11 @@ export const RecommendationItem = ({ item }: { item: any }) => {
     };
 
     const imageUrl =
+        `https://shikimori.one${item?.image?.original}` ||
         item?.entry?.images?.webp?.large_image_url ||
         `https:${item?.poster?.fullsize}`;
 
-    const title = item?.entry?.title || item?.title;
+    const title = item?.russian || item?.entry?.title || item?.title;
 
     return (
         <Pressable
